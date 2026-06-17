@@ -18,11 +18,6 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Skip rendering Navbar on Admin Panel routes
-  if (pathname?.startsWith('/admin')) {
-    return null;
-  }
-
   // Detect scroll to add shadow/border
   useEffect(() => {
     const handleScroll = () => {
@@ -35,6 +30,11 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Skip rendering Navbar on Admin Panel routes
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   const totalCartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const wishlistCount = wishlist.length;
