@@ -48,6 +48,24 @@ export default function AdminSettings() {
     reader.readAsDataURL(file);
   };
 
+  // Parse local video files to base64 strings
+  const handleConfigVideoUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 8 * 1024 * 1024) {
+      alert('The chosen video is larger than 8MB. For best performance, please use an optimized loop.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setter(base64String);
+    };
+    reader.readAsDataURL(file);
+  };
+
   useEffect(() => {
     const loadSettings = async () => {
       try {
@@ -398,15 +416,42 @@ export default function AdminSettings() {
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Hero Loop Video URL (Optional)</label>
-                <input
-                  type="text"
-                  value={heroVideoUrl}
-                  onChange={(e) => setHeroVideoUrl(e.target.value)}
-                  placeholder="e.g. https://www.w3schools.com/html/mov_bbb.mp4"
-                  className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm font-sans"
-                />
+              {/* Hero Video Uploader & Preview */}
+              <div className="space-y-2 p-3 bg-stone-50 rounded-sm border border-stone-200/60">
+                <label className="text-[10px] text-stone-600 font-bold uppercase tracking-wider block">Hero Banner Loop Video</label>
+                <div className="flex items-center space-x-4">
+                  {heroVideoUrl ? (
+                    <div className="relative w-16 h-20 bg-stone-100 border border-stone-200 rounded-sm overflow-hidden flex-shrink-0 flex items-center justify-center">
+                      <video src={heroVideoUrl} className="object-cover w-full h-full" muted />
+                      <button
+                        type="button"
+                        onClick={() => setHeroVideoUrl('')}
+                        className="absolute top-1 right-1 bg-red-650 text-white rounded-full p-0.5 shadow-sm hover:opacity-90 transition-opacity z-10"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-16 h-20 border border-dashed border-stone-300 rounded-sm flex items-center justify-center text-stone-400 flex-shrink-0 text-[10px] font-bold">
+                      <ImageIcon className="h-5 w-5" />
+                    </div>
+                  )}
+                  <div className="flex-grow space-y-1.5">
+                    <input
+                      type="file"
+                      accept="video/mp4,video/webm"
+                      onChange={(e) => handleConfigVideoUpload(e, setHeroVideoUrl)}
+                      className="w-full text-xs text-stone-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-sm file:border-0 file:text-[10px] file:font-bold file:uppercase file:bg-stone-950 file:text-white hover:file:opacity-90 cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Or paste loop video URL..."
+                      value={heroVideoUrl.startsWith('data:') ? '' : heroVideoUrl}
+                      onChange={(e) => setHeroVideoUrl(e.target.value)}
+                      className="w-full bg-white border border-stone-200 px-3 py-1.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm font-sans"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Hero Image Uploader & Preview */}
