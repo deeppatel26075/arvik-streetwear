@@ -19,6 +19,11 @@ export default function AdminSettings() {
   const [bgImageUrl, setBgImageUrl] = useState('');
   const [nextDropDate, setNextDropDate] = useState('2026-06-25T18:00');
 
+  // Payment configuration
+  const [paymentMode, setPaymentMode] = useState('simulation'); // 'simulation' | 'live'
+  const [razorpayKeyId, setRazorpayKeyId] = useState('');
+  const [razorpayKeySecret, setRazorpayKeySecret] = useState('');
+
   // Instagram Lookbook Gallery Images
   const [gallery1, setGallery1] = useState('https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=600');
   const [gallery2, setGallery2] = useState('https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=600');
@@ -92,6 +97,11 @@ export default function AdminSettings() {
             setBgImageUrl(parsed.general_config.bg_image_url || '');
             setNextDropDate(parsed.general_config.next_drop_date || '2026-06-25T18:00');
           }
+          if (parsed.payment_config) {
+            setPaymentMode(parsed.payment_config.payment_mode || 'simulation');
+            setRazorpayKeyId(parsed.payment_config.key_id || '');
+            setRazorpayKeySecret(parsed.payment_config.key_secret || '');
+          }
           if (parsed.gallery_config) {
             setGallery1(parsed.gallery_config.img1 || '');
             setGallery2(parsed.gallery_config.img2 || '');
@@ -111,6 +121,7 @@ export default function AdminSettings() {
           const heroConfig = data.find(item => item.key === 'hero_config')?.value;
           const storyConfig = data.find(item => item.key === 'story_config')?.value;
           const generalConfig = data.find(item => item.key === 'general_config')?.value;
+          const paymentConfig = data.find(item => item.key === 'payment_config')?.value;
           const galleryConfig = data.find(item => item.key === 'gallery_config')?.value;
 
           const merged: any = {};
@@ -134,6 +145,12 @@ export default function AdminSettings() {
             setBgImageUrl(generalConfig.bg_image_url || '');
             setNextDropDate(generalConfig.next_drop_date || '2026-06-25T18:00');
             merged.general_config = generalConfig;
+          }
+          if (paymentConfig) {
+            setPaymentMode(paymentConfig.payment_mode || 'simulation');
+            setRazorpayKeyId(paymentConfig.key_id || '');
+            setRazorpayKeySecret(paymentConfig.key_secret || '');
+            merged.payment_config = paymentConfig;
           }
           if (galleryConfig) {
             setGallery1(galleryConfig.img1 || '');
@@ -184,6 +201,11 @@ export default function AdminSettings() {
         bg_image_url: bgImageUrl,
         next_drop_date: nextDropDate,
       },
+      payment_config: {
+        payment_mode: paymentMode,
+        key_id: razorpayKeyId,
+        key_secret: razorpayKeySecret,
+      },
       gallery_config: {
         img1: gallery1,
         img2: gallery2,
@@ -199,6 +221,7 @@ export default function AdminSettings() {
       await supabase.from('site_settings').upsert({ key: 'hero_config', value: localSettings.hero_config });
       await supabase.from('site_settings').upsert({ key: 'story_config', value: localSettings.story_config });
       await supabase.from('site_settings').upsert({ key: 'general_config', value: localSettings.general_config });
+      await supabase.from('site_settings').upsert({ key: 'payment_config', value: localSettings.payment_config });
       await supabase.from('site_settings').upsert({ key: 'gallery_config', value: localSettings.gallery_config });
 
       // Update localStorage cache
@@ -570,6 +593,50 @@ export default function AdminSettings() {
                   className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm font-sans"
                 />
               </div>
+            </div>
+
+            {/* Section: Payment Gateway */}
+            <div className="space-y-4 pt-4 border-t border-stone-100">
+              <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider block border-b pb-1.5 font-syne">Payment Gateway Configurations</span>
+              
+              <div className="space-y-1">
+                <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Checkout Payment Mode</label>
+                <select
+                  value={paymentMode}
+                  onChange={(e) => setPaymentMode(e.target.value)}
+                  className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm font-sans"
+                >
+                  <option value="simulation">Demo Simulation Mode (Bypass active keys)</option>
+                  <option value="live">Live Gateway Mode (Official Razorpay popup)</option>
+                </select>
+              </div>
+
+              {paymentMode === 'live' && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Razorpay Key ID</label>
+                    <input
+                      type="text"
+                      required
+                      value={razorpayKeyId}
+                      onChange={(e) => setRazorpayKeyId(e.target.value)}
+                      placeholder="rzp_test_..."
+                      className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm font-mono"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Razorpay Key Secret</label>
+                    <input
+                      type="password"
+                      required
+                      value={razorpayKeySecret}
+                      onChange={(e) => setRazorpayKeySecret(e.target.value)}
+                      placeholder="••••••••••••••••"
+                      className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm font-mono"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Section: Website Styling */}

@@ -16,7 +16,24 @@ export async function POST(request: Request) {
     } = await request.json();
 
     // 1. Signature Verification
-    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'mockkeysecret456';
+    let paymentConfig: any = {};
+    try {
+      const { data } = await supabase
+        .from('site_settings')
+        .select('*')
+        .eq('key', 'payment_config')
+        .single();
+      if (data && data.value) {
+        paymentConfig = data.value;
+      }
+    } catch (e) {
+      console.warn('Failed to load DB payment config in verify:', e);
+    }
+
+    const isLive = paymentConfig.payment_mode === 'live';
+    const key_secret = isLive
+      ? (paymentConfig.key_secret || process.env.RAZORPAY_KEY_SECRET || 'mockkeysecret456')
+      : 'mockkeysecret456';
     
     // Create text combination
     const text = `${razorpay_order_id}|${razorpay_payment_id}`;
@@ -29,8 +46,8 @@ export async function POST(request: Request) {
 
     const isVerified = generated_signature === razorpay_signature;
 
-    // Check if it's a mock key bypass (for demo/sandbox testing)
-    const isMock = key_secret === 'mockkeysecret456' || razorpay_signature === 'mock_signature';
+    // Check if it's a mock key bypass (for demo/sandbox testing or Cash on Delivery)
+    const isMock = !isLive || key_secret === 'mockkeysecret456' || razorpay_signature === 'mock_signature' || razorpay_order_id?.startsWith('order_mock_') || razorpay_payment_id === 'pay_cod';
 
     if (!isVerified && !isMock) {
       return NextResponse.json({ error: 'Payment signature verification failed' }, { status: 400 });
