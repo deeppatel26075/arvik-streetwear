@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCart, WishlistItem } from '@/context/CartContext';
 import { formatPrice } from '@/lib/utils';
-import { Heart, ShoppingBag } from 'lucide-react';
+import { Heart, ShoppingBag, X } from 'lucide-react';
 
 interface ProductImage {
   image_url: string;
@@ -28,6 +28,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart, toggleWishlist, isInWishlist } = useCart();
   const [hovered, setHovered] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [showSizes, setShowSizes] = useState(false);
 
   const images = product.product_images || [];
   const primaryImage = images[0]?.image_url || '/placeholder-tee.jpg';
@@ -139,8 +140,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        {/* Quick Add Overlay on Hover */}
-        <div className="absolute inset-x-0 bottom-0 bg-stone-950/80 backdrop-blur-xs p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-10">
+        {/* Quick Add Overlay on Hover (Desktop Only) */}
+        <div className="hidden md:block absolute inset-x-0 bottom-0 bg-stone-950/80 backdrop-blur-xs p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-10">
           <p className="text-[10px] text-stone-300 font-bold uppercase tracking-widest mb-2 text-center">
             {adding ? 'Adding to Bag...' : 'Quick Add Size'}
           </p>
@@ -166,7 +167,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </Link>
 
       {/* Product Information */}
-      <div className="p-4 flex flex-col flex-grow bg-white border-t border-stone-100">
+      <div className="p-3 sm:p-4 flex flex-col flex-grow bg-white border-t border-stone-100">
         <span className="text-[9px] text-stone-400 font-bold uppercase tracking-widest mb-1">
           {product.category?.name || 'Streetwear'}
         </span>
@@ -176,7 +177,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         >
           {product.name}
         </Link>
-        <div className="mt-auto flex items-center space-x-2">
+        <div className="flex items-center space-x-2 mb-3">
           <span className="text-xs font-semibold text-stone-950">
             {formatPrice(activePrice)}
           </span>
@@ -184,6 +185,55 @@ export default function ProductCard({ product }: ProductCardProps) {
             <span className="text-[10px] text-stone-400 line-through">
               {formatPrice(product.price)}
             </span>
+          )}
+        </div>
+
+        {/* Add to Cart / Inline Size Selector */}
+        <div className="mt-auto pt-2 border-t border-stone-100/60">
+          {!showSizes ? (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowSizes(true);
+              }}
+              className="w-full border border-stone-200 text-stone-900 bg-white hover:bg-stone-950 hover:text-white text-[10px] font-bold uppercase tracking-widest py-2 rounded-sm transition-colors duration-200 flex items-center justify-center space-x-1.5"
+            >
+              <ShoppingBag className="h-3.5 w-3.5" />
+              <span>Add to Cart</span>
+            </button>
+          ) : (
+            <div className="flex items-center justify-between space-x-1">
+              <span className="text-[9px] font-bold text-stone-400 uppercase tracking-wider flex-shrink-0">Size:</span>
+              <div className="flex items-center space-x-1 overflow-x-auto py-0.5">
+                {availableSizes.length === 0 ? (
+                  <span className="text-[10px] text-stone-400 font-semibold uppercase">Out</span>
+                ) : (
+                  availableSizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={(e) => {
+                        handleQuickAdd(size as any, e);
+                        setShowSizes(false);
+                      }}
+                      className="bg-stone-100 hover:bg-stone-950 hover:text-white text-stone-900 font-bold text-[9px] w-5.5 h-5.5 rounded-full transition-colors flex items-center justify-center"
+                    >
+                      {size}
+                    </button>
+                  ))
+                )}
+              </div>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowSizes(false);
+                }}
+                className="text-stone-400 hover:text-stone-900 p-0.5"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
           )}
         </div>
       </div>

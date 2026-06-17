@@ -156,7 +156,7 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
           variants={staggerContainer}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+          className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-8"
         >
           {displayProducts.slice(0, 4).map((product) => (
             <motion.div key={product.id} variants={fadeIn}>
