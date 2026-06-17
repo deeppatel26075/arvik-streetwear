@@ -115,8 +115,8 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Badges */}
         {isDiscounted && (
-          <span className="absolute top-3 left-3 z-10 bg-accent text-white text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-xs">
-            Sale
+          <span className="absolute top-3 left-3 z-10 bg-yellow-400 text-stone-950 text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-sm shadow-md">
+            {Math.round(((product.price - activePrice) / product.price) * 100)}% OFF
           </span>
         )}
 

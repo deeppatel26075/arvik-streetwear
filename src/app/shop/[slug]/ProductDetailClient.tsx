@@ -289,8 +289,26 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           </button>
         </div>
 
+        {/* Streetwear Trust Elements & Offers (Veirdo Style) */}
+        <div className="bg-stone-50 border border-stone-200/60 p-4 rounded-sm text-xs space-y-3.5 mt-2 shadow-xs">
+          <div className="flex items-center space-x-2.5 text-stone-850">
+            <span className="bg-yellow-400 text-stone-950 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-xs">OFFER</span>
+            <span className="font-extrabold uppercase tracking-wider text-[10px]">⚡ Buy any 3 at ₹1199 (Code: B31199)</span>
+          </div>
+          <div className="flex items-center space-x-2.5 text-stone-800">
+            <Truck className="h-4.5 w-4.5 text-stone-500 flex-shrink-0" />
+            <span className="font-medium tracking-wide">Free shipping on priority prepaid orders above ₹1499</span>
+          </div>
+          <div className="flex items-center space-x-2.5 text-stone-800">
+            <svg className="h-4.5 w-4.5 text-stone-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span className="font-medium tracking-wide">100% Premium Heavyweight Cotton Guaranteed</span>
+          </div>
+        </div>
+
         {/* Details accordion sheets */}
-        <div className="border-t border-stone-200 mt-8 pt-4 space-y-3">
+        <div className="border-t border-stone-200 mt-6 pt-4 space-y-3">
           {/* Tab switches */}
           <div className="flex space-x-6 border-b border-stone-100 pb-2 text-xs font-bold uppercase tracking-wider">
             <button
@@ -316,7 +334,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <div className="py-2 text-[11px] sm:text-xs text-stone-600 leading-relaxed font-light">
             {activeTab === 'details' && (
               <p>
-                ARVIK street fit features dropped shoulders, a tighter collar lock, and structured length that sits perfectly on trousers or cargo pants. Handcrafted details. Double stitch hemline.
+                ARVIIK street fit features dropped shoulders, a tighter collar lock, and structured length that sits perfectly on trousers or cargo pants. Handcrafted details. Double stitch hemline.
               </p>
             )}
 

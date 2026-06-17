@@ -14,7 +14,7 @@ export default function ProductDetailFallback({ slug }: ProductDetailFallbackPro
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('arvik_custom_products');
+      const stored = localStorage.getItem('arviik_custom_products');
       if (stored) {
         const parsed = JSON.parse(stored);
         const found = parsed.find((p: any) => p.slug === slug);

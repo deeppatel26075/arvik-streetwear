@@ -13,20 +13,42 @@ export default function AdminOrders() {
   const loadOrders = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*, order_items(*, products(name))')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error(error);
+      
+      // Load local orders for offline/local prototype mode
+      let localOrdersList: any[] = [];
+      try {
+        const stored = localStorage.getItem('arviik_custom_orders');
+        if (stored) {
+          localOrdersList = JSON.parse(stored);
+        }
+      } catch (e) {
+        console.error('Failed to load local orders:', e);
       }
 
-      if (data && data.length > 0) {
-        setOrders(data);
+      let dbOrders: any[] = [];
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*, order_items(*, products(name))')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error(error);
+        } else if (data) {
+          dbOrders = data;
+        }
+      } catch (dbErr) {
+        console.warn('Supabase orders fetch skipped/failed, using local/mock orders:', dbErr);
+      }
+
+      // Combine both lists (local first, then DB)
+      const combined = [...localOrdersList, ...dbOrders];
+
+      if (combined.length > 0) {
+        setOrders(combined);
       } else {
         // Fallback mock orders
-        setOrders([
+        const mockList = [
           {
             id: 'ORD-89472',
             created_at: new Date().toISOString(),
@@ -40,7 +62,7 @@ export default function AdminOrders() {
             total_amount: 2598,
             status: 'pending',
             order_items: [
-              { size: 'M', quantity: 2, price: 1299, products: { name: 'ESSENTIALS LOGO TEE' } }
+              { size: 'M', quantity: 2, price: 1299, products: { name: 'FAREBI OVERSIZED OLIVE TEE' } }
             ]
           },
           {
@@ -56,7 +78,7 @@ export default function AdminOrders() {
             total_amount: 1299,
             status: 'delivered',
             order_items: [
-              { size: 'S', quantity: 1, price: 1299, products: { name: 'ARCHIVE-01 GRAPHIC TEE' } }
+              { size: 'S', quantity: 1, price: 1299, products: { name: 'POLARIZE VINTAGE CREAM TEE' } }
             ]
           },
           {
@@ -72,10 +94,12 @@ export default function AdminOrders() {
             total_amount: 3897,
             status: 'packing',
             order_items: [
-              { size: 'L', quantity: 3, price: 1299, products: { name: 'ESSENTIALS LOGO TEE' } }
+              { size: 'L', quantity: 3, price: 1299, products: { name: 'MARD PAISA BURGUNDY TEE' } }
             ]
           }
-        ]);
+        ];
+        setOrders(mockList);
+        localStorage.setItem('arviik_custom_orders', JSON.stringify(mockList));
       }
     } catch (e) {
       console.error(e);
@@ -96,17 +120,26 @@ export default function AdminOrders() {
         .eq('id', orderId);
 
       if (error) throw error;
-      
-      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
-      if (selectedOrder && selectedOrder.id === orderId) {
-        setSelectedOrder((prev: any) => ({ ...prev, status: newStatus }));
-      }
     } catch (e) {
-      // Demo update locally if DB fails
-      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
-      if (selectedOrder && selectedOrder.id === orderId) {
-        setSelectedOrder((prev: any) => ({ ...prev, status: newStatus }));
+      console.warn('Supabase status update skipped/failed, applying locally:', e);
+    }
+
+    // Update state
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    if (selectedOrder && selectedOrder.id === orderId) {
+      setSelectedOrder((prev: any) => ({ ...prev, status: newStatus }));
+    }
+
+    // Sync with local storage
+    try {
+      const stored = localStorage.getItem('arviik_custom_orders');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const updated = parsed.map((o: any) => o.id === orderId ? { ...o, status: newStatus } : o);
+        localStorage.setItem('arviik_custom_orders', JSON.stringify(updated));
       }
+    } catch (err) {
+      console.error('Failed to update local order cache status:', err);
     }
   };
 

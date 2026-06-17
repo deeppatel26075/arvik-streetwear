@@ -99,7 +99,7 @@ export default function CheckoutPage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_mockkeyid123',
         amount: orderData.amount,
         currency: orderData.currency,
-        name: 'ARVIK Streetwear',
+        name: 'ARVIIK Streetwear',
         description: 'Order Payment',
         image: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=150',
         order_id: orderData.id,
@@ -143,6 +143,61 @@ export default function CheckoutPage() {
               spread: 80,
               origin: { y: 0.6 },
             });
+
+            // Local cache saving for order and stock decrementing (prototype mode)
+            try {
+              const localOrder = {
+                id: verifyData.orderId || `ORD-${Math.floor(100000 + Math.random() * 900000)}`,
+                created_at: new Date().toISOString(),
+                shipping_name: name,
+                shipping_email: email,
+                shipping_phone: phone,
+                shipping_address: address,
+                shipping_city: city,
+                shipping_state: state,
+                shipping_pincode: pincode,
+                total_amount: getCartTotal(),
+                status: 'pending',
+                order_items: cart.map(item => ({
+                  size: item.size,
+                  quantity: item.quantity,
+                  price: item.discountPrice || item.price,
+                  products: { name: item.name }
+                }))
+              };
+              const existingOrders = JSON.parse(localStorage.getItem('arviik_custom_orders') || '[]');
+              localStorage.setItem('arviik_custom_orders', JSON.stringify([localOrder, ...existingOrders]));
+
+              // Decrement local inventory stock in product listings
+              const storedProducts = localStorage.getItem('arviik_custom_products');
+              if (storedProducts) {
+                const productsList = JSON.parse(storedProducts);
+                const updatedProducts = productsList.map((prod: any) => {
+                  const cartItemsForProduct = cart.filter(item => item.productId === prod.id);
+                  if (cartItemsForProduct.length > 0) {
+                    const updatedSizes = prod.sizes?.map((sizeItem: any) => {
+                      const matchedCartItem = cartItemsForProduct.find(item => item.size === sizeItem.size);
+                      if (matchedCartItem) {
+                        return {
+                          ...sizeItem,
+                          quantity: Math.max(0, sizeItem.quantity - matchedCartItem.quantity)
+                        };
+                      }
+                      return sizeItem;
+                    }) || [];
+                    return {
+                      ...prod,
+                      sizes: updatedSizes,
+                      inventory: updatedSizes
+                    };
+                  }
+                  return prod;
+                });
+                localStorage.setItem('arviik_custom_products', JSON.stringify(updatedProducts));
+              }
+            } catch (e) {
+              console.error('Failed to update local order cache/inventory:', e);
+            }
 
             setCompletedOrderDetails({
               orderId: verifyData.orderId,

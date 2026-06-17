@@ -59,12 +59,12 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
   // Sync with localStorage
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('arvik_custom_products');
+      const stored = localStorage.getItem('arviik_custom_products');
       if (stored) {
         const parsed = JSON.parse(stored);
         const hasOldMocks = parsed.some((p: any) => p.name === 'ARCHIVE-01 GRAPHIC TEE' || p.name === 'ESSENTIALS LOGO TEE');
         if (hasOldMocks) {
-          localStorage.setItem('arvik_custom_products', JSON.stringify(initialProducts));
+          localStorage.setItem('arviik_custom_products', JSON.stringify(initialProducts));
           setLocalProducts(initialProducts);
         } else if (parsed && parsed.length > 0) {
           setLocalProducts(parsed.filter((p: any) => !p.is_hidden));
@@ -146,7 +146,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
       {/* 1. Header Banner */}
       <div className="border-b border-stone-200 pb-6">
         <span className="text-[10px] text-stone-400 font-bold tracking-[0.3em] uppercase">
-          ARVIK Catalog
+          ARVIIK Catalog
         </span>
         <h1 className="font-syne font-extrabold text-3xl uppercase tracking-wider text-stone-900 mt-1">
           Streetwear Drops

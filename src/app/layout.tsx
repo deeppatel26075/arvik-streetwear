@@ -22,11 +22,11 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: 'ARVIK | Premium Oversized Streetwear',
+  title: 'ARVIIK | Premium Oversized Streetwear',
   description: 'Luxury printed oversized T-shirts. Crafted with 240 GSM premium cotton, bold designs, and modern minimalist fits. Wear your identity.',
-  keywords: ['streetwear', 'oversized t-shirts', 'luxury fashion', 'printed tees', 'arvik clothing'],
+  keywords: ['streetwear', 'oversized t-shirts', 'luxury fashion', 'printed tees', 'arviik clothing'],
   openGraph: {
-    title: 'ARVIK | Premium Oversized Streetwear',
+    title: 'ARVIIK | Premium Oversized Streetwear',
     description: 'Luxury printed oversized T-shirts. Wear your identity.',
     type: 'website',
   },

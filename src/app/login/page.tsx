@@ -62,8 +62,8 @@ export default function LoginPage() {
         setPassword('');
       } else {
         // Local bypass for mock testing
-        const isBypassAdmin = email.toLowerCase() === 'admin@arvik.com' && password === 'admin123';
-        const isBypassCustomer = email.toLowerCase() === 'customer@arvik.com' && password === 'customer123';
+        const isBypassAdmin = email.toLowerCase() === 'admin@arviik.com' && password === 'admin123';
+        const isBypassCustomer = email.toLowerCase() === 'customer@arviik.com' && password === 'customer123';
         
         if (isBypassAdmin || isBypassCustomer) {
           signInMock(email);
@@ -111,7 +111,7 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center space-y-1">
           <span className="font-syne font-extrabold text-2xl tracking-[0.25em] text-stone-950">
-            ARVIK
+            ARVIIK
           </span>
           <h2 className="text-xs font-bold uppercase tracking-widest text-stone-400">
             {isRegister ? 'Create Account' : 'Customer Login'}
@@ -207,7 +207,7 @@ export default function LoginPage() {
               <input
                 type="email"
                 required
-                placeholder="customer@arvik.com"
+                placeholder="customer@arviik.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-stone-50 border border-stone-200 px-4 py-3 pl-10 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
@@ -255,8 +255,8 @@ export default function LoginPage() {
         {/* Demo/Testing instructions */}
         <div className="bg-stone-50 border border-stone-150 p-4 rounded-sm space-y-1 text-[10px] text-stone-500 uppercase tracking-wider font-semibold">
           <p className="text-stone-900 font-bold">Demo Logins (Once DB is active):</p>
-          <p>Admin: <strong className="text-stone-700">admin@arvik.com</strong> / <span className="text-stone-600">admin123</span></p>
-          <p>Customer: <strong className="text-stone-700">customer@arvik.com</strong> / <span className="text-stone-600">customer123</span></p>
+          <p>Admin: <strong className="text-stone-700">admin@arviik.com</strong> / <span className="text-stone-600">admin123</span></p>
+          <p>Customer: <strong className="text-stone-700">customer@arviik.com</strong> / <span className="text-stone-600">customer123</span></p>
         </div>
 
       </div>

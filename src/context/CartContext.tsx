@@ -61,9 +61,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Load from localStorage
   useEffect(() => {
     try {
-      const storedCart = localStorage.getItem('arvik_cart');
-      const storedWishlist = localStorage.getItem('arvik_wishlist');
-      const storedCoupon = localStorage.getItem('arvik_coupon');
+      const storedCart = localStorage.getItem('arviik_cart');
+      const storedWishlist = localStorage.getItem('arviik_wishlist');
+      const storedCoupon = localStorage.getItem('arviik_coupon');
 
       if (storedCart) setCart(JSON.parse(storedCart));
       if (storedWishlist) setWishlist(JSON.parse(storedWishlist));
@@ -78,7 +78,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (!isInitialized) return;
     try {
-      localStorage.setItem('arvik_cart', JSON.stringify(cart));
+      localStorage.setItem('arviik_cart', JSON.stringify(cart));
     } catch (err) {
       console.error('Error saving cart:', err);
     }
@@ -87,7 +87,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (!isInitialized) return;
     try {
-      localStorage.setItem('arvik_wishlist', JSON.stringify(wishlist));
+      localStorage.setItem('arviik_wishlist', JSON.stringify(wishlist));
     } catch (err) {
       console.error('Error saving wishlist:', err);
     }
@@ -97,9 +97,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!isInitialized) return;
     try {
       if (coupon) {
-        localStorage.setItem('arvik_coupon', JSON.stringify(coupon));
+        localStorage.setItem('arviik_coupon', JSON.stringify(coupon));
       } else {
-        localStorage.removeItem('arvik_coupon');
+        localStorage.removeItem('arviik_coupon');
       }
     } catch (err) {
       console.error('Error saving coupon:', err);

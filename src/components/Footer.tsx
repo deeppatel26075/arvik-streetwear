@@ -30,7 +30,7 @@ export default function Footer() {
           {/* Brand Info & Newsletter */}
           <div className="lg:col-span-2 space-y-6">
             <h3 className="font-syne font-extrabold text-2xl tracking-[0.25em] text-white">
-              ARVIK
+              ARVIIK
             </h3>
             <p className="text-sm text-stone-400 max-w-sm tracking-wide leading-relaxed">
               Premium printed oversized T-shirts. Crafted with custom heavyweight fabrics and high-density typography to project your identity.
@@ -123,7 +123,7 @@ export default function Footer() {
 
         {/* Footer Bottom */}
         <div className="flex flex-col sm:flex-row items-center justify-between pt-8 text-stone-500 text-[10px] tracking-widest uppercase">
-          <p>© {new Date().getFullYear()} ARVIK CLOTHING. WEAR YOUR IDENTITY.</p>
+          <p>© {new Date().getFullYear()} ARVIIK CLOTHING. WEAR YOUR IDENTITY.</p>
           <div className="flex space-x-6 mt-4 sm:mt-0">
             <span>Razorpay Payments Secure</span>
             <span>Made in India</span>

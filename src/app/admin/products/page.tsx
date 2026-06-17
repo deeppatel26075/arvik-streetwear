@@ -57,7 +57,7 @@ export default function AdminProducts() {
 
       // Check categories
       let loadedCats = [];
-      const storedCats = localStorage.getItem('arvik_custom_categories');
+      const storedCats = localStorage.getItem('arviik_custom_categories');
       if (storedCats) {
         loadedCats = JSON.parse(storedCats);
       } else {
@@ -65,7 +65,7 @@ export default function AdminProducts() {
           const { data: cats } = await supabase.from('categories').select('*');
           if (cats && cats.length > 0) {
             loadedCats = cats;
-            localStorage.setItem('arvik_custom_categories', JSON.stringify(cats));
+            localStorage.setItem('arviik_custom_categories', JSON.stringify(cats));
           }
         } catch (catErr) {
           console.error('Failed to load DB categories:', catErr);
@@ -76,13 +76,13 @@ export default function AdminProducts() {
           { id: 'cat-001', name: 'Graphic Prints', slug: 'graphic-prints' },
           { id: 'cat-002', name: 'Minimalist Typo', slug: 'minimalist-typo' }
         ];
-        localStorage.setItem('arvik_custom_categories', JSON.stringify(loadedCats));
+        localStorage.setItem('arviik_custom_categories', JSON.stringify(loadedCats));
       }
       setCategories(loadedCats);
 
       // Check products
       let loadedProds = [];
-      const storedProds = localStorage.getItem('arvik_custom_products');
+      const storedProds = localStorage.getItem('arviik_custom_products');
       if (storedProds) {
         const parsed = JSON.parse(storedProds);
         const hasOldMocks = parsed.some((p: any) => p.name === 'ARCHIVE-01 GRAPHIC TEE' || p.name === 'ESSENTIALS LOGO TEE');
@@ -94,7 +94,7 @@ export default function AdminProducts() {
             sizes: p.inventory,
             inventory: p.inventory
           }));
-          localStorage.setItem('arvik_custom_products', JSON.stringify(loadedProds));
+          localStorage.setItem('arviik_custom_products', JSON.stringify(loadedProds));
         } else {
           loadedProds = parsed;
         }
@@ -111,7 +111,7 @@ export default function AdminProducts() {
               images: p.product_images?.map((img: any) => img.image_url) || [],
               sizes: p.inventory || [],
             }));
-            localStorage.setItem('arvik_custom_products', JSON.stringify(loadedProds));
+            localStorage.setItem('arviik_custom_products', JSON.stringify(loadedProds));
           }
         } catch (prodErr) {
           console.error('Failed to load DB products:', prodErr);
@@ -126,7 +126,7 @@ export default function AdminProducts() {
           sizes: p.inventory,
           inventory: p.inventory
         }));
-        localStorage.setItem('arvik_custom_products', JSON.stringify(loadedProds));
+        localStorage.setItem('arviik_custom_products', JSON.stringify(loadedProds));
       }
       setProducts(loadedProds);
     } catch (e) {
@@ -293,7 +293,7 @@ export default function AdminProducts() {
         ? products.map((p) => (p.id === editingId ? { ...p, ...mockNewItem } : p))
         : [mockNewItem, ...products];
       setProducts(updated);
-      localStorage.setItem('arvik_custom_products', JSON.stringify(updated));
+      localStorage.setItem('arviik_custom_products', JSON.stringify(updated));
       setFormOpen(false);
     } catch (err) {
       console.warn('Supabase DB write skipped/failed, applying changes locally in localStorage:', err);
@@ -302,7 +302,7 @@ export default function AdminProducts() {
         ? products.map((p) => (p.id === editingId ? { ...p, ...mockNewItem } : p))
         : [mockNewItem, ...products];
       setProducts(updated);
-      localStorage.setItem('arvik_custom_products', JSON.stringify(updated));
+      localStorage.setItem('arviik_custom_products', JSON.stringify(updated));
       setFormOpen(false);
     }
   };
@@ -315,7 +315,7 @@ export default function AdminProducts() {
     }
     const updated = products.map((p) => (p.id === id ? { ...p, is_hidden: !currentHidden } : p));
     setProducts(updated);
-    localStorage.setItem('arvik_custom_products', JSON.stringify(updated));
+    localStorage.setItem('arviik_custom_products', JSON.stringify(updated));
   };
 
   const toggleFeatured = async (id: string, currentFeatured: boolean) => {
@@ -326,7 +326,7 @@ export default function AdminProducts() {
     }
     const updated = products.map((p) => (p.id === id ? { ...p, is_featured: !currentFeatured } : p));
     setProducts(updated);
-    localStorage.setItem('arvik_custom_products', JSON.stringify(updated));
+    localStorage.setItem('arviik_custom_products', JSON.stringify(updated));
   };
 
   const handleDelete = async (id: string) => {
@@ -338,7 +338,7 @@ export default function AdminProducts() {
     }
     const updated = products.filter((p) => p.id !== id);
     setProducts(updated);
-    localStorage.setItem('arvik_custom_products', JSON.stringify(updated));
+    localStorage.setItem('arviik_custom_products', JSON.stringify(updated));
   };
 
   return (

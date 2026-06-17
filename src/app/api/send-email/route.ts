@@ -9,13 +9,13 @@ export async function POST(request: Request) {
     console.log('\n==================================================');
     console.log('📬 SIMULATED CONFIRMATION EMAIL');
     console.log(`To: ${email} (${name})`);
-    console.log(`Subject: Your ARVIK Order Confirmation [${orderId}]`);
+    console.log(`Subject: Your ARVIIK Order Confirmation [${orderId}]`);
     console.log('--------------------------------------------------');
     console.log(`Hello ${name},`);
     console.log(`We have successfully received your payment of INR ${total}.`);
     console.log(`Your order ${orderId} is being prepared in our warehouse.`);
     console.log('Thank you for wearing your identity.');
-    console.log('Team ARVIK.');
+    console.log('Team ARVIIK.');
     console.log('==================================================\n');
 
     return NextResponse.json({ message: 'Email mock sent successfully' });

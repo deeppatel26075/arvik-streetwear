@@ -60,16 +60,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInMock = (email: string) => {
-    const isMockAdmin = email.toLowerCase() === 'admin@arvik.com';
+    const isMockAdmin = email.toLowerCase() === 'admin@arviik.com';
     const mockUser = {
       id: isMockAdmin ? 'mock-admin-id' : 'mock-customer-id',
       email,
-      user_metadata: { full_name: isMockAdmin ? 'Arvik Admin' : 'Demo Customer' },
+      user_metadata: { full_name: isMockAdmin ? 'Arviik Admin' : 'Demo Customer' },
     } as any;
     
     const mockProfile: UserProfile = {
       id: mockUser.id,
-      full_name: isMockAdmin ? 'Arvik Admin' : 'Demo Customer',
+      full_name: isMockAdmin ? 'Arviik Admin' : 'Demo Customer',
       phone: '9999999999',
       role: isMockAdmin ? 'admin' : 'customer',
       shipping_address: '123 Fashion Street',
@@ -80,7 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     try {
-      localStorage.setItem('arvik_mock_session', JSON.stringify({ user: mockUser, profile: mockProfile }));
+      localStorage.setItem('arviik_mock_session', JSON.stringify({ user: mockUser, profile: mockProfile }));
     } catch (e) {
       console.error('Failed to write mock session:', e);
     }
@@ -94,7 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const getInitialSession = async () => {
       try {
         // Check local storage for mock session first
-        const storedMock = localStorage.getItem('arvik_mock_session');
+        const storedMock = localStorage.getItem('arviik_mock_session');
         if (storedMock) {
           const parsed = JSON.parse(storedMock);
           setUser(parsed.user);
@@ -121,7 +121,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         // Ignore auth changes if using mock session
-        if (localStorage.getItem('arvik_mock_session')) {
+        if (localStorage.getItem('arviik_mock_session')) {
           return;
         }
 
@@ -150,7 +150,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Supabase signout failed:', err);
     }
     try {
-      localStorage.removeItem('arvik_mock_session');
+      localStorage.removeItem('arviik_mock_session');
     } catch (e) {}
     setUser(null);
     setProfile(null);

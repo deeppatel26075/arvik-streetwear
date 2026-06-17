@@ -25,7 +25,7 @@ export default function AdminSidebar() {
       {/* Brand Header */}
       <div className="p-6 border-b border-stone-900 flex flex-col">
         <span className="font-syne font-extrabold text-lg text-white tracking-[0.25em] uppercase">
-          ARVIK
+          ARVIIK
         </span>
         <span className="text-[9px] text-stone-500 font-bold uppercase tracking-wider mt-1">
           Control Center

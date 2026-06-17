@@ -1,4 +1,4 @@
--- ARVIK STREETWEAR DATABASE SCHEMA
+-- ARVIIK STREETWEAR DATABASE SCHEMA
 
 -- 1. Create Categories Table
 CREATE TABLE IF NOT EXISTS public.categories (
@@ -147,7 +147,7 @@ DECLARE
   default_role VARCHAR(50) := 'customer';
 BEGIN
   -- If we want to set a specific email as admin, we can check here
-  IF NEW.email = 'admin@arvik.com' THEN
+  IF NEW.email = 'admin@arviik.com' THEN
     default_role := 'admin';
   END IF;
 

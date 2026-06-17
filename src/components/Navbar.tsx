@@ -97,7 +97,7 @@ export default function Navbar() {
                 href="/"
                 className="font-syne font-extrabold text-2xl sm:text-3xl tracking-[0.25em] text-stone-900 transition-opacity hover:opacity-85"
               >
-                ARVIK
+                ARVIIK
               </Link>
             </div>
 
@@ -195,7 +195,7 @@ export default function Navbar() {
             >
               <div className="flex items-center justify-between border-b border-stone-200 pb-3 mb-4">
                 <h3 className="font-syne font-bold uppercase text-stone-900 tracking-wider text-sm">
-                  Search ARVIK
+                  Search ARVIIK
                 </h3>
                 <button
                   onClick={() => setSearchOpen(false)}

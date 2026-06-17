@@ -16,18 +16,18 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
 
   React.useEffect(() => {
     try {
-      const stored = localStorage.getItem('arvik_custom_products');
+      const stored = localStorage.getItem('arviik_custom_products');
       if (stored) {
         const parsed = JSON.parse(stored);
         const hasOldMocks = parsed.some((p: any) => p.name === 'ARCHIVE-01 GRAPHIC TEE' || p.name === 'ESSENTIALS LOGO TEE');
         if (hasOldMocks) {
-          localStorage.setItem('arvik_custom_products', JSON.stringify(products));
+          localStorage.setItem('arviik_custom_products', JSON.stringify(products));
           setDisplayProducts(products);
         } else if (parsed && parsed.length > 0) {
           setDisplayProducts(parsed.filter((p: any) => !p.is_hidden));
         }
       } else {
-        localStorage.setItem('arvik_custom_products', JSON.stringify(products));
+        localStorage.setItem('arviik_custom_products', JSON.stringify(products));
       }
     } catch (e) {
       console.error('Failed to load custom products:', e);
@@ -67,7 +67,7 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
         <div className="absolute inset-0 z-0">
           <Image
             src="/products/mard-paisa-maroon.jpg"
-            alt="ARVIK Streetwear Hero"
+            alt="ARVIIK Streetwear Hero"
             fill
             priority
             sizes="100vw"
@@ -84,7 +84,7 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-[10px] sm:text-xs font-bold tracking-[0.4em] uppercase text-stone-300"
           >
-            ARVIK CLOTHING LAB
+            ARVIIK CLOTHING LAB
           </motion.p>
           
           <motion.h1
@@ -188,7 +188,7 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
                 </h2>
               </div>
               <p className="text-stone-400 text-sm tracking-wide leading-relaxed font-light">
-                At ARVIK, we believe clothing is more than fabric—it is an outward projection of internal identity. Our oversized fits are engineered from custom-woven 240 GSM ring-spun cotton, creating a structure that holds its shape wash after wash.
+                At ARVIIK, we believe clothing is more than fabric—it is an outward projection of internal identity. Our oversized fits are engineered from custom-woven 240 GSM ring-spun cotton, creating a structure that holds its shape wash after wash.
               </p>
               <p className="text-stone-400 text-sm tracking-wide leading-relaxed font-light">
                 Every print uses eco-friendly, premium high-density ink that fuses into the fabric rather than sitting on top, ensuring details remain vibrant over long timelines.
@@ -248,7 +248,7 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
               {
                 name: 'Karan Malhotra',
                 city: 'Mumbai',
-                text: 'The print quality is unmatched. Most oversized tees lose shape around the neck after three washes, but ARVIK feels as heavy and boxy as day one.',
+                text: 'The print quality is unmatched. Most oversized tees lose shape around the neck after three washes, but ARVIIK feels as heavy and boxy as day one.',
                 stars: 5,
               },
               {
@@ -294,7 +294,7 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
       <section className="py-20 space-y-10">
         <div className="text-center space-y-1">
           <span className="text-[10px] text-stone-400 font-bold tracking-[0.3em] uppercase">
-            #ARVIKLAB
+            #ARVIIKLAB
           </span>
           <h2 className="font-syne font-extrabold text-2xl uppercase tracking-wider text-stone-900">
             Instagram Gallery

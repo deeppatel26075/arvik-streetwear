@@ -9,7 +9,7 @@ export default function AdminSettings() {
   const [heroSlogan, setHeroSlogan] = useState('Heavyweight fabrics. Bold printed oversized silhouettes. Premium local craftsmanship.');
   const [heroImageUrl, setHeroImageUrl] = useState('https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=1600');
   const [brandStoryTitle, setBrandStoryTitle] = useState('Engineered Streetwear');
-  const [brandStoryDesc, setBrandStoryDesc] = useState('At ARVIK, we believe clothing is more than fabric—it is an outward projection of internal identity.');
+  const [brandStoryDesc, setBrandStoryDesc] = useState('At ARVIIK, we believe clothing is more than fabric—it is an outward projection of internal identity.');
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
