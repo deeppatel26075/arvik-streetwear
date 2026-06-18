@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin as supabase } from '@/lib/supabaseAdmin';
 
 export async function POST(request: Request) {
   try {
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
       .from('orders')
       .insert({
         user_id: userId || null,
-        status: isCod ? 'cod_pending' : 'pending',
+        status: 'pending',
         total_amount: total,
         coupon_id: coupon_db_id,
         shipping_name: shipping.name,
