@@ -80,7 +80,7 @@ export default function ProfilePage() {
       try {
         const { data, error } = await supabase
           .from('orders')
-          .select('*, order_items(*, products(*, product_images(image_url))))')
+          .select('*, order_items(*, products(*, product_images(image_url)))')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
