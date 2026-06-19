@@ -238,7 +238,7 @@ export default function LoginPage() {
         {/* Demo/Testing instructions */}
         <div className="bg-stone-50 border border-stone-150 p-4 rounded-sm space-y-1 text-[10px] text-stone-500 uppercase tracking-wider font-semibold">
           <p className="text-stone-900 font-bold">Demo Logins (Once DB is active):</p>
-          <p>Admin: <strong className="text-stone-700">admin@arviik.com</strong> / <span className="text-stone-600">admin123</span></p>
+          <p>Admin: <strong className="text-stone-700">16patelrishi10@gmail.com</strong> / <span className="text-stone-600">Rishi1610</span></p>
           <p>Customer: <strong className="text-stone-700">customer@arviik.com</strong> / <span className="text-stone-600">customer123</span></p>
         </div>
 
