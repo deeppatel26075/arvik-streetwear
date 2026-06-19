@@ -4,6 +4,8 @@ import { supabase } from '@/lib/supabase';
 import ProductCard from '@/components/ProductCard';
 import HomeClientWrapper from './HomeClientWrapper';
 
+export const dynamic = 'force-dynamic';
+
 // Define the mock products to display if Supabase fails or doesn't have data yet
 export const MOCK_PRODUCTS = [
   {

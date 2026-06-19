@@ -3,6 +3,8 @@ import { MOCK_PRODUCTS } from '../page';
 import ShopClient from './ShopClient';
 import { Suspense } from 'react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ShopPage() {
   let dbProducts = [];
   let dbCategories = [];
