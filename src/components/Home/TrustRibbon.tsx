@@ -5,7 +5,6 @@ import { Users, Truck, RotateCcw, ShieldCheck } from 'lucide-react';
 
 export default function TrustRibbon() {
   const points = [
-    { label: '40K+ HAPPY CUSTOMERS', icon: Users },
     { label: 'FREE SHIPPING', icon: Truck },
     { label: 'EASY RETURNS', icon: RotateCcw },
     { label: 'COD AVAILABLE', icon: ShieldCheck }

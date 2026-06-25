@@ -29,9 +29,13 @@ export default function Footer() {
           
           {/* Brand Info & Newsletter */}
           <div className="lg:col-span-2 space-y-6">
-            <h3 className="font-syne font-extrabold text-2xl tracking-[0.25em] text-white">
-              ARVIIK
-            </h3>
+            <div className="bg-white p-3.5 inline-block rounded-xs">
+              <img
+                src="/logo.jpg"
+                alt="ARVIIK Logo"
+                className="h-10 w-auto object-contain"
+              />
+            </div>
             <p className="text-sm text-stone-400 max-w-sm tracking-wide leading-relaxed">
               Premium printed oversized T-shirts. Crafted with custom heavyweight fabrics and high-density typography to project your identity.
             </p>

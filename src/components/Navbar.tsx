@@ -22,10 +22,10 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const announcements = [
+    "⚡ Prepaid Orders Will Be Shipped On Priority",
     "🔥 Oversized Tees SALE | Buy Any 3 @1199",
     "⚡ FREE SHIPPING ACROSS INDIA",
-    "⚡ EASY RETURNS & COD AVAILABLE",
-    "⚡ LIMITED DROP LIVE | SHOP NOW"
+    "⚡ EASY RETURNS & COD AVAILABLE"
   ];
 
   // Rotate announcement messages
@@ -60,7 +60,7 @@ export default function Navbar() {
     <>
       <header className="fixed top-0 left-0 w-full z-40 bg-white border-b border-stone-200">
         {/* Dynamic Announcement Bar */}
-        <div className="bg-secondary text-white py-2 text-center text-xs font-black tracking-wider uppercase select-none transition-all duration-300">
+        <div className="bg-[#106bc5] text-white py-2 text-center text-xs font-black tracking-wider uppercase select-none transition-all duration-300">
           <AnimatePresence mode="wait">
             <motion.div
               key={announcementIdx}
@@ -88,14 +88,13 @@ export default function Navbar() {
             
             <Link
               href="/"
-              className="font-syne font-extrabold text-2xl sm:text-3xl uppercase tracking-normal select-none italic logo-retro transform skew-x-[-12deg] inline-block pr-1"
+              className="flex items-center select-none"
             >
-              <span>A</span>
-              <span className="inline-block scale-x-[-1]">R</span>
-              <span>V</span>
-              <span>I</span>
-              <span>I</span>
-              <span className="inline-block scale-x-[-1]">K</span>
+              <img
+                src="/logo.jpg"
+                alt="ARVIIK Logo"
+                className="h-10 w-auto object-contain mix-blend-multiply"
+              />
             </Link>
           </div>
 

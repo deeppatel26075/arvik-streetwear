@@ -109,7 +109,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div
-      className="group relative flex flex-col bg-white border border-stone-200 rounded-sm overflow-hidden shadow-xs hover:shadow-md transition-shadow duration-300 select-none"
+      className="group relative flex flex-col bg-white border border-stone-200 rounded-sm overflow-hidden shadow-2xs hover:shadow-sm transition-shadow duration-300 select-none"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -126,31 +126,30 @@ export default function ProductCard({ product }: ProductCardProps) {
         >
           <Heart
             className={`h-4 w-4 transition-colors ${
-              isFavorited ? 'fill-sale text-sale' : 'text-stone-600'
+              isFavorited ? 'fill-sale text-sale animate-pulse' : 'text-stone-600'
             }`}
           />
         </button>
 
-        {/* Top-Left Bestseller tag */}
-        <span className="absolute top-2.5 left-2.5 z-10 bg-emerald-50 text-success text-[8px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full border border-success/10">
+        {/* Top-Left Bestseller tag: Solid green background as in Veirdo photo */}
+        <span className="absolute top-2.5 left-2.5 z-10 bg-[#0f8a5f] text-white text-[8px] font-black tracking-wider uppercase px-2 py-0.5 rounded-xs shadow-xs">
           BEST SELLER
         </span>
 
         {/* Bottom-Left Rating Badges */}
-        <div className="absolute bottom-2.5 left-2.5 z-10 bg-white/85 backdrop-blur-xs px-2 py-0.5 rounded-full flex items-center space-x-1 text-[8px] font-black text-stone-850 shadow-xs">
-          <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-500" />
-          <span>{product.rating || 4.6}</span>
-          <span className="text-stone-400">|</span>
-          <span className="text-stone-500 font-bold">{product.reviews || 230}</span>
+        <div className="absolute bottom-2.5 left-2.5 z-10 bg-white/95 px-2 py-0.5 rounded-full flex items-center space-x-1 text-[9px] font-bold text-stone-850 shadow-xs border border-stone-100">
+          <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+          <span>{product.rating || 4.5}</span>
+          <span className="text-stone-300">|</span>
+          <span className="text-stone-500 font-semibold">{product.reviews || 320}</span>
         </div>
 
         {/* Bottom-Right Color Swatches indicators */}
-        <div className="absolute bottom-2.5 right-2.5 z-10 bg-white/80 backdrop-blur-xs px-2 py-0.5 rounded-full flex items-center space-x-1 text-[8px] font-bold text-stone-500 shadow-xs">
+        <div className="absolute bottom-2.5 right-2.5 z-10 bg-white/95 px-2 py-0.5 rounded-full flex items-center space-x-1 text-[9px] font-bold text-stone-500 shadow-xs border border-stone-100">
           <div className="flex space-x-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-stone-950 inline-block" />
-            <span className="w-1.5 h-1.5 rounded-full bg-stone-100 border border-stone-300 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-amber-100 border border-stone-300 inline-block" />
+            <span className="w-2 h-2 rounded-full bg-blue-600 inline-block" />
           </div>
-          <span>+2</span>
         </div>
 
         {/* Primary/Secondary Image swaps */}
@@ -174,47 +173,39 @@ export default function ProductCard({ product }: ProductCardProps) {
       </Link>
 
       {/* Product Details info */}
-      <div className="p-3.5 flex flex-col flex-grow bg-white">
+      <div className="p-3.5 flex flex-col flex-grow bg-white space-y-1">
         {/* Brand label */}
-        <span className="text-[8px] text-stone-450 font-bold uppercase tracking-widest mb-0.5">
+        <span className="text-[8px] text-stone-400 font-bold uppercase tracking-widest">
           ARVIIK CLOTHING
         </span>
         
-        {/* Title */}
-        <Link
-          href={`/shop/${product.slug}`}
-          onClick={handleProductClick}
-          className="font-syne font-black text-[11px] sm:text-xs uppercase text-stone-900 tracking-wider hover:text-secondary transition-colors line-clamp-1 mb-1.5"
-        >
-          {product.name}
-        </Link>
-
-        {/* Multi-Price Row */}
-        <div className="flex items-center space-x-2 mb-1.5">
-          <span className="text-xs font-black text-stone-950">
+        {/* Pricing Row (MRP, Price, Discount in Green) - Placed BEFORE title as in photo */}
+        <div className="flex items-center space-x-2">
+          <span className="text-sm font-black text-stone-950">
             {formatPrice(priceVal)}
           </span>
           <span className="text-[10px] text-stone-400 line-through">
             {formatPrice(mrpVal)}
           </span>
-          <span className="text-[9px] text-sale font-black uppercase">
+          <span className="text-[10px] text-emerald-600 font-black">
             {discountVal}% OFF
           </span>
         </div>
 
-        {/* Best Price capsule */}
-        <div className="flex items-center space-x-1.5 bg-emerald-50/60 border border-success/5 py-1 px-2.5 rounded-sm mb-3">
-          <span className="text-[8px] bg-success text-white w-3 h-3 rounded-full flex items-center justify-center font-bold">%</span>
-          <span className="text-[9px] font-black text-success uppercase">
-            Best Price: {formatPrice(bestPriceVal)}
-          </span>
+        {/* Best Price Capsule (Bullet + Green text) */}
+        <div className="flex items-center space-x-1.5 text-[10px] text-emerald-600 font-black">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+          <span>Best price {formatPrice(bestPriceVal)}</span>
         </div>
 
-        {/* Nudge notification labels */}
-        <div className="flex justify-between items-center text-[8px] font-extrabold text-stone-400 uppercase tracking-wider mb-3.5">
-          <span className="text-amber-600">🔥 Selling Fast</span>
-          <span>🚚 Ships in 24h</span>
-        </div>
+        {/* Title - Placed AFTER prices as in photo */}
+        <Link
+          href={`/shop/${product.slug}`}
+          onClick={handleProductClick}
+          className="text-stone-500 hover:text-stone-950 text-xs font-semibold line-clamp-2 leading-tight tracking-normal pb-2"
+        >
+          {product.name}
+        </Link>
 
         {/* Action Button: ADD TO CART */}
         <div className="mt-auto border-t border-stone-100/60 pt-3">
@@ -225,21 +216,20 @@ export default function ProductCard({ product }: ProductCardProps) {
                 e.stopPropagation();
                 setShowSizes(true);
               }}
-              className="w-full border border-stone-950 text-stone-950 bg-white hover:bg-stone-950 hover:text-white text-[9px] font-black uppercase tracking-widest py-2 rounded-sm transition-colors duration-200 flex items-center justify-center space-x-1.5"
+              className="w-full border border-stone-300 text-stone-900 bg-white hover:bg-stone-950 hover:text-white hover:border-stone-950 text-[10px] font-black uppercase tracking-widest py-2 rounded-sm transition-all duration-200 flex items-center justify-center space-x-1.5 shadow-2xs"
             >
-              <ShoppingBag className="h-3 w-3" />
               <span>ADD TO CART</span>
             </button>
           ) : (
             <div className="flex items-center justify-between space-x-1">
-              <span className="text-[8px] font-black text-stone-400 uppercase tracking-widest">SIZE:</span>
+              <span className="text-[9px] font-black text-stone-400 uppercase tracking-widest">SIZE:</span>
               <div className="flex items-center space-x-1 overflow-x-auto py-0.5">
                 {availableSizes.map((size) => (
                   <button
                     key={size}
                     onClick={(e) => handleQuickAdd(size as any, e)}
                     disabled={adding}
-                    className="bg-stone-100 hover:bg-stone-950 hover:text-white text-stone-900 font-bold text-[9px] w-5.5 h-5.5 rounded-full transition-colors flex items-center justify-center border border-stone-200 hover:border-stone-950"
+                    className="bg-stone-100 hover:bg-stone-950 hover:text-white text-stone-900 font-bold text-[9px] w-6.5 h-6.5 rounded-full transition-colors flex items-center justify-center border border-stone-200 hover:border-stone-950"
                   >
                     {size}
                   </button>
