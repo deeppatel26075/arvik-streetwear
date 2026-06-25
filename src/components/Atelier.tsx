@@ -123,7 +123,7 @@ export default function Atelier() {
       reply = 'For your evening presence: ARVIIK/003 Burgundy Maroon Tee. The rich boxy drape adds architectural structure under dim lighting. Offset its warm hue with charcoal tailored trousers and minimal metal chains. Bold details. Silence first.';
       suggestions = [catalog[2]];
     } else if (q.includes('street') || q.includes('travel') || q.includes('transit') || q.includes('outdoor')) {
-      reply = 'For your street transit: ARVIIK/001 Olive Oversized Tee. Built with double-hemmed 240 GSM Terry to endure heavy movement. Pair with techwear joggers and dark utility chests. Structured durability.';
+      reply = 'For your street transit: ARVIIK/001 Olive Oversized Tee. Built with double-hemmed 240 GSM Terry to endure heavy movement. Pair with vintage denim and dark utility chest rigs. Structured durability.';
       suggestions = [catalog[0]];
     } else if (q.includes('minimal') || q.includes('business') || q.includes('work') || q.includes('studio')) {
       reply = 'For your studio presence: ARVIIK/004 Navy Blue Tee. Engineered from premium combed fibers for a clean drop-shoulder look. Pair with dark beige utility pants. Focus on the craft, no compromises.';

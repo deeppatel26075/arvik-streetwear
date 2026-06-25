@@ -117,12 +117,12 @@ export default function Navbar() {
               OVERSIZED T-SHIRTS
             </Link>
 
-            <Link href="/shop?category=Joggers" className="text-stone-900 hover:text-secondary transition-colors">
-              JOGGERS
+            <Link href="/shop?category=Graphic+Prints" className="text-stone-900 hover:text-secondary transition-colors">
+              GRAPHIC PRINTS
             </Link>
 
-            <Link href="/shop?category=Hoodies" className="text-stone-900 hover:text-secondary transition-colors">
-              HOODIES
+            <Link href="/shop?category=Minimalist+Typo" className="text-stone-900 hover:text-secondary transition-colors">
+              MINIMALIST TYPO
             </Link>
 
             <Link href="/shop?tag=BESTSELLER" className="text-stone-900 hover:text-secondary transition-colors text-sale">
@@ -221,7 +221,7 @@ export default function Navbar() {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Search for black oversized tees, joggers, hoodies..."
+                    placeholder="Search for black oversized tees, graphic prints..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-stone-50 border border-stone-250 px-4 py-3 text-sm focus:outline-none focus:border-stone-900"

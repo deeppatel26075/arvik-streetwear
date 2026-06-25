@@ -37,18 +37,18 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
   const categoriesList = [
     {
       name: 'Oversized Tees',
+      img: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=600',
+      href: '/shop'
+    },
+    {
+      name: 'Graphic Prints',
+      img: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=600',
+      href: '/shop?category=Graphic+Prints'
+    },
+    {
+      name: 'Minimalist Typo',
       img: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=600',
-      href: '/shop?category=Oversized+T-Shirts'
-    },
-    {
-      name: 'Street Hoodies',
-      img: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=600',
-      href: '/shop?category=Hoodies'
-    },
-    {
-      name: 'Fleece Joggers',
-      img: 'https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=600',
-      href: '/shop?category=Joggers'
+      href: '/shop?category=Minimalist+Typo'
     }
   ];
 

@@ -51,9 +51,9 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
 
   const allProducts = dbProducts.length > 0 ? dbProducts : PRODUCTS;
   const finalCategories = dbCategories.length > 0 ? dbCategories : [
-    { id: 'cat-001', name: 'Oversized T-Shirts', slug: 'oversized-t-shirts' },
-    { id: 'cat-002', name: 'Hoodies', slug: 'hoodies' },
-    { id: 'cat-003', name: 'Joggers', slug: 'joggers' }
+    { id: 'cat-001', name: 'Graphic Prints', slug: 'graphic-prints' },
+    { id: 'cat-002', name: 'Minimalist Typo', slug: 'minimalist-typo' },
+    { id: 'cat-003', name: 'Plus Size', slug: 'plus-size' }
   ];
 
   const settingsMap = dbSettings.reduce((acc: any, item: any) => {
@@ -66,23 +66,26 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   let collectionTitle = 'Streetwear Drop';
 
   if (slug === 'oversized' || slug === 'oversized-t-shirts') {
-    filteredProducts = allProducts.filter(
-      p => p.category?.toLowerCase() === 'oversized t-shirts' || 
-           p.category?.name?.toLowerCase() === 'oversized t-shirts'
-    );
+    filteredProducts = allProducts;
     collectionTitle = 'Oversized Collection';
-  } else if (slug === 'joggers') {
+  } else if (slug === 'graphic-prints' || slug === 'graphic-tees') {
     filteredProducts = allProducts.filter(
-      p => p.category?.toLowerCase() === 'joggers' || 
-           p.category?.name?.toLowerCase() === 'joggers'
+      p => p.category?.toLowerCase() === 'graphic prints' || 
+           p.category?.name?.toLowerCase() === 'graphic prints'
     );
-    collectionTitle = 'Joggers Collection';
-  } else if (slug === 'hoodies') {
+    collectionTitle = 'Graphic Printed Collection';
+  } else if (slug === 'minimalist-typo' || slug === 'minimalist-tees') {
     filteredProducts = allProducts.filter(
-      p => p.category?.toLowerCase() === 'hoodies' || 
-           p.category?.name?.toLowerCase() === 'hoodies'
+      p => p.category?.toLowerCase() === 'minimalist typo' || 
+           p.category?.name?.toLowerCase() === 'minimalist typo'
     );
-    collectionTitle = 'Hoodies Collection';
+    collectionTitle = 'Minimalist Typo Collection';
+  } else if (slug === 'plus-size') {
+    filteredProducts = allProducts.filter(
+      p => p.category?.toLowerCase() === 'plus size' || 
+           p.category?.name?.toLowerCase() === 'plus size'
+    );
+    collectionTitle = 'Plus Size Tees';
   } else if (slug === 'bestsellers') {
     filteredProducts = allProducts.filter(p => p.tags?.includes('BESTSELLER'));
     collectionTitle = 'Bestsellers';

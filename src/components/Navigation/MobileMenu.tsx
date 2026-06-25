@@ -16,9 +16,9 @@ export default function MobileMenu({ isOpen, onClose, isAdmin }: MobileMenuProps
 
   const links = [
     { label: 'New Drops', href: '/shop?tag=NEW+ARRIVAL' },
-    { label: 'Oversized Tees', href: '/shop?category=Oversized+T-Shirts' },
-    { label: 'Joggers', href: '/shop?category=Joggers' },
-    { label: 'Hoodies & Fleece', href: '/shop?category=Hoodies' },
+    { label: 'Oversized Tees', href: '/shop' },
+    { label: 'Graphic Prints', href: '/shop?category=Graphic+Prints' },
+    { label: 'Minimalist Typo', href: '/shop?category=Minimalist+Typo' },
     { label: 'Plus Size Fit', href: '/shop?category=Plus+Size' },
     { label: 'Bestsellers', href: '/shop?tag=BESTSELLER' }
   ];

@@ -10,28 +10,24 @@ interface MegaMenuProps {
 export default function MegaMenu({ onClose }: MegaMenuProps) {
   const sections = [
     {
-      title: 'TOPWEAR',
+      title: 'SHOP BY FIT',
       links: [
-        { label: 'Oversized T-Shirts', href: '/shop?category=Oversized+T-Shirts' },
-        { label: 'Classic T-Shirts', href: '/shop?category=Oversized+T-Shirts' }, // Fallback to shop
-        { label: 'Shirts', href: '/shop' },
-        { label: 'Hoodies', href: '/shop?category=Hoodies' }
+        { label: 'Oversized Tees', href: '/shop' },
+        { label: 'Plus Size Fit', href: '/shop?category=Plus+Size' }
       ]
     },
     {
-      title: 'BOTTOMWEAR',
+      title: 'SHOP BY STYLE',
       links: [
-        { label: 'Joggers', href: '/shop?category=Joggers' },
-        { label: 'Shorts', href: '/shop' },
-        { label: 'Cargo Pants', href: '/shop?category=Joggers' }
+        { label: 'Graphic Prints', href: '/shop?category=Graphic+Prints' },
+        { label: 'Minimalist Typo', href: '/shop?category=Minimalist+Typo' }
       ]
     },
     {
-      title: 'SHOP BY',
+      title: 'SHOP BY DROP',
       links: [
         { label: 'New Drops', href: '/shop?tag=NEW+ARRIVAL' },
-        { label: 'Bestsellers', href: '/shop?tag=BESTSELLER' },
-        { label: 'Sale Specials', href: '/shop' }
+        { label: 'Bestsellers', href: '/shop?tag=BESTSELLER' }
       ]
     }
   ];

@@ -187,7 +187,7 @@ export default function AdminCategories() {
             <input
               type="text"
               required
-              placeholder="e.g., Winter Oversized, Graphic Hoodies"
+              placeholder="e.g., Graphic Prints, Minimalist Typo"
               value={name}
               onChange={handleNameChange}
               className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm font-sans"

@@ -210,9 +210,9 @@ export default function ProfilePage() {
 
   // Pre-configured upcoming drops locked inside Vault
   const upcomingDrops = [
-    { name: 'ARVIIK / 005 "CYBER CITY" ZIP HOODIE', date: 'WINTER 2026' },
-    { name: 'ARVIIK / 006 "DISCORD" FLEECE SWEATSHIRT', date: 'WINTER 2026' },
-    { name: 'ARVIIK / 007 "NOMAD" HEAVYWEIGHT PANTS', date: 'SPRING 2027' }
+    { name: 'ARVIIK / 005 "CYBER CITY" ACID TEE', date: 'WINTER 2026' },
+    { name: 'ARVIIK / 006 "DISCORD" HEAVYWEIGHT TEE', date: 'WINTER 2026' },
+    { name: 'ARVIIK / 007 "NOMAD" VINTAGE TEES', date: 'SPRING 2027' }
   ];
 
   return (

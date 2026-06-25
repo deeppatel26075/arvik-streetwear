@@ -49,7 +49,8 @@ export default async function ShopPage() {
   // Set default categories if database is empty
   const finalCategories = dbCategories.length > 0 ? dbCategories : [
     { id: 'cat-001', name: 'Graphic Prints', slug: 'graphic-prints' },
-    { id: 'cat-002', name: 'Minimalist Typo', slug: 'minimalist-typo' }
+    { id: 'cat-002', name: 'Minimalist Typo', slug: 'minimalist-typo' },
+    { id: 'cat-003', name: 'Plus Size', slug: 'plus-size' }
   ];
 
   const settingsMap = dbSettings.reduce((acc: any, item: any) => {

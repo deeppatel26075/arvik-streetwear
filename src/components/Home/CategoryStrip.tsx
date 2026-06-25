@@ -6,23 +6,23 @@ import Link from 'next/link';
 export default function CategoryStrip() {
   const items = [
     {
-      label: 'PREMIUM T-SHIRT',
+      label: 'OVERSIZED TEES',
+      image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=300',
+      href: '/shop'
+    },
+    {
+      label: 'GRAPHIC PRINTS',
+      image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=300',
+      href: '/shop?category=Graphic+Prints'
+    },
+    {
+      label: 'MINIMALIST TYPO',
       image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=300',
-      href: '/shop?category=Oversized+T-Shirts'
-    },
-    {
-      label: 'HOODIES & SWEATS',
-      image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=300',
-      href: '/shop?category=Hoodies'
-    },
-    {
-      label: 'JOGGERS & CARGOS',
-      image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=300',
-      href: '/shop?category=Joggers'
+      href: '/shop?category=Minimalist+Typo'
     },
     {
       label: 'TRENDING DROPS',
-      image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=300',
+      image: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=300',
       href: '/shop?tag=BESTSELLER'
     },
     {
