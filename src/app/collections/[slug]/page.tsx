@@ -95,16 +95,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="border-b border-stone-200 pb-5 mb-8">
-        <span className="text-[10px] text-stone-400 font-bold tracking-[0.3em] uppercase">
-          ARVIIK Collections
-        </span>
-        <h1 className="font-syne font-black text-3xl uppercase tracking-wider text-stone-900 mt-1">
-          {collectionTitle}
-        </h1>
-      </div>
-
+    <div className="w-full space-y-0">
       <Suspense fallback={
         <div className="flex justify-center items-center py-20 text-xs font-bold uppercase tracking-widest text-stone-400">
           Loading collection...
