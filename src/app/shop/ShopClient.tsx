@@ -305,14 +305,14 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent" />
         <div className="absolute inset-0 flex items-center justify-start p-6 sm:p-12 md:p-16">
           <div className="max-w-xl space-y-2 sm:space-y-3">
-            <span className="text-[9px] text-[#ffd200] font-black tracking-[0.25em] uppercase">
+            <span className="text-[9px] text-secondary font-bold tracking-[0.25em] uppercase">
               Oversized Printed T-Shirts
             </span>
-            <h1 className="font-syne font-black text-2xl sm:text-4xl text-white uppercase tracking-wider leading-none">
+            <h1 className="font-serif font-medium text-2xl sm:text-4xl text-white uppercase tracking-[0.1em] leading-none">
               STARTING FROM ₹899
             </h1>
             <div className="pt-2">
-              <span className="inline-block bg-white text-stone-950 text-[9px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full shadow-lg">
+              <span className="inline-block bg-white text-stone-950 text-[9px] font-bold uppercase tracking-widest px-6 py-3 rounded-none shadow-md border border-stone-200 hover:bg-stone-950 hover:text-white transition-colors cursor-pointer">
                 Shop Collection
               </span>
             </div>
@@ -355,7 +355,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
                 {/* Circular image container */}
                 <div className={`relative w-16 h-16 rounded-full overflow-hidden border transition-all duration-300 shadow-2xs ${
                   isSelected 
-                    ? 'border-[#ffd200] ring-2 ring-[#ffd200]/25' 
+                    ? 'border-secondary ring-2 ring-secondary/25' 
                     : `${isDarkTheme ? 'border-stone-800' : 'border-stone-200/60'}`
                 }`}>
                   <img
@@ -365,7 +365,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
                   />
                 </div>
                 <span className={`text-[8px] uppercase tracking-widest text-center mt-2.5 font-bold leading-tight ${
-                  isSelected ? 'text-[#ffd200] font-black' : `${isDarkTheme ? 'text-stone-400' : 'text-stone-500'}`
+                  isSelected ? 'text-secondary font-black' : `${isDarkTheme ? 'text-stone-400' : 'text-stone-500'}`
                 }`}>
                   {item.label}
                 </span>
@@ -384,7 +384,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
             <span className="text-[9px] text-stone-400 font-bold tracking-[0.3em] uppercase">
               Streetwear Catalog
             </span>
-            <h1 className={`font-syne font-extrabold text-2xl uppercase tracking-wider ${titleTextClass} mt-0.5`}>
+            <h1 className={`font-serif font-semibold text-2xl uppercase tracking-wider ${titleTextClass} mt-0.5`}>
               {selectedCategory || 'All Drops'}
               <span className="text-xs text-stone-400 font-semibold lowercase ml-2">
                 ({products.length} {products.length === 1 ? 'item' : 'items'})
@@ -451,7 +451,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
           
           {/* Category Filter */}
           <div className="space-y-3">
-            <h3 className={`font-syne font-bold uppercase text-xs tracking-wider border-b ${sidebarHeaderClass} pb-2`}>
+            <h3 className={`font-sans font-semibold uppercase text-xs tracking-[0.15em] border-b ${sidebarHeaderClass} pb-2`}>
               Categories
             </h3>
             <div className="flex flex-col space-y-2 text-xs">
@@ -483,7 +483,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
 
           {/* Size Filter */}
           <div className="space-y-3">
-            <h3 className={`font-syne font-bold uppercase text-xs tracking-wider border-b ${sidebarHeaderClass} pb-2`}>
+            <h3 className={`font-sans font-semibold uppercase text-xs tracking-[0.15em] border-b ${sidebarHeaderClass} pb-2`}>
               Sizes
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -574,7 +574,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
     </div>
 
     {/* Mobile Floating Bottom Bar for Filters & Sorting */}
-    <div className={`lg:hidden fixed bottom-14 left-0 w-full h-12 ${isDarkTheme ? 'bg-stone-950 border-stone-850 text-white' : 'bg-white border-stone-200 text-stone-900'} border-t z-40 flex divide-x ${isDarkTheme ? 'divide-stone-850' : 'divide-stone-200'} shadow-md font-syne text-[10px] font-black tracking-widest uppercase`}>
+    <div className={`lg:hidden fixed bottom-14 left-0 w-full h-12 ${isDarkTheme ? 'bg-stone-950 border-stone-850 text-white' : 'bg-white border-stone-200 text-stone-900'} border-t z-40 flex divide-x ${isDarkTheme ? 'divide-stone-850' : 'divide-stone-200'} shadow-luxury font-sans text-[10px] font-semibold tracking-[0.2em] uppercase`}>
       <button 
         onClick={() => setMobileFiltersOpen(true)}
         className="flex-1 flex items-center justify-center space-x-2 active:bg-stone-100/10"
@@ -612,7 +612,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
             className={`fixed bottom-0 left-0 w-full ${isDarkTheme ? 'bg-stone-900 text-stone-300' : 'bg-white text-stone-850'} rounded-t-xl shadow-2xl z-50 flex flex-col lg:hidden pb-6`}
           >
             <div className={`flex justify-between items-center px-6 py-4 border-b ${isDarkTheme ? 'border-stone-800' : 'border-stone-150'}`}>
-              <span className={`font-syne font-bold uppercase tracking-wider text-[10px] ${isDarkTheme ? 'text-white' : 'text-stone-900'}`}>
+              <span className={`font-sans font-semibold uppercase tracking-[0.15em] text-[10px] ${isDarkTheme ? 'text-white' : 'text-stone-900'}`}>
                 Sort By
               </span>
               <button
@@ -637,7 +637,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
                   }}
                   className={`text-left py-3.5 border-b ${isDarkTheme ? 'border-stone-800/40' : 'border-stone-100'} last:border-b-0 ${
                     priceSort === opt.value
-                      ? 'text-[#ffd200] font-black'
+                      ? 'text-secondary font-bold'
                       : `${isDarkTheme ? 'text-stone-350' : 'text-stone-605'}`
                   }`}
                 >
@@ -671,7 +671,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
               className={`fixed top-0 left-0 h-full w-full max-w-xs ${isDarkTheme ? 'bg-stone-900 text-stone-300' : 'bg-stone-50 text-stone-800'} shadow-2xl z-50 flex flex-col lg:hidden`}
             >
               <div className={`flex justify-between items-center px-6 py-5 border-b ${isDarkTheme ? 'border-stone-800 bg-stone-950' : 'border-stone-200 bg-white'}`}>
-                <span className={`font-syne font-bold uppercase tracking-wider text-sm ${isDarkTheme ? 'text-white' : 'text-stone-900'}`}>
+                <span className={`font-sans font-semibold uppercase tracking-[0.15em] text-sm ${isDarkTheme ? 'text-white' : 'text-stone-900'}`}>
                   Filters
                 </span>
                 <button
@@ -685,7 +685,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
               <div className="flex-grow overflow-y-auto px-6 py-6 space-y-8">
                 {/* Categories */}
                 <div className="space-y-3">
-                  <h3 className={`font-syne font-bold uppercase text-xs tracking-wider border-b ${sidebarHeaderClass} pb-2`}>
+                  <h3 className={`font-sans font-semibold uppercase text-xs tracking-[0.15em] border-b ${sidebarHeaderClass} pb-2`}>
                     Categories
                   </h3>
                   <div className="flex flex-col space-y-2 text-xs">
@@ -723,7 +723,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
 
                 {/* Sizes */}
                 <div className="space-y-3">
-                  <h3 className={`font-syne font-bold uppercase text-xs tracking-wider border-b ${sidebarHeaderClass} pb-2`}>
+                  <h3 className={`font-sans font-semibold uppercase text-xs tracking-[0.15em] border-b ${sidebarHeaderClass} pb-2`}>
                     Sizes
                   </h3>
                   <div className="flex flex-wrap gap-2">

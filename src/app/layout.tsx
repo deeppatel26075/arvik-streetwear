@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Syne } from 'next/font/google';
+import { Jost, Cormorant_Garamond } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
@@ -11,17 +11,17 @@ import SoundExperience from '@/components/SoundExperience';
 import Atelier from '@/components/Atelier';
 import MobileBottomNav from '@/components/Navigation/MobileBottomNav';
 
-const inter = Inter({
+const jost = Jost({
   variable: '--font-sans',
   subsets: ['latin'],
   display: 'swap',
 });
 
-const syne = Syne({
-  variable: '--font-syne',
+const cormorant = Cormorant_Garamond({
+  variable: '--font-serif',
   subsets: ['latin'],
   display: 'swap',
-  weight: ['400', '700', '800'],
+  weight: ['300', '400', '500', '600', '700'],
 });
 
 export const metadata: Metadata = {
@@ -41,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${syne.variable} h-full antialiased`}>
+    <html lang="en" className={`${jost.variable} ${cormorant.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
         <AuthProvider>
           <CartProvider>

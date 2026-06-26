@@ -157,7 +157,7 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
 
   return (
     <div 
-      className={`w-full space-y-0 ${isDarkTheme ? 'bg-stone-950 text-white' : bgStyleVal === 'sepia' ? 'bg-[#f4efe6]' : bgStyleVal === 'custom-color' ? '' : 'bg-white'}`}
+      className={`w-full space-y-0 ${isDarkTheme ? 'bg-stone-950 text-white' : bgStyleVal === 'sepia' ? 'bg-[#f4efe6]' : bgStyleVal === 'custom-color' ? '' : 'bg-[#faf9f6]'}`}
       style={{ backgroundColor: bgStyleVal === 'custom-color' ? customBgColorVal : undefined }}
     >
       {/* 1. Category Strip */}
@@ -170,47 +170,49 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
       <TrustRibbon />
 
       {/* 4. OUR BESTSELLERS SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-10 select-none">
-        <div className="text-center">
-          <span className={`text-[10px] ${subTextClass} font-bold tracking-[0.3em] uppercase`}>
-            Hot Right Now
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-12 select-none">
+        <div className="text-center space-y-2">
+          <span className={`text-[10px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
+            Curated Selection
           </span>
-          <h2 className={`font-syne font-black text-2xl uppercase tracking-wider ${textClass} mt-1`}>
+          <h2 className={`font-serif font-light text-3xl sm:text-4xl tracking-wide ${textClass} mt-1`}>
             Our Bestsellers
           </h2>
+          <div className="w-12 h-[1px] bg-secondary/60 mx-auto mt-4" />
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12">
           {renderBestsellers.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
 
-        {/* SEE MORE BESTSELLERS Neon CTA Button */}
+        {/* SEE MORE BESTSELLERS CTA Button */}
         <div className="pt-8 flex justify-center">
           <Link
             href="/shop?tag=BESTSELLER"
-            className="w-full max-w-md text-center py-4 bg-accent border border-stone-950 text-stone-950 font-syne font-black text-xs tracking-[0.25em] uppercase rounded-sm shadow-retro-yellow active:scale-98 transition-transform"
+            className="w-full max-w-md text-center py-4 bg-stone-900 text-white hover:bg-stone-850 font-sans font-medium text-xs tracking-[0.25em] uppercase rounded-none transition-colors duration-300"
           >
-            SEE MORE BESTSELLERS
+            DISCOVER ALL BESTSELLERS
           </Link>
         </div>
       </section>
 
       {/* 5. NEW ARRIVALS SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10 select-none">
-        <div className="text-center">
-          <span className={`text-[10px] ${subTextClass} font-bold tracking-[0.3em] uppercase`}>
-            Fresh From Drop
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12 select-none border-t border-stone-200/30">
+        <div className="text-center space-y-2">
+          <span className={`text-[10px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
+            Fresh Release
           </span>
-          <h2 className={`font-syne font-black text-2xl uppercase tracking-wider ${textClass} mt-1`}>
+          <h2 className={`font-serif font-light text-3xl sm:text-4xl tracking-wide ${textClass} mt-1`}>
             New Arrivals
           </h2>
+          <div className="w-12 h-[1px] bg-secondary/60 mx-auto mt-4" />
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12">
           {renderNewArrivals.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
@@ -218,27 +220,28 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
       </section>
 
       {/* 6. OVERSIZED COLLECTION promo banner */}
-      <section className="w-full bg-stone-950 text-white py-20 px-4 relative overflow-hidden select-none">
+      <section className="w-full bg-stone-950 text-white py-28 px-4 relative overflow-hidden select-none">
         <img
           src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=1600"
           alt="ARVIIK Promo Look"
           className="absolute inset-0 w-full h-full object-cover opacity-25"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent" />
-        <div className="relative z-10 max-w-4xl mx-auto space-y-5">
-          <span className="text-[10px] text-accent font-bold tracking-[0.4em] uppercase">
-            Heavyweight Drop Series
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent" />
+        <div className="relative z-10 max-w-4xl mx-auto space-y-6">
+          <span className="text-[10px] text-accent font-semibold tracking-[0.4em] uppercase block">
+            THE EDITORIAL DROP
           </span>
-          <h2 className="font-syne font-black text-3xl sm:text-5xl uppercase tracking-wider leading-none">
-            ENGINEERED OVERSIZED FITS
+          <h2 className="font-serif font-light text-4xl sm:text-6xl tracking-wide leading-tight">
+            Architectural <br className="sm:hidden" />
+            Oversized Fits
           </h2>
-          <p className="text-xs sm:text-sm font-light text-stone-300 max-w-md tracking-wider leading-relaxed">
-            Custom-woven 240 GSM Terry cotton designed to hold shape and survive washes. Drop shoulder loose cut silhouette for absolute streetwear comfort.
+          <p className="text-xs sm:text-sm font-light text-stone-300 max-w-md tracking-wider leading-relaxed font-sans">
+            Custom-woven 240 GSM Terry cotton designed to hold shape and survive washes. Drop shoulder loose cut silhouette for absolute comfort.
           </p>
           <div className="pt-2">
             <Link
               href="/shop?category=Oversized+T-Shirts"
-              className="inline-flex items-center space-x-2 bg-white text-stone-950 font-syne font-black text-[10px] sm:text-xs tracking-[0.2em] px-8 py-3.5 rounded-full uppercase hover:bg-stone-200 transition-colors"
+              className="inline-flex items-center space-x-2.5 bg-white text-stone-900 font-sans font-medium text-xs tracking-[0.25em] px-9 py-4 rounded-none uppercase hover:bg-stone-50 transition-colors duration-300"
             >
               <span>SHOP COLLECTION</span>
               <ArrowRight className="h-3.5 w-3.5" />
@@ -247,32 +250,32 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
         </div>
       </section>
 
-      {/* Veirdo-Style Banner Grid (2 columns on desktop, 1 on mobile) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 select-none">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Premium Editorial Promo Grid (2 columns on desktop, 1 on mobile) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 select-none">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Card 1: Epic Thread */}
           <Link
             href="/shop?category=Graphic+Prints"
-            className="group relative aspect-[16/10] sm:aspect-[21/10] w-full rounded-sm overflow-hidden border border-stone-200/40 flex items-center p-6 sm:p-10 shadow-xs hover:shadow-md transition-all duration-300 bg-stone-950 text-white"
+            className="group relative aspect-[16/10] sm:aspect-[21/10] w-full rounded-none overflow-hidden border border-stone-200/20 flex items-center p-6 sm:p-12 shadow-luxury bg-stone-950 text-white"
           >
             <img
               src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=800"
               alt="Epic Thread Collection"
-              className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-102 transition-transform duration-500"
+              className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-102 transition-transform duration-700"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent" />
-            <div className="relative z-10 space-y-2 max-w-xs sm:max-w-sm">
-              <span className="text-[9px] text-[#ffd200] font-black tracking-[0.25em] uppercase">
-                EPIC THREAD SERIES
+            <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/35 to-transparent" />
+            <div className="relative z-10 space-y-3.5 max-w-xs sm:max-w-sm">
+              <span className="text-[9px] text-accent font-semibold tracking-[0.3em] uppercase block">
+                THE ART OF PRINTING
               </span>
-              <h3 className="font-syne font-black text-xl sm:text-3xl leading-none uppercase tracking-wider">
-                BUY 2 FOR ₹999
+              <h3 className="font-serif font-light text-2xl sm:text-4xl leading-tight tracking-wide">
+                Premium Graphics
               </h3>
-              <p className="text-[10px] text-stone-300 font-medium leading-relaxed tracking-wider hidden sm:block">
-                Premium high-density prints crafted from 240 GSM Terry cotton. Unmatched street aesthetics.
+              <p className="text-[10px] text-stone-300 font-light leading-relaxed tracking-wider hidden sm:block font-sans">
+                Premium high-density prints crafted from 240 GSM Terry cotton. Unmatched streetwear aesthetics.
               </p>
               <div className="pt-1.5">
-                <span className="inline-block text-[9px] font-black uppercase tracking-widest bg-white text-stone-950 px-4 py-2 rounded-full group-hover:bg-[#ffd200] transition-colors">
+                <span className="inline-block text-[9px] font-sans font-medium uppercase tracking-widest bg-white text-stone-950 px-5 py-2.5 rounded-none group-hover:bg-accent group-hover:text-white transition-colors duration-300">
                   Shop Now
                 </span>
               </div>
@@ -282,26 +285,26 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
           {/* Card 2: Supreme Edition */}
           <Link
             href="/shop?category=Minimalist+Typo"
-            className="group relative aspect-[16/10] sm:aspect-[21/10] w-full rounded-sm overflow-hidden border border-stone-200/40 flex items-center p-6 sm:p-10 shadow-xs hover:shadow-md transition-all duration-300 bg-stone-900 text-white"
+            className="group relative aspect-[16/10] sm:aspect-[21/10] w-full rounded-none overflow-hidden border border-stone-200/20 flex items-center p-6 sm:p-12 shadow-luxury bg-stone-900 text-white"
           >
             <img
               src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800"
               alt="Supreme Edition"
-              className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-102 transition-transform duration-500"
+              className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-102 transition-transform duration-700"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent" />
-            <div className="relative z-10 space-y-2 max-w-xs sm:max-w-sm">
-              <span className="text-[9px] text-[#00e676] font-black tracking-[0.25em] uppercase">
-                SUPREME EDITION
+            <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/35 to-transparent" />
+            <div className="relative z-10 space-y-3.5 max-w-xs sm:max-w-sm">
+              <span className="text-[9px] text-accent font-semibold tracking-[0.3em] uppercase block">
+                THE ART OF SPEECH
               </span>
-              <h3 className="font-syne font-black text-xl sm:text-3xl leading-none uppercase tracking-wider">
-                FLAT 50% OFF
+              <h3 className="font-serif font-light text-2xl sm:text-4xl leading-tight tracking-wide">
+                Minimalist Typo
               </h3>
-              <p className="text-[10px] text-stone-300 font-medium leading-relaxed tracking-wider hidden sm:block">
+              <p className="text-[10px] text-stone-300 font-light leading-relaxed tracking-wider hidden sm:block font-sans">
                 Clean architectural structures. Minimalist typography and puff print drops.
               </p>
               <div className="pt-1.5">
-                <span className="inline-block text-[9px] font-black uppercase tracking-widest bg-white text-stone-950 px-4 py-2 rounded-full group-hover:bg-[#00e676] transition-colors">
+                <span className="inline-block text-[9px] font-sans font-medium uppercase tracking-widest bg-white text-stone-950 px-5 py-2.5 rounded-none group-hover:bg-accent group-hover:text-white transition-colors duration-300">
                   View Collection
                 </span>
               </div>
@@ -311,36 +314,37 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
       </section>
 
       {/* 7. SHOP BY CATEGORY section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-10 select-none">
-        <div className="text-center">
-          <span className={`text-[10px] ${subTextClass} font-bold tracking-[0.3em] uppercase`}>
-            Narrow Your Fit
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-12 select-none border-t border-stone-200/30">
+        <div className="text-center space-y-2">
+          <span className={`text-[10px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
+            Explore Fits
           </span>
-          <h2 className={`font-syne font-black text-2xl uppercase tracking-wider ${textClass} mt-1`}>
+          <h2 className={`font-serif font-light text-3xl sm:text-4xl tracking-wide ${textClass} mt-1`}>
             Shop By Category
           </h2>
+          <div className="w-12 h-[1px] bg-secondary/60 mx-auto mt-4" />
         </div>
 
         {/* Visual Category Blocks */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {categoriesList.map((cat, idx) => (
             <Link
               key={idx}
               href={cat.href}
-              className="relative aspect-video sm:aspect-square w-full rounded-sm overflow-hidden border border-stone-200 group flex items-end p-6 shadow-2xs hover:shadow-md transition-shadow duration-300"
+              className="relative aspect-[4/5] w-full rounded-none overflow-hidden group flex items-end p-8 shadow-luxury bg-stone-100"
             >
               <img
                 src={cat.img}
                 alt={cat.name}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
               <div className="relative z-10 w-full flex justify-between items-center text-white">
-                <span className="font-syne font-black text-base uppercase tracking-wider">
+                <span className="font-serif font-light text-xl tracking-wide uppercase">
                   {cat.name}
                 </span>
-                <span className="text-[9px] font-bold tracking-widest bg-white/10 backdrop-blur-xs border border-white/20 px-3 py-1.5 rounded-full">
-                  Explore
+                <span className="text-[9px] font-sans font-medium tracking-[0.2em] border-b border-white py-1 uppercase group-hover:text-accent group-hover:border-accent transition-colors duration-300 font-sans">
+                  Discover
                 </span>
               </div>
             </Link>
@@ -349,32 +353,36 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
       </section>
 
       {/* 8. TRENDING NOW SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 select-none">
-        <div className="text-center">
-          <span className={`text-[10px] ${subTextClass} font-bold tracking-[0.3em] uppercase`}>
-            Street Grails
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12 select-none border-t border-stone-200/30">
+        <div className="text-center space-y-2">
+          <span className={`text-[10px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
+            Trending Styles
           </span>
-          <h2 className={`font-syne font-black text-2xl uppercase tracking-wider ${textClass} mt-1`}>
+          <h2 className={`font-serif font-light text-3xl sm:text-4xl tracking-wide ${textClass} mt-1`}>
             Trending Now
           </h2>
+          <div className="w-12 h-[1px] bg-secondary/60 mx-auto mt-4" />
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12">
           {renderTrending.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
-      </section>      {/* 9. CUSTOMER REVIEWS */}
+      </section>
+
+      {/* 9. CUSTOMER REVIEWS */}
       <section className={sectionBgClass}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="text-center">
-            <span className={`text-[10px] ${subTextClass} font-bold tracking-[0.3em] uppercase`}>
-              What The Crew Says
+          <div className="text-center space-y-2">
+            <span className={`text-[10px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
+              Patron Statements
             </span>
-            <h2 className={`font-syne font-black text-2xl uppercase tracking-wider ${textClass} mt-1`}>
-              Community Reviews
+            <h2 className={`font-serif font-light text-3xl sm:text-4xl tracking-wide ${textClass} mt-1`}>
+              Customer Testimonials
             </h2>
+            <div className="w-12 h-[1px] bg-secondary/60 mx-auto mt-4" />
           </div>
  
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -382,35 +390,35 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
               {
                 name: 'Karan Malhotra',
                 city: 'Mumbai',
-                text: 'The print quality is unmatched. Most oversized tees lose shape around the neck after three washes, but ARVIIK feels as heavy and boxy as day one.',
+                text: 'The fabric density is outstanding. Unlike typical streetwear tees that lose their boxy shape around the neck after a few washes, ARVIIK remains as heavyweight as day one.',
                 stars: 5,
               },
               {
                 name: 'Elena Rostova',
                 city: 'Delhi',
-                text: 'Bought the Polarize Vintage Cream tee. Absolutely in love with the cotton fabric weight. Shipping was fast, and the size guide recommendation was spot on.',
+                text: 'Purchased the Polarize Vintage Cream tee. Absolutely impressed by the structured drape. Shipping was prompt, and the detailed sizing guide was perfectly accurate.',
                 stars: 5,
               },
               {
                 name: 'Rohan Sharma',
                 city: 'Bangalore',
-                text: 'Super premium packaging. Fits extremely oversized, giving that authentic street look. Buy 3 deal is really value for money!',
+                text: 'Incredibly premium packaging and presentation. The oversized cut provides that authentic relaxed aesthetic. A truly refined addition to my collection.',
                 stars: 5,
               },
             ].map((review, i) => (
               <div
                 key={i}
-                className={`${cardBgClass} p-6 rounded-sm shadow-2xs flex flex-col space-y-4`}
+                className={`${cardBgClass} p-8 rounded-none border border-stone-200/40 shadow-luxury flex flex-col space-y-6`}
               >
-                <div className="flex items-center text-amber-500">
+                <div className="flex items-center text-secondary">
                   {[...Array(review.stars)].map((_, starIdx) => (
-                    <Star key={starIdx} className="h-4 w-4 fill-current text-current" />
+                    <Star key={starIdx} className="h-3.5 w-3.5 fill-current text-current stroke-[1.5]" />
                   ))}
                 </div>
-                <p className={`text-xs ${isDarkTheme ? 'text-stone-300' : 'text-stone-600'} leading-relaxed italic font-light`}>
+                <p className={`text-[13px] ${isDarkTheme ? 'text-stone-300' : 'text-stone-600'} leading-relaxed font-light italic`}>
                   "{review.text}"
                 </p>
-                <div className={`pt-2.5 border-t ${isDarkTheme ? 'border-stone-800' : 'border-stone-100'} flex justify-between items-center text-[9px] font-bold ${subTextClass} uppercase tracking-widest`}>
+                <div className={`pt-4 border-t ${isDarkTheme ? 'border-stone-850' : 'border-stone-100'} flex justify-between items-center text-[9px] font-semibold ${subTextClass} uppercase tracking-[0.2em] font-sans`}>
                   <span>{review.name}</span>
                   <span>{review.city}</span>
                 </div>
@@ -421,18 +429,19 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
       </section>
  
       {/* 10. INSTAGRAM LOOKS */}
-      <section className="py-20 space-y-10 select-none">
-        <div className="text-center">
-          <span className={`text-[10px] ${subTextClass} font-bold tracking-[0.3em] uppercase`}>
-            #ARVIIKCREW
+      <section className="py-20 space-y-12 select-none border-t border-stone-200/30">
+        <div className="text-center space-y-2">
+          <span className={`text-[10px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
+            Lifestyle Lookbook
           </span>
-          <h2 className={`font-syne font-black text-2xl uppercase tracking-wider ${textClass} mt-1`}>
-            Instagram Looks
+          <h2 className={`font-serif font-light text-3xl sm:text-4xl tracking-wide ${textClass} mt-1`}>
+            #ARVIIKLOOKS
           </h2>
+          <div className="w-12 h-[1px] bg-secondary/60 mx-auto mt-4" />
         </div>
 
         {/* Grid of gallery pictures */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 px-4 sm:px-6 lg:px-8">
           {[
             'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=600',
             'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=600',
@@ -445,11 +454,11 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
               <img
                 src={src}
                 alt={`Instagram look ${i + 1}`}
-                className="object-cover w-full h-full transition-transform duration-500 ease-out group-hover:scale-104"
+                className="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-103"
               />
-              <div className="absolute inset-0 bg-stone-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <span className="text-white text-[9px] font-bold tracking-widest uppercase border border-white px-3 py-1.5 rounded-sm">
-                  View Look
+              <div className="absolute inset-0 bg-stone-950/45 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+                <span className="text-white text-[9px] font-sans font-medium tracking-[0.25em] uppercase border border-white/60 px-4 py-2.5 bg-transparent hover:bg-white hover:text-stone-950 transition-colors duration-300">
+                  View Fit
                 </span>
               </div>
             </div>

@@ -27,6 +27,7 @@ interface ProductCardProps {
     mrp?: number;
     discount?: number;
     colors?: string[];
+    tags?: string[];
   };
 }
 
@@ -109,7 +110,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div
-      className="group relative flex flex-col bg-white border border-stone-200 rounded-sm overflow-hidden shadow-2xs hover:shadow-sm transition-shadow duration-300 select-none"
+      className="group relative flex flex-col bg-transparent overflow-hidden transition-all duration-300 select-none"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -117,40 +118,26 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Link
         href={`/shop/${product.slug}`}
         onClick={handleProductClick}
-        className="relative block aspect-3/4 bg-stone-50 overflow-hidden"
+        className="relative block aspect-3/4 bg-[#fbfbfb] overflow-hidden"
       >
         {/* Floating Wishlist Heart */}
         <button
           onClick={handleWishlistClick}
-          className="absolute top-2.5 right-2.5 z-10 p-1.5 rounded-full bg-white/90 backdrop-blur-xs text-stone-900 shadow-xs hover:bg-white transition-colors"
+          className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-white/80 hover:bg-white text-stone-900 shadow-sm transition-transform active:scale-95"
         >
           <Heart
-            className={`h-4 w-4 transition-colors ${
-              isFavorited ? 'fill-sale text-sale animate-pulse' : 'text-stone-600'
+            className={`h-3.5 w-3.5 transition-colors ${
+              isFavorited ? 'fill-sale text-sale' : 'text-stone-700'
             }`}
           />
         </button>
 
-        {/* Top-Left Bestseller tag: Solid green background as in Veirdo photo */}
-        <span className="absolute top-2.5 left-2.5 z-10 bg-[#0f8a5f] text-white text-[8px] font-black tracking-wider uppercase px-2 py-0.5 rounded-xs shadow-xs">
-          BEST SELLER
-        </span>
-
-        {/* Bottom-Left Rating Badges */}
-        <div className="absolute bottom-2.5 left-2.5 z-10 bg-white/95 px-2 py-0.5 rounded-full flex items-center space-x-1 text-[9px] font-bold text-stone-850 shadow-xs border border-stone-100">
-          <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
-          <span>{product.rating || 4.5}</span>
-          <span className="text-stone-300">|</span>
-          <span className="text-stone-500 font-semibold">{product.reviews || 320}</span>
-        </div>
-
-        {/* Bottom-Right Color Swatches indicators */}
-        <div className="absolute bottom-2.5 right-2.5 z-10 bg-white/95 px-2 py-0.5 rounded-full flex items-center space-x-1 text-[9px] font-bold text-stone-500 shadow-xs border border-stone-100">
-          <div className="flex space-x-0.5">
-            <span className="w-2 h-2 rounded-full bg-amber-100 border border-stone-300 inline-block" />
-            <span className="w-2 h-2 rounded-full bg-blue-600 inline-block" />
-          </div>
-        </div>
+        {/* Top-Left Bestseller tag: Minimalist premium look */}
+        {product.tags?.includes('BESTSELLER') && (
+          <span className="absolute top-3 left-3 z-10 bg-stone-950 text-white text-[7px] font-bold tracking-[0.2em] uppercase px-2.5 py-1">
+            Exclusive
+          </span>
+        )}
 
         {/* Primary/Secondary Image swaps */}
         <div className="w-full h-full relative">
@@ -158,7 +145,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             <img
               src={hovered ? secondaryImage : primaryImage}
               alt={product.name}
-              className="object-cover w-full h-full absolute inset-0 transition-transform duration-500 group-hover:scale-102"
+              className="object-cover w-full h-full absolute inset-0 transition-transform duration-700 group-hover:scale-103"
             />
           ) : (
             <Image
@@ -166,49 +153,47 @@ export default function ProductCard({ product }: ProductCardProps) {
               alt={product.name}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-102"
+              className="object-cover transition-transform duration-700 group-hover:scale-103"
             />
           )}
         </div>
       </Link>
 
       {/* Product Details info */}
-      <div className="p-3.5 flex flex-col flex-grow bg-white space-y-1">
-        {/* Brand label */}
-        <span className="text-[8px] text-stone-400 font-bold uppercase tracking-widest">
-          ARVIIK CLOTHING
-        </span>
-        
-        {/* Pricing Row (MRP, Price, Discount in Green) - Placed BEFORE title as in photo */}
-        <div className="flex items-center space-x-2">
-          <span className="text-sm font-black text-stone-950">
-            {formatPrice(priceVal)}
-          </span>
-          <span className="text-[10px] text-stone-400 line-through">
-            {formatPrice(mrpVal)}
-          </span>
-          <span className="text-[10px] text-emerald-600 font-black">
-            {discountVal}% OFF
-          </span>
-        </div>
-
-        {/* Best Price Capsule (Bullet + Green text) */}
-        <div className="flex items-center space-x-1.5 text-[10px] text-emerald-600 font-black">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
-          <span>Best price {formatPrice(bestPriceVal)}</span>
-        </div>
-
-        {/* Title - Placed AFTER prices as in photo */}
+      <div className="pt-3.5 pb-2.5 px-0.5 flex flex-col flex-grow bg-transparent space-y-1">
+        {/* Title */}
         <Link
           href={`/shop/${product.slug}`}
           onClick={handleProductClick}
-          className="text-stone-500 hover:text-stone-950 text-xs font-semibold line-clamp-2 leading-tight tracking-normal pb-2"
+          className="text-stone-900 hover:text-secondary text-[11px] font-semibold tracking-wider transition-colors uppercase leading-tight font-sans"
         >
           {product.name}
         </Link>
+        
+        {/* Brand label */}
+        <span className="text-[8px] text-stone-400 font-bold uppercase tracking-[0.2em] font-sans pb-1">
+          ARVIIK CLASSIC
+        </span>
+        
+        {/* Pricing Row */}
+        <div className="flex items-center space-x-2 text-xs font-sans">
+          <span className="font-bold text-stone-900">
+            {formatPrice(priceVal)}
+          </span>
+          {mrpVal > priceVal && (
+            <>
+              <span className="text-[10px] text-stone-400 line-through">
+                {formatPrice(mrpVal)}
+              </span>
+              <span className="text-[9px] text-[#992b2b] font-medium tracking-wide">
+                ({discountVal}% OFF)
+              </span>
+            </>
+          )}
+        </div>
 
-        {/* Action Button: ADD TO CART */}
-        <div className="mt-auto border-t border-stone-100/60 pt-3">
+        {/* Action Button: ADD TO BAG */}
+        <div className="mt-auto pt-2">
           {!showSizes ? (
             <button
               onClick={(e) => {
@@ -216,20 +201,20 @@ export default function ProductCard({ product }: ProductCardProps) {
                 e.stopPropagation();
                 setShowSizes(true);
               }}
-              className="w-full border border-stone-300 text-stone-900 bg-white hover:bg-stone-950 hover:text-white hover:border-stone-950 text-[10px] font-black uppercase tracking-widest py-2 rounded-sm transition-all duration-200 flex items-center justify-center space-x-1.5 shadow-2xs"
+              className="w-full bg-stone-950 hover:bg-stone-850 text-white text-[9px] font-bold uppercase tracking-[0.25em] py-3 transition-colors flex items-center justify-center space-x-1.5 rounded-none"
             >
-              <span>ADD TO CART</span>
+              <span>ADD TO BAG</span>
             </button>
           ) : (
-            <div className="flex items-center justify-between space-x-1">
-              <span className="text-[9px] font-black text-stone-400 uppercase tracking-widest">SIZE:</span>
-              <div className="flex items-center space-x-1 overflow-x-auto py-0.5">
+            <div className="flex items-center justify-between space-x-1 py-1">
+              <span className="text-[8px] font-black text-stone-400 uppercase tracking-widest font-sans">SIZE:</span>
+              <div className="flex items-center space-x-1.5 overflow-x-auto py-0.5 scrollbar-none">
                 {availableSizes.map((size) => (
                   <button
                     key={size}
                     onClick={(e) => handleQuickAdd(size as any, e)}
                     disabled={adding}
-                    className="bg-stone-100 hover:bg-stone-950 hover:text-white text-stone-900 font-bold text-[9px] w-6.5 h-6.5 rounded-full transition-colors flex items-center justify-center border border-stone-200 hover:border-stone-950"
+                    className="bg-white hover:bg-stone-950 hover:text-white text-stone-900 font-bold text-[9px] w-7 h-7 rounded-none transition-colors flex items-center justify-center border border-stone-200 hover:border-stone-950 font-sans"
                   >
                     {size}
                   </button>
@@ -241,7 +226,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                   e.stopPropagation();
                   setShowSizes(false);
                 }}
-                className="text-stone-400 hover:text-stone-900 p-0.5"
+                className="text-stone-400 hover:text-stone-950 p-1"
               >
                 <X className="h-3 w-3" />
               </button>

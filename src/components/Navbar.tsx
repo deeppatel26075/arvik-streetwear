@@ -87,12 +87,12 @@ export default function Navbar() {
   // Determine dynamic classes based on background theme config
   const bgConfig = activeSettings?.general_config || {};
   const bgStyleVal = bgConfig.bg_style || 'default';
-  const customBgColorVal = bgConfig.custom_bg_color || '#fafaf9';
+  const customBgColorVal = bgConfig.custom_bg_color || '#faf9f6';
 
-  let headerBgClass = 'bg-white border-stone-200 text-stone-900';
-  let navTextClass = 'text-stone-900 hover:text-secondary';
+  let headerBgClass = 'bg-[#faf9f6]/95 backdrop-blur-md border-stone-200/50 text-stone-900';
+  let navTextClass = 'text-stone-900 hover:text-secondary transition-colors font-sans text-[10px] tracking-[0.18em] font-semibold';
   let iconColorClass = 'text-stone-900 hover:text-secondary';
-  let announcementBgColor = '#106bc5';
+  let announcementBgColor = '#1c1917';
   let announcementTextColor = 'text-white';
 
   const isDarkCustom = () => {
@@ -110,27 +110,27 @@ export default function Navbar() {
   const isDark = bgStyleVal === 'charcoal' || isDarkCustom();
 
   if (bgStyleVal === 'charcoal') {
-    headerBgClass = 'bg-stone-950 border-stone-900 text-white';
-    navTextClass = 'text-stone-300 hover:text-[#ffd200]';
-    iconColorClass = 'text-stone-100 hover:text-[#ffd200]';
-    announcementBgColor = '#000000';
+    headerBgClass = 'bg-stone-950/95 backdrop-blur-md border-stone-900 text-white';
+    navTextClass = 'text-stone-300 hover:text-secondary transition-colors font-sans text-[10px] tracking-[0.18em] font-semibold';
+    iconColorClass = 'text-stone-100 hover:text-secondary';
+    announcementBgColor = '#0a0a0a';
   } else if (bgStyleVal === 'sepia') {
-    headerBgClass = 'bg-[#f4efe6] border-stone-300/60 text-stone-900';
-    navTextClass = 'text-stone-850 hover:text-secondary';
+    headerBgClass = 'bg-[#f4efe6]/95 backdrop-blur-md border-stone-300/50 text-stone-900';
+    navTextClass = 'text-stone-850 hover:text-secondary transition-colors font-sans text-[10px] tracking-[0.18em] font-semibold';
     iconColorClass = 'text-stone-850 hover:text-secondary';
-    announcementBgColor = '#604c3f';
+    announcementBgColor = '#503f33';
   } else if (bgStyleVal === 'custom-color') {
-    headerBgClass = `border-stone-200/60`;
+    headerBgClass = `backdrop-blur-md border-stone-200/50`;
     if (isDark) {
       headerBgClass += ' text-white';
-      navTextClass = 'text-stone-300 hover:text-white';
+      navTextClass = 'text-stone-300 hover:text-secondary transition-colors font-sans text-[10px] tracking-[0.18em] font-semibold';
       iconColorClass = 'text-stone-100 hover:text-stone-300';
       announcementBgColor = '#121212';
     } else {
       headerBgClass += ' text-stone-900';
-      navTextClass = 'text-stone-800 hover:text-secondary';
+      navTextClass = 'text-stone-805 hover:text-secondary transition-colors font-sans text-[10px] tracking-[0.18em] font-semibold';
       iconColorClass = 'text-stone-900 hover:text-secondary';
-      announcementBgColor = '#106bc5';
+      announcementBgColor = '#1c1917';
     }
   }
 
@@ -142,7 +142,7 @@ export default function Navbar() {
       >
         {/* Dynamic Announcement Bar */}
         <div 
-          className="text-white py-2 text-center text-xs font-black tracking-wider uppercase select-none transition-all duration-300"
+          className="text-white py-1.5 text-center text-[9px] font-semibold tracking-[0.25em] uppercase select-none transition-all duration-300"
           style={{ backgroundColor: announcementBgColor }}
         >
           <AnimatePresence mode="wait">

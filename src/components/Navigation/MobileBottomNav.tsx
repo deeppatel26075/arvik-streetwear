@@ -74,9 +74,9 @@ export default function MobileBottomNav() {
   // Determine dynamic classes based on background theme config
   const bgConfig = activeSettings?.general_config || {};
   const bgStyleVal = bgConfig.bg_style || 'default';
-  const customBgColorVal = bgConfig.custom_bg_color || '#fafaf9';
+  const customBgColorVal = bgConfig.custom_bg_color || '#faf9f6';
 
-  let navBgClass = 'bg-white border-stone-200 text-stone-900';
+  let navBgClass = 'bg-[#faf9f6]/95 backdrop-blur-md border-stone-200/60 text-stone-900';
   let activeColorClass = 'text-secondary fill-secondary/10';
   let inactiveColorClass = 'text-stone-600';
   let labelActiveColorClass = 'text-secondary';
@@ -97,13 +97,13 @@ export default function MobileBottomNav() {
   const isDark = bgStyleVal === 'charcoal' || isDarkCustom();
 
   if (bgStyleVal === 'charcoal') {
-    navBgClass = 'bg-stone-950 border-stone-900 text-white';
-    activeColorClass = 'text-[#ffd200] fill-[#ffd200]/10';
+    navBgClass = 'bg-stone-950/95 backdrop-blur-md border-stone-900 text-white';
+    activeColorClass = 'text-secondary fill-secondary/10';
     inactiveColorClass = 'text-stone-400';
-    labelActiveColorClass = 'text-[#ffd200]';
+    labelActiveColorClass = 'text-secondary';
     labelInactiveColorClass = 'text-stone-400';
   } else if (bgStyleVal === 'sepia') {
-    navBgClass = 'bg-[#f4efe6] border-stone-350 text-stone-900';
+    navBgClass = 'bg-[#f4efe6]/95 backdrop-blur-md border-stone-350 text-stone-900';
     activeColorClass = 'text-secondary fill-secondary/10';
     inactiveColorClass = 'text-stone-600';
     labelActiveColorClass = 'text-secondary';
@@ -111,9 +111,9 @@ export default function MobileBottomNav() {
   } else if (bgStyleVal === 'custom-color') {
     if (isDark) {
       navBgClass = `border-stone-850 text-white`;
-      activeColorClass = 'text-white fill-white/10';
+      activeColorClass = 'text-secondary fill-secondary/10';
       inactiveColorClass = 'text-stone-400';
-      labelActiveColorClass = 'text-white';
+      labelActiveColorClass = 'text-secondary';
       labelInactiveColorClass = 'text-stone-400';
     } else {
       navBgClass = `border-stone-200 text-stone-900`;
