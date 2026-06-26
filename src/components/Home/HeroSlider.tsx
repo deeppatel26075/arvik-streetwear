@@ -55,61 +55,61 @@ export default function HeroSlider() {
   }, [slides.length]);
 
   return (
-    <section className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 pt-0 sm:pt-4 pb-2 select-none">
-      <div className="relative w-full h-[45vh] sm:h-[65vh] bg-stone-950 rounded-none sm:rounded-lg overflow-hidden shadow-luxury">
+    <section className="w-full select-none">
+      <div className="relative w-full h-[65vh] sm:h-[80vh] bg-stone-950 overflow-hidden">
         {/* Slides view wrapper */}
         <div className="absolute inset-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIdx}
-              initial={{ opacity: 0, scale: 1.01 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: 'easeInOut' }}
+              transition={{ duration: 0.9, ease: 'easeInOut' }}
               className="w-full h-full relative"
             >
               {/* Background image */}
               <img
                 src={slides[currentIdx].image}
                 alt="Streetwear Banner"
-                className="object-cover w-full h-full opacity-35 absolute inset-0"
+                className="object-cover w-full h-full opacity-40 absolute inset-0"
               />
               {/* Dark tint gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-black/25" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
  
-              {/* Slide content overlay */}
-              <div className="absolute inset-0 flex items-center justify-start text-left p-6 sm:p-12 md:p-16">
-                <div className="max-w-2xl space-y-4">
+              {/* Slide content overlay (Centered absolutely) */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 sm:p-12">
+                <div className="max-w-3xl space-y-5">
                   {/* Slogan */}
                   <motion.p
-                    initial={{ opacity: 0, y: 15 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2, duration: 0.5 }}
-                    className="font-sans text-[10px] sm:text-xs tracking-[0.35em] text-stone-300 font-semibold uppercase"
+                    className="font-sans text-[9px] sm:text-[10px] tracking-[0.4em] text-stone-200 font-semibold uppercase"
                   >
                     {slides[currentIdx].sub}
                   </motion.p>
  
                   {/* Big Heading */}
                   <motion.h1
-                    initial={{ opacity: 0, y: 25 }}
+                    initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3, duration: 0.6 }}
-                    className="font-serif text-3xl sm:text-5xl lg:text-6xl leading-tight text-white tracking-wide font-light"
+                    className="font-serif text-3xl sm:text-6xl lg:text-7xl leading-tight text-white tracking-[0.05em] font-light uppercase"
                   >
                     {slides[currentIdx].title}
                   </motion.h1>
  
                   {/* Button CTA */}
                   <motion.div
-                    initial={{ opacity: 0, y: 15 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5, duration: 0.4 }}
-                    className="pt-2"
+                    className="pt-4"
                   >
                     <Link
                       href={slides[currentIdx].href}
-                      className={`inline-block font-sans font-medium text-[10px] sm:text-xs tracking-[0.25em] px-7 sm:px-9 py-3.5 rounded-none uppercase transition-all duration-300 active:scale-97 shadow-xs ${slides[currentIdx].btnColor}`}
+                      className={`inline-block font-sans font-semibold text-[9px] sm:text-[10px] tracking-[0.25em] px-8 sm:px-10 py-4 rounded-none uppercase transition-all duration-300 active:scale-97 shadow-xs ${slides[currentIdx].btnColor}`}
                     >
                       {slides[currentIdx].btnText}
                     </Link>
@@ -120,18 +120,26 @@ export default function HeroSlider() {
           </AnimatePresence>
         </div>
  
-        {/* Muted Linear Indicators */}
-        <div className="absolute bottom-6 left-0 w-full flex justify-center items-center space-x-2.5 z-10">
-          {slides.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentIdx(idx)}
-              className={`w-6 h-[2px] transition-all duration-300 focus:outline-none ${
-                currentIdx === idx ? 'bg-white' : 'bg-white/40 hover:bg-white/60'
-              }`}
-            />
-          ))}
+        {/* Muted Numeric Tracker (Bottom Right) */}
+        <div className="absolute bottom-8 right-8 sm:right-12 text-white font-sans text-[11px] tracking-[0.25em] font-semibold select-none z-10 flex items-center space-x-2">
+          <span>0{currentIdx + 1}</span>
+          <span className="text-white/40">/</span>
+          <span className="text-white/40">0{slides.length}</span>
         </div>
+        
+        {/* Left/Right Click zones for desktop navigation */}
+        <button
+          onClick={() => setCurrentIdx((prev) => (prev === 0 ? slides.length - 1 : prev - 1))}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors text-xs font-semibold tracking-[0.2em] font-sans hidden sm:block z-10 uppercase"
+        >
+          PRV
+        </button>
+        <button
+          onClick={() => setCurrentIdx((prev) => (prev + 1) % slides.length)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors text-xs font-semibold tracking-[0.2em] font-sans hidden sm:block z-10 uppercase"
+        >
+          NXT
+        </button>
       </div>
     </section>
   );

@@ -169,182 +169,191 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
       {/* 3. Trust Ribbon */}
       <TrustRibbon />
 
-      {/* 4. OUR BESTSELLERS SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-12 select-none">
+      {/* 4. Editorial Intro Hook */}
+      <section className="max-w-4xl mx-auto text-center py-24 px-4 space-y-4 select-none">
+        <span className={`text-[9px] ${subTextClass} font-semibold tracking-[0.35em] uppercase block`}>
+          THE ART OF SIMPLICITY
+        </span>
+        <h2 className={`font-serif font-light text-3xl sm:text-5xl tracking-wide ${textClass} leading-tight uppercase`}>
+          Architectural Fits. Muted Tones.
+        </h2>
+        <div className="w-10 h-[1px] bg-secondary/50 mx-auto my-6" />
+        <p className="text-xs sm:text-sm font-sans font-light text-stone-500 max-w-xl mx-auto leading-relaxed tracking-wide">
+          Engineered with custom-woven 240 GSM French Terry cotton, ARVIIK printed oversized tees present a study in structured drapes, drop-shoulder comfort, and premium high-density aesthetics.
+        </p>
+      </section>
+
+      {/* 5. OUR BESTSELLERS SECTION */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 space-y-14 select-none">
         <div className="text-center space-y-2">
-          <span className={`text-[10px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
-            Curated Selection
+          <span className={`text-[9px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
+            THE SIGNATURE EDIT
           </span>
-          <h2 className={`font-serif font-light text-3xl sm:text-4xl tracking-wide ${textClass} mt-1`}>
+          <h2 className={`font-serif font-light text-2xl sm:text-3xl tracking-wide ${textClass} uppercase`}>
             Our Bestsellers
           </h2>
-          <div className="w-12 h-[1px] bg-secondary/60 mx-auto mt-4" />
         </div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12">
+        {/* Products Grid - Borderless, spacious */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-12 sm:gap-x-6 sm:gap-y-16">
           {renderBestsellers.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
 
-        {/* SEE MORE BESTSELLERS CTA Button */}
+        {/* DISCOVER ALL BESTSELLERS Button */}
         <div className="pt-8 flex justify-center">
           <Link
             href="/shop?tag=BESTSELLER"
-            className="w-full max-w-md text-center py-4 bg-stone-900 text-white hover:bg-stone-850 font-sans font-medium text-xs tracking-[0.25em] uppercase rounded-none transition-colors duration-300"
+            className="w-full max-w-xs text-center py-3.5 bg-stone-900 text-white hover:bg-stone-800 font-sans font-semibold text-[10px] tracking-[0.25em] uppercase rounded-none transition-colors duration-300 border border-stone-900"
           >
-            DISCOVER ALL BESTSELLERS
+            DISCOVER THE COLLECTION
           </Link>
         </div>
       </section>
 
-      {/* 5. NEW ARRIVALS SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12 select-none border-t border-stone-200/30">
+      {/* 6. Editorial Split Panels (Replaces cheap 2-column banners) */}
+      <section className="w-full select-none pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Panel 1: Graphics */}
+          <div className="relative aspect-[3/4] sm:aspect-[4/5] bg-stone-100 overflow-hidden flex flex-col justify-end p-8 sm:p-12 group">
+            <img
+              src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=800"
+              alt="Editorial look graphics"
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-101 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="relative z-10 space-y-3.5 text-white max-w-xs">
+              <span className="text-[9px] text-accent font-semibold tracking-[0.3em] uppercase block">
+                COUTURE SERIE 01
+              </span>
+              <h3 className="font-serif font-light text-2xl sm:text-3.5xl leading-tight uppercase tracking-wider">
+                Graphic Prints
+              </h3>
+              <p className="text-[10px] text-stone-300 font-sans font-light leading-relaxed tracking-wider hidden sm:block">
+                Architectural patterns and high-density screens set on premium heavyweight Terry.
+              </p>
+              <div className="pt-1.5">
+                <Link
+                  href="/shop?category=Graphic+Prints"
+                  className="inline-block text-[9px] font-sans font-semibold uppercase tracking-widest bg-white text-stone-950 px-6 py-3 rounded-none hover:bg-stone-100 transition-colors duration-300"
+                >
+                  SHOP PRINTS
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Panel 2: Minimalist */}
+          <div className="relative aspect-[3/4] sm:aspect-[4/5] bg-stone-100 overflow-hidden flex flex-col justify-end p-8 sm:p-12 group">
+            <img
+              src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800"
+              alt="Editorial look minimalist"
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-101 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="relative z-10 space-y-3.5 text-white max-w-xs">
+              <span className="text-[9px] text-accent font-semibold tracking-[0.3em] uppercase block">
+                COUTURE SERIE 02
+              </span>
+              <h3 className="font-serif font-light text-2xl sm:text-3.5xl leading-tight uppercase tracking-wider">
+                Minimalist Typo
+              </h3>
+              <p className="text-[10px] text-stone-300 font-sans font-light leading-relaxed tracking-wider hidden sm:block">
+                Clean type settings and micro puff print placements for daily premium aesthetics.
+              </p>
+              <div className="pt-1.5">
+                <Link
+                  href="/shop?category=Minimalist+Typo"
+                  className="inline-block text-[9px] font-sans font-semibold uppercase tracking-widest bg-white text-stone-950 px-6 py-3 rounded-none hover:bg-stone-100 transition-colors duration-300"
+                >
+                  SHOP MINIMALIST
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. NEW ARRIVALS SECTION */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-14 select-none border-t border-stone-200/20">
         <div className="text-center space-y-2">
-          <span className={`text-[10px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
-            Fresh Release
+          <span className={`text-[9px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
+            THE FRESH DROP
           </span>
-          <h2 className={`font-serif font-light text-3xl sm:text-4xl tracking-wide ${textClass} mt-1`}>
+          <h2 className={`font-serif font-light text-2xl sm:text-3xl tracking-wide ${textClass} uppercase`}>
             New Arrivals
           </h2>
-          <div className="w-12 h-[1px] bg-secondary/60 mx-auto mt-4" />
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-12 sm:gap-x-6 sm:gap-y-16">
           {renderNewArrivals.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
 
-      {/* 6. OVERSIZED COLLECTION promo banner */}
-      <section className="w-full bg-stone-950 text-white py-28 px-4 relative overflow-hidden select-none">
+      {/* 8. Full-Bleed Inset Lookbook Banner */}
+      <section className="w-full bg-stone-950 text-white py-32 px-4 relative overflow-hidden select-none">
         <img
           src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=1600"
-          alt="ARVIIK Promo Look"
-          className="absolute inset-0 w-full h-full object-cover opacity-25"
+          alt="ARVIIK Lookbook Cover"
+          className="absolute inset-0 w-full h-full object-cover opacity-30"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent" />
-        <div className="relative z-10 max-w-4xl mx-auto space-y-6">
-          <span className="text-[10px] text-accent font-semibold tracking-[0.4em] uppercase block">
-            THE EDITORIAL DROP
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black/90" />
+        <div className="relative z-10 max-w-3xl mx-auto space-y-6 text-center">
+          <span className="text-[9px] text-accent font-semibold tracking-[0.4em] uppercase block">
+            HEAVYWEIGHT FRENCH TERRY
           </span>
-          <h2 className="font-serif font-light text-4xl sm:text-6xl tracking-wide leading-tight">
-            Architectural <br className="sm:hidden" />
-            Oversized Fits
+          <h2 className="font-serif font-light text-3xl sm:text-5xl lg:text-6xl tracking-wider leading-tight uppercase">
+            The Signature Fit
           </h2>
-          <p className="text-xs sm:text-sm font-light text-stone-300 max-w-md tracking-wider leading-relaxed font-sans">
-            Custom-woven 240 GSM Terry cotton designed to hold shape and survive washes. Drop shoulder loose cut silhouette for absolute comfort.
+          <p className="text-xs sm:text-sm font-sans font-light text-stone-300 max-w-md mx-auto leading-relaxed tracking-wider">
+            Our premium T-shirts weigh a heavy 240 GSM. Designed with structured shoulders and a loose drape to preserve the designer silhouette wash after wash.
           </p>
-          <div className="pt-2">
+          <div className="pt-4">
             <Link
               href="/shop?category=Oversized+T-Shirts"
-              className="inline-flex items-center space-x-2.5 bg-white text-stone-900 font-sans font-medium text-xs tracking-[0.25em] px-9 py-4 rounded-none uppercase hover:bg-stone-50 transition-colors duration-300"
+              className="inline-flex items-center space-x-2 bg-white text-stone-900 font-sans font-semibold text-[10px] tracking-[0.25em] px-8 py-3.5 rounded-none uppercase hover:bg-stone-50 transition-colors duration-300 border border-stone-200"
             >
-              <span>SHOP COLLECTION</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <span>SHOP THE FITS</span>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Premium Editorial Promo Grid (2 columns on desktop, 1 on mobile) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 select-none">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Card 1: Epic Thread */}
-          <Link
-            href="/shop?category=Graphic+Prints"
-            className="group relative aspect-[16/10] sm:aspect-[21/10] w-full rounded-none overflow-hidden border border-stone-200/20 flex items-center p-6 sm:p-12 shadow-luxury bg-stone-950 text-white"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=800"
-              alt="Epic Thread Collection"
-              className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-102 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/35 to-transparent" />
-            <div className="relative z-10 space-y-3.5 max-w-xs sm:max-w-sm">
-              <span className="text-[9px] text-accent font-semibold tracking-[0.3em] uppercase block">
-                THE ART OF PRINTING
-              </span>
-              <h3 className="font-serif font-light text-2xl sm:text-4xl leading-tight tracking-wide">
-                Premium Graphics
-              </h3>
-              <p className="text-[10px] text-stone-300 font-light leading-relaxed tracking-wider hidden sm:block font-sans">
-                Premium high-density prints crafted from 240 GSM Terry cotton. Unmatched streetwear aesthetics.
-              </p>
-              <div className="pt-1.5">
-                <span className="inline-block text-[9px] font-sans font-medium uppercase tracking-widest bg-white text-stone-950 px-5 py-2.5 rounded-none group-hover:bg-accent group-hover:text-white transition-colors duration-300">
-                  Shop Now
-                </span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Card 2: Supreme Edition */}
-          <Link
-            href="/shop?category=Minimalist+Typo"
-            className="group relative aspect-[16/10] sm:aspect-[21/10] w-full rounded-none overflow-hidden border border-stone-200/20 flex items-center p-6 sm:p-12 shadow-luxury bg-stone-900 text-white"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800"
-              alt="Supreme Edition"
-              className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-102 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/35 to-transparent" />
-            <div className="relative z-10 space-y-3.5 max-w-xs sm:max-w-sm">
-              <span className="text-[9px] text-accent font-semibold tracking-[0.3em] uppercase block">
-                THE ART OF SPEECH
-              </span>
-              <h3 className="font-serif font-light text-2xl sm:text-4xl leading-tight tracking-wide">
-                Minimalist Typo
-              </h3>
-              <p className="text-[10px] text-stone-300 font-light leading-relaxed tracking-wider hidden sm:block font-sans">
-                Clean architectural structures. Minimalist typography and puff print drops.
-              </p>
-              <div className="pt-1.5">
-                <span className="inline-block text-[9px] font-sans font-medium uppercase tracking-widest bg-white text-stone-950 px-5 py-2.5 rounded-none group-hover:bg-accent group-hover:text-white transition-colors duration-300">
-                  View Collection
-                </span>
-              </div>
-            </div>
-          </Link>
-        </div>
-      </section>
-
-      {/* 7. SHOP BY CATEGORY section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-12 select-none border-t border-stone-200/30">
+      {/* 9. SHOP BY CATEGORY section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-14 select-none border-t border-stone-200/20">
         <div className="text-center space-y-2">
-          <span className={`text-[10px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
-            Explore Fits
+          <span className={`text-[9px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
+            CATEGORIES DROPS
           </span>
-          <h2 className={`font-serif font-light text-3xl sm:text-4xl tracking-wide ${textClass} mt-1`}>
+          <h2 className={`font-serif font-light text-2xl sm:text-3xl tracking-wide ${textClass} uppercase`}>
             Shop By Category
           </h2>
-          <div className="w-12 h-[1px] bg-secondary/60 mx-auto mt-4" />
         </div>
 
-        {/* Visual Category Blocks */}
+        {/* Category Blocks - Portrait format */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {categoriesList.map((cat, idx) => (
             <Link
               key={idx}
               href={cat.href}
-              className="relative aspect-[4/5] w-full rounded-none overflow-hidden group flex items-end p-8 shadow-luxury bg-stone-100"
+              className="relative aspect-[3/4] w-full rounded-none overflow-hidden group flex items-end p-8 shadow-luxury bg-stone-100 border border-stone-200/10"
             >
               <img
                 src={cat.img}
                 alt={cat.name}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-700"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-101 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
               <div className="relative z-10 w-full flex justify-between items-center text-white">
-                <span className="font-serif font-light text-xl tracking-wide uppercase">
+                <span className="font-serif font-light text-lg uppercase tracking-wider">
                   {cat.name}
                 </span>
-                <span className="text-[9px] font-sans font-medium tracking-[0.2em] border-b border-white py-1 uppercase group-hover:text-accent group-hover:border-accent transition-colors duration-300 font-sans">
-                  Discover
+                <span className="text-[9px] font-sans font-semibold tracking-[0.25em] border-b border-white pb-0.5 uppercase group-hover:text-accent group-hover:border-accent transition-colors duration-300">
+                  DISCOVER
                 </span>
               </div>
             </Link>
@@ -352,95 +361,41 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
         </div>
       </section>
 
-      {/* 8. TRENDING NOW SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12 select-none border-t border-stone-200/30">
-        <div className="text-center space-y-2">
-          <span className={`text-[10px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
-            Trending Styles
+      {/* 10. CUSTOMER TESTIMONIALS (Luxury minimal centered slider representation) */}
+      <section className="bg-[#faf9f6] py-28 border-y border-stone-200/20 select-none">
+        <div className="max-w-4xl mx-auto px-6 text-center space-y-8">
+          <span className={`text-[9px] ${subTextClass} font-semibold tracking-[0.35em] uppercase block`}>
+            PATRON TESTIMONIALS
           </span>
-          <h2 className={`font-serif font-light text-3xl sm:text-4xl tracking-wide ${textClass} mt-1`}>
-            Trending Now
-          </h2>
-          <div className="w-12 h-[1px] bg-secondary/60 mx-auto mt-4" />
-        </div>
-
-        {/* Products Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12">
-          {renderTrending.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </section>
-
-      {/* 9. CUSTOMER REVIEWS */}
-      <section className={sectionBgClass}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="text-center space-y-2">
-            <span className={`text-[10px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
-              Patron Statements
-            </span>
-            <h2 className={`font-serif font-light text-3xl sm:text-4xl tracking-wide ${textClass} mt-1`}>
-              Customer Testimonials
-            </h2>
-            <div className="w-12 h-[1px] bg-secondary/60 mx-auto mt-4" />
-          </div>
- 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                name: 'Karan Malhotra',
-                city: 'Mumbai',
-                text: 'The fabric density is outstanding. Unlike typical streetwear tees that lose their boxy shape around the neck after a few washes, ARVIIK remains as heavyweight as day one.',
-                stars: 5,
-              },
-              {
-                name: 'Elena Rostova',
-                city: 'Delhi',
-                text: 'Purchased the Polarize Vintage Cream tee. Absolutely impressed by the structured drape. Shipping was prompt, and the detailed sizing guide was perfectly accurate.',
-                stars: 5,
-              },
-              {
-                name: 'Rohan Sharma',
-                city: 'Bangalore',
-                text: 'Incredibly premium packaging and presentation. The oversized cut provides that authentic relaxed aesthetic. A truly refined addition to my collection.',
-                stars: 5,
-              },
-            ].map((review, i) => (
-              <div
-                key={i}
-                className={`${cardBgClass} p-8 rounded-none border border-stone-200/40 shadow-luxury flex flex-col space-y-6`}
-              >
-                <div className="flex items-center text-secondary">
-                  {[...Array(review.stars)].map((_, starIdx) => (
-                    <Star key={starIdx} className="h-3.5 w-3.5 fill-current text-current stroke-[1.5]" />
-                  ))}
-                </div>
-                <p className={`text-[13px] ${isDarkTheme ? 'text-stone-300' : 'text-stone-600'} leading-relaxed font-light italic`}>
-                  "{review.text}"
-                </p>
-                <div className={`pt-4 border-t ${isDarkTheme ? 'border-stone-850' : 'border-stone-100'} flex justify-between items-center text-[9px] font-semibold ${subTextClass} uppercase tracking-[0.2em] font-sans`}>
-                  <span>{review.name}</span>
-                  <span>{review.city}</span>
-                </div>
-              </div>
-            ))}
+          
+          <div className="space-y-4">
+            <p className={`font-serif font-light text-lg sm:text-2xl leading-relaxed italic ${textClass}`}>
+              "The weight and drape of the 240 GSM cotton is phenomenal. It holds its structured form perfectly after several washes, unlike anything else. ARVIIK is a true luxury essential."
+            </p>
+            <div className="flex justify-center text-secondary py-1">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="h-3 w-3 fill-current text-current stroke-[1.5]" />
+              ))}
+            </div>
+            <div className={`text-[9px] font-semibold ${subTextClass} uppercase tracking-[0.25em] pt-2`}>
+              — KARAN M. <span className="text-stone-300 font-light mx-2">·</span> MUMBAI
+            </div>
           </div>
         </div>
       </section>
  
-      {/* 10. INSTAGRAM LOOKS */}
-      <section className="py-20 space-y-12 select-none border-t border-stone-200/30">
+      {/* 11. #ARVIIKLOOKS Lookbook Grid */}
+      <section className="py-24 space-y-14 select-none border-t border-stone-200/20">
         <div className="text-center space-y-2">
-          <span className={`text-[10px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
-            Lifestyle Lookbook
+          <span className={`text-[9px] ${subTextClass} font-semibold tracking-[0.3em] uppercase block`}>
+            LIFESTYLE GALLERIES
           </span>
-          <h2 className={`font-serif font-light text-3xl sm:text-4xl tracking-wide ${textClass} mt-1`}>
+          <h2 className={`font-serif font-light text-2xl sm:text-3xl tracking-wide ${textClass} uppercase`}>
             #ARVIIKLOOKS
           </h2>
-          <div className="w-12 h-[1px] bg-secondary/60 mx-auto mt-4" />
         </div>
 
-        {/* Grid of gallery pictures */}
+        {/* Grid of gallery pictures - borderless */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 px-4 sm:px-6 lg:px-8">
           {[
             'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=600',
@@ -450,15 +405,15 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
             'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=600',
             'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=600'
           ].map((src, i) => (
-            <div key={i} className="relative aspect-square w-full group overflow-hidden bg-stone-100">
+            <div key={i} className="relative aspect-square w-full group overflow-hidden bg-stone-50">
               <img
                 src={src}
-                alt={`Instagram look ${i + 1}`}
-                className="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-103"
+                alt={`Lifestyle Look ${i + 1}`}
+                className="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-102"
               />
               <div className="absolute inset-0 bg-stone-950/45 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-                <span className="text-white text-[9px] font-sans font-medium tracking-[0.25em] uppercase border border-white/60 px-4 py-2.5 bg-transparent hover:bg-white hover:text-stone-950 transition-colors duration-300">
-                  View Fit
+                <span className="text-white text-[9px] font-sans font-semibold tracking-[0.25em] uppercase border border-white/60 px-5 py-2.5 bg-transparent hover:bg-white hover:text-stone-950 transition-colors duration-300">
+                  VIEW FIT
                 </span>
               </div>
             </div>
@@ -466,7 +421,7 @@ export default function HomeClientWrapper({ products, settings }: HomeClientWrap
         </div>
       </section>
 
-      {/* 11. Recently Viewed Slider */}
+      {/* 12. Recently Viewed Slider */}
       <RecentlyViewed />
     </div>
   );

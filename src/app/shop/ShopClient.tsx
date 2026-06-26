@@ -403,7 +403,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
             placeholder="Search items..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`w-full ${isDarkTheme ? 'bg-stone-900 border-stone-800 text-white placeholder-stone-500 focus:border-stone-400' : 'bg-stone-50 border-stone-200 focus:border-stone-900'} px-4 py-2.5 pl-10 text-xs focus:outline-none rounded-sm`}
+            className={`w-full ${isDarkTheme ? 'bg-stone-900 border-stone-800 text-white placeholder-stone-500 focus:border-stone-400' : 'bg-transparent border border-stone-200 focus:border-stone-800'} px-4 py-2.5 pl-10 text-xs focus:outline-none rounded-none`}
           />
           <Search className="absolute left-3.5 top-3.5 h-3.5 w-3.5 text-stone-400" />
           {searchQuery && (
@@ -420,11 +420,11 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
         <div className="flex items-center space-x-4 justify-between md:justify-end">
           <button
             onClick={() => setMobileFiltersOpen(true)}
-            className={`lg:hidden inline-flex items-center space-x-1.5 border px-4 py-2.5 text-xs font-bold uppercase tracking-wider rounded-sm ${
-              isDarkTheme ? 'border-stone-800 text-stone-200 hover:bg-stone-900' : 'border-stone-200 text-stone-850 hover:bg-stone-50'
+            className={`lg:hidden inline-flex items-center space-x-1.5 border px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] rounded-none ${
+              isDarkTheme ? 'border-stone-800 text-stone-200 hover:bg-stone-900' : 'border-stone-900 text-stone-900 hover:bg-stone-50'
             }`}
           >
-            <SlidersHorizontal className="h-4 w-4" />
+            <SlidersHorizontal className="h-3.5 w-3.5" />
             <span>Filters</span>
           </button>
 
@@ -433,7 +433,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
             <select
               value={priceSort}
               onChange={(e) => setPriceSort(e.target.value)}
-              className={`${isDarkTheme ? 'bg-stone-900 border-stone-800 text-white' : 'bg-stone-50 border-stone-200'} text-xs font-semibold px-3 py-2.5 focus:outline-none rounded-sm`}
+              className={`${isDarkTheme ? 'bg-stone-900 border-stone-800 text-white' : 'bg-transparent border border-stone-200'} text-[10px] uppercase font-semibold tracking-[0.15em] px-3 py-2.5 focus:outline-none rounded-none`}
             >
               <option value="">Sort Price</option>
               <option value="low-high">Low to High</option>
@@ -571,24 +571,6 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
           )}
         </div>
       </div>
-    </div>
-
-    {/* Mobile Floating Bottom Bar for Filters & Sorting */}
-    <div className={`lg:hidden fixed bottom-14 left-0 w-full h-12 ${isDarkTheme ? 'bg-stone-950 border-stone-850 text-white' : 'bg-white border-stone-200 text-stone-900'} border-t z-40 flex divide-x ${isDarkTheme ? 'divide-stone-850' : 'divide-stone-200'} shadow-luxury font-sans text-[10px] font-semibold tracking-[0.2em] uppercase`}>
-      <button 
-        onClick={() => setMobileFiltersOpen(true)}
-        className="flex-1 flex items-center justify-center space-x-2 active:bg-stone-100/10"
-      >
-        <SlidersHorizontal className="h-3.5 w-3.5" />
-        <span>Filters</span>
-      </button>
-      <button 
-        onClick={() => setMobileSortOpen(true)}
-        className="flex-1 flex items-center justify-center space-x-2 active:bg-stone-100/10"
-      >
-        <ArrowUpDown className="h-3.5 w-3.5" />
-        <span>Sort By</span>
-      </button>
     </div>
 
     {/* Mobile Sort Options Drawer */}

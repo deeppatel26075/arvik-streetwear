@@ -50,8 +50,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L' | 'XL' | 'XXL' | ''>('');
   const [quantity, setQuantity] = useState(1);
   const [sizeWarning, setSizeWarning] = useState(false);
-  const [adding, setAdding] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [activeAccordion, setActiveAccordion] = useState<string | null>('specs');
+
+  const toggleAccordion = (tab: string) => {
+    setActiveAccordion(activeAccordion === tab ? null : tab);
+  };
 
   const images = product.product_images || [];
   const primaryImage = images[activeImageIdx]?.image_url || '/placeholder-tee.jpg';
@@ -140,8 +145,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <button
                 key={i}
                 onClick={() => setActiveImageIdx(i)}
-                className={`relative aspect-3/4 w-16 md:w-full bg-stone-100 flex-shrink-0 border transition-all ${
-                  activeImageIdx === i ? 'border-stone-900 shadow-sm' : 'border-stone-200/50 opacity-70 hover:opacity-100'
+                className={`relative aspect-3/4 w-16 md:w-full bg-stone-50 flex-shrink-0 border transition-all ${
+                  activeImageIdx === i ? 'border-stone-900' : 'border-stone-200/40 opacity-70 hover:opacity-100'
                 }`}
               >
                 <img
@@ -154,16 +159,16 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           </div>
 
           {/* Primary Zoom Display */}
-          <div className="order-1 md:order-2 flex-grow relative bg-white border border-stone-200/40 rounded-xs shadow-xs">
+          <div className="order-1 md:order-2 flex-grow relative bg-transparent overflow-hidden rounded-none">
             <ImageZoom src={primaryImage} alt={product.name} />
             
             {/* Wishlist Heart Toggle */}
             <button
               onClick={handleWishlistClick}
-              className="absolute top-4 right-4 z-10 p-3 rounded-full bg-white/95 backdrop-blur-xs text-stone-900 shadow-md hover:bg-white transition-colors"
+              className="absolute top-4 right-4 z-10 p-2.5 rounded-full bg-[#faf9f6]/95 backdrop-blur-xs text-stone-900 shadow-luxury hover:bg-white transition-colors"
             >
               <Heart
-                className={`h-5 w-5 ${
+                className={`h-4.5 w-4.5 stroke-[1.5] ${
                   isFavorited ? 'fill-sale text-sale' : 'text-stone-700'
                 }`}
               />
@@ -173,57 +178,52 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
         {/* Right Side: Product Details buy panel */}
         <div className="lg:col-span-5 flex flex-col justify-start space-y-6 lg:py-2">
-          <div className="space-y-1">
-            <span className="text-[9px] text-stone-400 font-bold uppercase tracking-[0.25em] block">
-              ARVIIK STREETWEAR CO.
+          <div className="space-y-1.5">
+            <span className="text-[9px] text-stone-400 font-semibold tracking-[0.3em] block">
+              ARVIIK SIGNATURE
             </span>
-            <h1 className="font-syne font-black text-2xl md:text-3xl uppercase tracking-wider text-stone-950">
+            <h1 className="font-serif font-light text-2xl md:text-3.5xl tracking-wide text-stone-900 uppercase">
               {product.name}
             </h1>
           </div>
 
           {/* Multi-Price Listing */}
-          <div className="flex items-center space-x-3 pb-4 border-b border-stone-200/80">
-            <span className="text-xl font-extrabold text-stone-950">
+          <div className="flex items-center space-x-3 pb-5 border-b border-stone-200/20 font-sans">
+            <span className="text-lg font-semibold text-stone-900">
               {formatPrice(priceVal)}
             </span>
-            <span className="text-sm text-stone-400 line-through">
-              {formatPrice(mrpVal)}
-            </span>
-            <span className="text-xs text-sale font-black uppercase">
-              {discountVal}% OFF
-            </span>
-          </div>
-
-          {/* Best Price capsule */}
-          <div className="bg-emerald-50 border border-success/15 py-3 px-4 rounded-sm flex items-center space-x-2">
-            <span className="bg-success text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold shadow-2xs">%</span>
-            <div className="text-[10px] font-bold text-success uppercase tracking-wider">
-              Best price with coupon code: <span className="font-black text-xs text-stone-900">{formatPrice(bestPriceVal)}</span>
-            </div>
+            {mrpVal > priceVal && (
+              <>
+                <span className="text-xs text-stone-400 line-through">
+                  {formatPrice(mrpVal)}
+                </span>
+                <span className="text-[10px] text-sale font-medium tracking-[0.1em] uppercase">
+                  ({discountVal}% OFF)
+                </span>
+              </>
+            )}
           </div>
 
           {/* Short info description */}
-          <p className="text-xs text-stone-600 leading-relaxed font-light">
+          <p className="text-xs text-stone-500 leading-relaxed font-light font-sans tracking-wide">
             {product.description}
           </p>
 
           {/* Size selection row */}
-          <div className="space-y-3 pt-2">
-            <div className="flex justify-between items-center text-xs">
-              <span className="font-bold uppercase tracking-wider text-stone-900">
+          <div className="space-y-4 pt-2">
+            <div className="flex justify-between items-center text-xs font-sans">
+              <span className="font-semibold uppercase tracking-[0.15em] text-[10px] text-stone-850">
                 Choose Size
               </span>
               <button
                 onClick={() => setSizeGuideOpen(true)}
-                className="text-secondary hover:text-stone-950 cursor-pointer underline tracking-wider font-semibold flex items-center space-x-1"
+                className="text-secondary hover:text-stone-950 cursor-pointer underline tracking-[0.15em] text-[10px] font-semibold flex items-center space-x-1"
               >
-                <HelpCircle className="h-3.5 w-3.5" />
-                <span>Fit Helper / Size Chart</span>
+                <span>Size Guide / Chart</span>
               </button>
             </div>
 
-            <div className="flex flex-wrap gap-2.5">
+            <div className="flex flex-wrap gap-2">
               {sizes.map((size) => {
                 const stock = getStock(size);
                 const isAvailable = stock > 0;
@@ -235,12 +235,12 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       setSelectedSize(size);
                       setSizeWarning(false);
                     }}
-                    className={`border font-semibold text-xs px-5 py-3 rounded-sm flex items-center justify-center transition-colors uppercase ${
+                    className={`border font-semibold text-[11px] w-11 h-11 flex items-center justify-center transition-colors uppercase rounded-none font-sans ${
                       selectedSize === size
-                        ? 'bg-stone-950 text-white border-stone-950 shadow-sm'
+                        ? 'bg-stone-900 text-white border-stone-900'
                         : !isAvailable
                         ? 'border-stone-100 text-stone-300 cursor-not-allowed line-through bg-stone-50/50'
-                        : 'border-stone-250 text-stone-700 hover:border-stone-950'
+                        : 'border-stone-200 text-stone-600 hover:border-stone-900'
                     }`}
                   >
                     {size}
@@ -251,74 +251,113 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
             {/* Size alerts & stocks warnings */}
             {sizeWarning && (
-              <p className="text-[11px] text-sale font-black uppercase tracking-wider">
+              <p className="text-[10px] text-sale font-semibold uppercase tracking-[0.15em] font-sans">
                 Please select a size to proceed.
               </p>
             )}
 
             {selectedSize && activeSizeStock > 0 && activeSizeStock <= 5 && (
-              <p className="text-[11px] text-amber-700 font-bold uppercase tracking-wider">
-                Running Low! Only {activeSizeStock} left in stock.
+              <p className="text-[10px] text-amber-700 font-semibold uppercase tracking-[0.15em] font-sans">
+                Running Low! Only {activeSizeStock} left.
               </p>
             )}
             
             {selectedSize && activeSizeStock === 0 && (
-              <p className="text-[11px] text-sale font-bold uppercase tracking-wider">
+              <p className="text-[10px] text-sale font-semibold uppercase tracking-[0.15em] font-sans">
                 {selectedSize} is SOLD OUT.
               </p>
             )}
           </div>
 
-          {/* D2C conversion card */}
-          <div className="bg-stone-900 border border-stone-850 p-4.5 rounded-sm space-y-3.5 text-xs text-stone-300 font-sans tracking-wide">
-            <span className="text-[9px] text-stone-500 font-bold uppercase tracking-[0.25em] block border-b border-stone-800 pb-1.5 font-syne">
-              PRODUCT SPECIFICATIONS
-            </span>
-            <div className="grid grid-cols-2 gap-y-2 text-[10px] font-bold uppercase tracking-widest text-stone-400">
-              <div>Fabric Weave:</div>
-              <div className="text-stone-200">{product.fabric}</div>
-              <div>Thread Spec:</div>
-              <div className="text-stone-200">{product.gsm}</div>
-              <div>Cut Style:</div>
-              <div className="text-stone-200">{product.fit_type}</div>
-              <div>Wash Care:</div>
-              <div className="text-stone-200">{product.wash_instructions}</div>
-            </div>
-          </div>
-
           {/* Action CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button
               onClick={() => handleAddToCart(false)}
               disabled={adding}
-              className="flex-grow bg-white border border-stone-950 text-stone-950 text-[10px] font-bold uppercase tracking-widest py-4 hover:bg-stone-950 hover:text-white transition-all duration-300 rounded-xs flex items-center justify-center space-x-2"
+              className="flex-grow bg-stone-900 text-white text-[10px] font-semibold tracking-[0.25em] py-4 hover:bg-stone-800 transition-all duration-300 rounded-none flex items-center justify-center space-x-2 border border-stone-900"
             >
-              <ShoppingBag className="h-4.5 w-4.5" />
+              <ShoppingBag className="h-4 w-4 stroke-[1.5]" />
               <span>{adding ? 'RESERVING...' : 'ADD TO BAG'}</span>
             </button>
             
             <button
               onClick={() => handleAddToCart(true)}
               disabled={adding}
-              className="flex-grow bg-secondary border border-secondary text-white text-[10px] font-bold uppercase tracking-widest py-4 hover:opacity-90 transition-all rounded-xs"
+              className="flex-grow bg-transparent border border-stone-300 text-stone-900 text-[10px] font-semibold tracking-[0.25em] py-4 hover:border-stone-900 transition-all rounded-none font-sans"
             >
               BUY IT NOW
             </button>
           </div>
 
-          {/* Brand trust icons */}
-          <div className="grid grid-cols-3 gap-2.5 text-center text-stone-600 font-bold text-[9px] uppercase tracking-wider py-4 border-t border-stone-150">
-            <div className="space-y-1">
-              <Award className="h-4 w-4 text-accent mx-auto" />
-              <p>Premium Cotton</p>
+          {/* Luxury Collapsible Accordions (Replaces specs table and trust icons) */}
+          <div className="border-t border-stone-200/20 pt-4 space-y-4">
+            {/* Accordion 1: Specs */}
+            <div className="border-b border-stone-200/20 pb-4">
+              <button
+                onClick={() => toggleAccordion('specs')}
+                className="w-full flex justify-between items-center text-[10px] font-semibold tracking-[0.2em] uppercase text-stone-900 py-1"
+              >
+                <span>PRODUCT SPECIFICATIONS</span>
+                <ChevronRight className={`h-3.5 w-3.5 text-stone-400 transition-transform duration-300 ${activeAccordion === 'specs' ? 'rotate-90' : ''}`} />
+              </button>
+              <div className={`luxury-accordion-content ${activeAccordion === 'specs' ? 'open' : ''}`}>
+                <div className="pt-3.5 pb-1.5 text-[10px] text-stone-500 leading-relaxed font-sans space-y-2 uppercase tracking-[0.08em]">
+                  <div className="flex justify-between">
+                    <span className="text-stone-400">FABRIC WEAVE:</span>
+                    <span className="font-semibold text-stone-800">{product.fabric}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-stone-400">THREAD WEIGHT:</span>
+                    <span className="font-semibold text-stone-800">{product.gsm}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-stone-400">FIT STYLE:</span>
+                    <span className="font-semibold text-stone-800">{product.fit_type}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-stone-400">WASH CARE:</span>
+                    <span className="font-semibold text-stone-800">MACHINE COLD</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="space-y-1">
-              <RefreshCw className="h-4 w-4 text-accent mx-auto" />
-              <p>7-Day Returns</p>
+
+            {/* Accordion 2: Care */}
+            <div className="border-b border-stone-200/20 pb-4">
+              <button
+                onClick={() => toggleAccordion('care')}
+                className="w-full flex justify-between items-center text-[10px] font-semibold tracking-[0.2em] uppercase text-stone-900 py-1"
+              >
+                <span>CARE & WASH INSTRUCTIONS</span>
+                <ChevronRight className={`h-3.5 w-3.5 text-stone-400 transition-transform duration-300 ${activeAccordion === 'care' ? 'rotate-90' : ''}`} />
+              </button>
+              <div className={`luxury-accordion-content ${activeAccordion === 'care' ? 'open' : ''}`}>
+                <div className="pt-3.5 pb-1.5 text-[11px] text-stone-500 leading-relaxed space-y-1.5 font-sans font-light tracking-wide">
+                  <p>· Machine wash cold with similar colors inside out.</p>
+                  <p>· Do not bleach or use heavy enzymatic detergents.</p>
+                  <p>· Dry flat in shade. Do not tumble dry.</p>
+                  <p>· Warm iron on reverse side. Do not iron directly on prints.</p>
+                </div>
+              </div>
             </div>
-            <div className="space-y-1">
-              <Truck className="h-4 w-4 text-accent mx-auto" />
-              <p>Free Delivery &gt; 999</p>
+
+            {/* Accordion 3: Shipping */}
+            <div className="border-b border-stone-200/20 pb-4">
+              <button
+                onClick={() => toggleAccordion('shipping')}
+                className="w-full flex justify-between items-center text-[10px] font-semibold tracking-[0.2em] uppercase text-stone-900 py-1"
+              >
+                <span>SHIPPING & RETURNS</span>
+                <ChevronRight className={`h-3.5 w-3.5 text-stone-400 transition-transform duration-300 ${activeAccordion === 'shipping' ? 'rotate-90' : ''}`} />
+              </button>
+              <div className={`luxury-accordion-content ${activeAccordion === 'shipping' ? 'open' : ''}`}>
+                <div className="pt-3.5 pb-1.5 text-[11px] text-stone-500 leading-relaxed space-y-1.5 font-sans font-light tracking-wide">
+                  <p>· Free standard shipping on all prepaid orders across India.</p>
+                  <p>· Dispatch within 24-48 hours. Delivery takes 3-5 business days.</p>
+                  <p>· Cash on Delivery (COD) is available (additional charges apply).</p>
+                  <p>· 7-day hassle-free returns and size exchanges from delivery date.</p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -334,17 +373,17 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       {/* Size recommendation guides modal */}
       <SizeGuide isOpen={sizeGuideOpen} onClose={() => setSizeGuideOpen(false)} />
 
-      {/* Mobile Sticky CTA footer (under 768px viewport) */}
-      <div className="md:hidden fixed bottom-14 left-0 w-full bg-white border-t border-stone-200 py-2.5 px-4 z-40 flex space-x-3.5 shadow-2xl">
+      {/* Mobile Sticky CTA footer (rests cleanly at bottom-0 since bottom nav bar is removed) */}
+      <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-stone-200 py-3.5 px-4 z-40 flex space-x-3.5 shadow-luxury pb-safe">
         <button
           onClick={() => handleAddToCart(false)}
-          className="flex-1 bg-white border border-stone-950 text-stone-950 text-[10px] font-black uppercase tracking-widest py-3 rounded-xs"
+          className="flex-1 bg-white border border-stone-900 text-stone-900 text-[9px] font-semibold tracking-[0.2em] py-3.5 rounded-none uppercase font-sans"
         >
           ADD TO BAG
         </button>
         <button
           onClick={() => handleAddToCart(true)}
-          className="flex-1 bg-secondary text-white text-[10px] font-black uppercase tracking-widest py-3 rounded-xs"
+          className="flex-1 bg-stone-900 text-white text-[9px] font-semibold tracking-[0.2em] py-3.5 rounded-none uppercase font-sans"
         >
           BUY NOW
         </button>

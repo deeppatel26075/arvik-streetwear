@@ -122,3 +122,15 @@ body {
   scrollbar-width: none;
 }
 
+/* Luxury Accordion Transitions */
+.luxury-accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s ease;
+}
+
+.luxury-accordion-content.open {
+  max-height: 250px;
+}
+
+

@@ -10,13 +10,13 @@ export default function TrustRibbon() {
   ];
 
   return (
-    <section className="w-full bg-[#faf9f6] py-4 border-b border-stone-200/40 select-none">
-      <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-12 md:gap-16 text-[9px] sm:text-[10px] text-stone-500 font-semibold tracking-[0.25em] uppercase text-center font-sans">
+    <section className="w-full bg-[#faf9f6] py-3.5 border-b border-stone-200/20 select-none">
+      <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-10 md:gap-14 text-[8px] sm:text-[9px] text-stone-400 font-medium tracking-[0.3em] uppercase text-center font-sans">
         {points.map((point, index) => (
           <React.Fragment key={index}>
-            <span className="hover:text-stone-800 transition-colors">{point}</span>
+            <span className="hover:text-stone-700 transition-colors">{point}</span>
             {index < points.length - 1 && (
-              <span className="hidden sm:inline text-stone-300 font-light select-none">|</span>
+              <span className="hidden sm:inline text-stone-300 select-none">·</span>
             )}
           </React.Fragment>
         ))}

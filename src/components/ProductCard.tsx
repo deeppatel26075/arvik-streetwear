@@ -134,7 +134,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Top-Left Bestseller tag: Minimalist premium look */}
         {product.tags?.includes('BESTSELLER') && (
-          <span className="absolute top-3 left-3 z-10 bg-stone-950 text-white text-[7px] font-bold tracking-[0.2em] uppercase px-2.5 py-1">
+          <span className="absolute top-3 left-3 z-10 bg-[#faf9f6]/95 backdrop-blur-xs text-stone-800 text-[8px] font-semibold tracking-[0.15em] uppercase px-2.5 py-1.5 border border-stone-200/50">
             Exclusive
           </span>
         )}
@@ -145,7 +145,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             <img
               src={hovered ? secondaryImage : primaryImage}
               alt={product.name}
-              className="object-cover w-full h-full absolute inset-0 transition-transform duration-700 group-hover:scale-103"
+              className="object-cover w-full h-full absolute inset-0 transition-transform duration-700 group-hover:scale-101"
             />
           ) : (
             <Image
@@ -153,31 +153,26 @@ export default function ProductCard({ product }: ProductCardProps) {
               alt={product.name}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-103"
+              className="object-cover transition-transform duration-700 group-hover:scale-101"
             />
           )}
         </div>
       </Link>
 
       {/* Product Details info */}
-      <div className="pt-3.5 pb-2.5 px-0.5 flex flex-col flex-grow bg-transparent space-y-1">
+      <div className="pt-4 pb-2 px-0.5 flex flex-col flex-grow bg-transparent space-y-1">
         {/* Title */}
         <Link
           href={`/shop/${product.slug}`}
           onClick={handleProductClick}
-          className="text-stone-900 hover:text-secondary text-[11px] font-semibold tracking-wider transition-colors uppercase leading-tight font-sans"
+          className="text-stone-900 hover:text-secondary text-[11px] font-medium tracking-[0.1em] transition-colors uppercase leading-tight font-sans"
         >
           {product.name}
         </Link>
         
-        {/* Brand label */}
-        <span className="text-[8px] text-stone-400 font-bold uppercase tracking-[0.2em] font-sans pb-1">
-          ARVIIK CLASSIC
-        </span>
-        
         {/* Pricing Row */}
-        <div className="flex items-center space-x-2 text-xs font-sans">
-          <span className="font-bold text-stone-900">
+        <div className="flex items-center space-x-2 text-[11px] font-sans pt-0.5">
+          <span className="font-semibold text-stone-900">
             {formatPrice(priceVal)}
           </span>
           {mrpVal > priceVal && (
@@ -185,7 +180,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               <span className="text-[10px] text-stone-400 line-through">
                 {formatPrice(mrpVal)}
               </span>
-              <span className="text-[9px] text-[#992b2b] font-medium tracking-wide">
+              <span className="text-[9px] text-sale font-medium tracking-wide">
                 ({discountVal}% OFF)
               </span>
             </>
@@ -193,7 +188,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Action Button: ADD TO BAG */}
-        <div className="mt-auto pt-2">
+        <div className="mt-auto pt-2.5">
           {!showSizes ? (
             <button
               onClick={(e) => {
@@ -201,20 +196,20 @@ export default function ProductCard({ product }: ProductCardProps) {
                 e.stopPropagation();
                 setShowSizes(true);
               }}
-              className="w-full bg-stone-950 hover:bg-stone-850 text-white text-[9px] font-bold uppercase tracking-[0.25em] py-3 transition-colors flex items-center justify-center space-x-1.5 rounded-none"
+              className="w-full bg-transparent border border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-white text-[9px] font-semibold uppercase tracking-[0.2em] py-2.5 transition-colors flex items-center justify-center rounded-none"
             >
               <span>ADD TO BAG</span>
             </button>
           ) : (
             <div className="flex items-center justify-between space-x-1 py-1">
-              <span className="text-[8px] font-black text-stone-400 uppercase tracking-widest font-sans">SIZE:</span>
+              <span className="text-[8px] font-semibold text-stone-400 uppercase tracking-[0.15em] font-sans">SIZE:</span>
               <div className="flex items-center space-x-1.5 overflow-x-auto py-0.5 scrollbar-none">
                 {availableSizes.map((size) => (
                   <button
                     key={size}
                     onClick={(e) => handleQuickAdd(size as any, e)}
                     disabled={adding}
-                    className="bg-white hover:bg-stone-950 hover:text-white text-stone-900 font-bold text-[9px] w-7 h-7 rounded-none transition-colors flex items-center justify-center border border-stone-200 hover:border-stone-950 font-sans"
+                    className="bg-white hover:bg-stone-900 hover:text-white text-stone-600 font-medium text-[9px] w-7 h-7 rounded-none transition-colors flex items-center justify-center border border-stone-200 hover:border-stone-900 font-sans"
                   >
                     {size}
                   </button>
@@ -226,7 +221,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                   e.stopPropagation();
                   setShowSizes(false);
                 }}
-                className="text-stone-400 hover:text-stone-950 p-1"
+                className="text-stone-400 hover:text-stone-900 p-1"
               >
                 <X className="h-3 w-3" />
               </button>

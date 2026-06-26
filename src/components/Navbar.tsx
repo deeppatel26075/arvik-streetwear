@@ -159,79 +159,77 @@ export default function Navbar() {
         </div>
 
         {/* Main Navbar */}
-        <div className="max-w-7xl mx-auto px-4 py-3.5 flex items-center justify-between relative">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between relative">
           
-          {/* Left section: Hamburger (mobile) */}
-          <div className="flex items-center space-x-3.5 z-10">
+          {/* Left section: Hamburger (mobile) & Nav Links (Desktop) */}
+          <div className="flex items-center space-x-6 z-10">
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="md:hidden text-stone-900 focus:outline-none p-1"
               style={{ color: isDark ? '#ffffff' : undefined }}
             >
-              <Menu className="h-6 w-6" />
+              <Menu className="h-5 w-5 stroke-[1.5]" />
             </button>
+
+            {/* Center section: Mega Menu hover link row (Desktop Only) */}
+            <nav className="hidden md:flex items-center space-x-6 text-[10px] font-semibold tracking-[0.2em] uppercase select-none">
+              <div
+                className="relative py-2 cursor-pointer"
+                onMouseEnter={() => setShowMegaMenu(true)}
+                onMouseLeave={() => setShowMegaMenu(false)}
+              >
+                <span className={navTextClass}>MEN</span>
+                {showMegaMenu && <MegaMenu onClose={() => setShowMegaMenu(false)} />}
+              </div>
+
+              <Link href="/shop?tag=NEW+ARRIVAL" className={navTextClass}>
+                NEW
+              </Link>
+
+              <Link href="/shop?category=Oversized+T-Shirts" className={navTextClass}>
+                OVERSIZED
+              </Link>
+
+              <Link href="/shop?category=Graphic+Prints" className={navTextClass}>
+                GRAPHICS
+              </Link>
+
+              <Link href="/shop?category=Minimalist+Typo" className={navTextClass}>
+                MINIMALIST
+              </Link>
+
+              <Link href="/shop?tag=BESTSELLER" className={`${navTextClass} text-sale`}>
+                BESTSELLERS
+              </Link>
+            </nav>
           </div>
           
-          {/* Centered Logo (Mobile/Desktop adaptive) */}
+          {/* Centered Logo (Absolute middle for both mobile and desktop) */}
           <Link
             href="/"
-            className="flex items-center select-none absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 md:relative md:left-auto md:top-auto md:transform-none"
+            className="flex items-center select-none absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
           >
-            <img
-              src="/logo.jpg"
-              alt="ARVIIK Logo"
-              className="h-8 md:h-10 w-auto object-contain mix-blend-multiply"
-            />
+            <span className="font-serif font-light text-xl md:text-2xl tracking-[0.25em] text-stone-900 uppercase" style={{ color: isDark ? '#ffffff' : undefined }}>
+              ARVIIK
+            </span>
           </Link>
 
-          {/* Center section: Mega Menu hover link row (Desktop Only) */}
-          <nav className="hidden md:flex items-center space-x-8 text-xs font-black tracking-widest uppercase select-none">
-            <div
-              className="relative py-2 cursor-pointer"
-              onMouseEnter={() => setShowMegaMenu(true)}
-              onMouseLeave={() => setShowMegaMenu(false)}
-            >
-              <span className={navTextClass}>MEN</span>
-              {showMegaMenu && <MegaMenu onClose={() => setShowMegaMenu(false)} />}
-            </div>
-
-            <Link href="/shop?tag=NEW+ARRIVAL" className={navTextClass}>
-              NEW ARRIVALS
-            </Link>
-
-            <Link href="/shop?category=Oversized+T-Shirts" className={navTextClass}>
-              OVERSIZED T-SHIRTS
-            </Link>
-
-            <Link href="/shop?category=Graphic+Prints" className={navTextClass}>
-              GRAPHIC PRINTS
-            </Link>
-
-            <Link href="/shop?category=Minimalist+Typo" className={navTextClass}>
-              MINIMALIST TYPO
-            </Link>
-
-            <Link href="/shop?tag=BESTSELLER" className={`${navTextClass} text-sale`}>
-              BESTSELLERS
-            </Link>
-          </nav>
-
           {/* Right section: Action Icons */}
-          <div className="flex items-center space-x-3 md:space-x-5 z-10">
+          <div className="flex items-center space-x-3.5 md:space-x-4.5 z-10">
             <button
               onClick={() => setSearchOpen(true)}
               className={`transition-opacity p-1 cursor-pointer ${iconColorClass}`}
             >
-              <Search className="h-5 w-5" />
+              <Search className="h-4.5 w-4.5 stroke-[1.5]" />
             </button>
 
             <Link
               href="/wishlist"
               className={`transition-opacity relative p-1 ${iconColorClass}`}
             >
-              <Heart className="h-5 w-5" />
+              <Heart className="h-4.5 w-4.5 stroke-[1.5]" />
               {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-sale text-white text-[8px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border border-white">
+                <span className="absolute -top-1 -right-1 bg-sale text-white text-[8px] font-semibold w-4 h-4 rounded-full flex items-center justify-center border border-white">
                   {wishlistCount}
                 </span>
               )}
@@ -241,16 +239,16 @@ export default function Navbar() {
               href={user ? '/account' : '/login'}
               className={`transition-opacity p-1 hidden md:block ${iconColorClass}`}
             >
-              <User className="h-5 w-5" />
+              <User className="h-4.5 w-4.5 stroke-[1.5]" />
             </Link>
 
             <button
               onClick={triggerCartOpen}
               className={`transition-opacity relative p-1 ${iconColorClass}`}
             >
-              <ShoppingBag className="h-5 w-5" />
+              <ShoppingBag className="h-4.5 w-4.5 stroke-[1.5]" />
               {totalCartItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-secondary text-white text-[8px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border border-white animate-pulse">
+                <span className="absolute -top-1 -right-1 bg-secondary text-white text-[8px] font-semibold w-4 h-4 rounded-full flex items-center justify-center border border-white">
                   {totalCartItems}
                 </span>
               )}
@@ -260,7 +258,7 @@ export default function Navbar() {
       </header>
 
       {/* Spacer to push content down below fixed Navbar */}
-      <div className="h-24 w-full" />
+      <div className="h-20 w-full" />
 
       {/* Full-Screen Mobile Drawer */}
       <MobileMenu

@@ -9,7 +9,6 @@ import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import SoundExperience from '@/components/SoundExperience';
 import Atelier from '@/components/Atelier';
-import MobileBottomNav from '@/components/Navigation/MobileBottomNav';
 
 const jost = Jost({
   variable: '--font-sans',
@@ -49,8 +48,7 @@ export default function RootLayout({
             <CartDrawer />
             <SoundExperience />
             <Atelier />
-            <main className="flex-grow flex flex-col pb-16 md:pb-0">{children}</main>
-            <MobileBottomNav />
+            <main className="flex-grow flex flex-col pb-0">{children}</main>
             <Footer />
           </CartProvider>
         </AuthProvider>
