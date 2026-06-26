@@ -59,7 +59,7 @@ export default async function ShopPage() {
   }, {});
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="w-full space-y-0">
       <Suspense fallback={
         <div className="flex justify-center items-center py-20 text-xs font-bold uppercase tracking-widest text-stone-400">
           Loading drops...

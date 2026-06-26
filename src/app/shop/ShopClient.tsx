@@ -59,6 +59,7 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [priceSort, setPriceSort] = useState<string>(''); // 'low-high' | 'high-low' | ''
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [mobileSortOpen, setMobileSortOpen] = useState(false);
 
   // Pagination count state
   const [visibleCount, setVisibleCount] = useState(12);
@@ -293,16 +294,104 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
   }
 
   return (
-    <div className="space-y-8 font-sans">
-      {/* 1. Header Banner */}
-      <div className={`border-b ${borderBottomClass} pb-6`}>
-        <span className="text-[10px] text-stone-400 font-bold tracking-[0.3em] uppercase">
-          ARVIIK Catalog
-        </span>
-        <h1 className={`font-syne font-extrabold text-3xl uppercase tracking-wider ${titleTextClass} mt-1`}>
-          Streetwear Drops
-        </h1>
+    <div className="w-full space-y-0 font-sans pb-24 md:pb-8">
+      {/* 1. Top Promo Banner */}
+      <div className="w-full relative h-[30vh] sm:h-[40vh] bg-stone-950 overflow-hidden select-none">
+        <img
+          src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=1200"
+          alt="ARVIIK Shop Banner"
+          className="absolute inset-0 w-full h-full object-cover opacity-55"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent" />
+        <div className="absolute inset-0 flex items-center justify-start p-6 sm:p-12 md:p-16">
+          <div className="max-w-xl space-y-2 sm:space-y-3">
+            <span className="text-[9px] text-[#ffd200] font-black tracking-[0.25em] uppercase">
+              Oversized Printed T-Shirts
+            </span>
+            <h1 className="font-syne font-black text-2xl sm:text-4xl text-white uppercase tracking-wider leading-none">
+              STARTING FROM ₹899
+            </h1>
+            <div className="pt-2">
+              <span className="inline-block bg-white text-stone-950 text-[9px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full shadow-lg">
+                Shop Collection
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* 2. Circular Categories Strip */}
+      <section className={`w-full ${isDarkTheme ? 'bg-stone-950/20 border-stone-850' : 'bg-white border-stone-150'} py-5 px-4 border-b select-none`}>
+        <div className="max-w-7xl mx-auto flex overflow-x-auto justify-start sm:justify-center gap-6 pb-1 scrollbar-none">
+          {[
+            {
+              label: 'All Drops',
+              image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=300',
+              value: ''
+            },
+            {
+              label: 'Graphic Prints',
+              image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=300',
+              value: 'Graphic Prints'
+            },
+            {
+              label: 'Minimalist Typo',
+              image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=300',
+              value: 'Minimalist Typo'
+            },
+            {
+              label: 'Plus Size',
+              image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=300',
+              value: 'Plus Size'
+            }
+          ].map((item, index) => {
+            const isSelected = selectedCategory === item.value;
+            return (
+              <button
+                key={index}
+                onClick={() => setSelectedCategory(item.value)}
+                className="flex flex-col items-center flex-shrink-0 w-20 sm:w-24 group focus:outline-none"
+              >
+                {/* Circular image container */}
+                <div className={`relative w-16 h-16 rounded-full overflow-hidden border transition-all duration-300 shadow-2xs ${
+                  isSelected 
+                    ? 'border-[#ffd200] ring-2 ring-[#ffd200]/25' 
+                    : `${isDarkTheme ? 'border-stone-800' : 'border-stone-200/60'}`
+                }`}>
+                  <img
+                    src={item.image}
+                    alt={item.label}
+                    className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+                  />
+                </div>
+                <span className={`text-[8px] uppercase tracking-widest text-center mt-2.5 font-bold leading-tight ${
+                  isSelected ? 'text-[#ffd200] font-black' : `${isDarkTheme ? 'text-stone-400' : 'text-stone-500'}`
+                }`}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 3. Main Catalog Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        {/* Dynamic Category Name & Items Count Header */}
+        <div className={`border-b ${borderBottomClass} pb-4 flex justify-between items-end`}>
+          <div>
+            <span className="text-[9px] text-stone-400 font-bold tracking-[0.3em] uppercase">
+              Streetwear Catalog
+            </span>
+            <h1 className={`font-syne font-extrabold text-2xl uppercase tracking-wider ${titleTextClass} mt-0.5`}>
+              {selectedCategory || 'All Drops'}
+              <span className="text-xs text-stone-400 font-semibold lowercase ml-2">
+                ({products.length} {products.length === 1 ? 'item' : 'items'})
+              </span>
+            </h1>
+          </div>
+        </div>
 
       {/* 2. Controls / Search bar */}
       <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 border-b ${borderBottomClass} pb-5`}>
@@ -482,8 +571,86 @@ export default function ShopClient({ initialProducts, categories, settings }: Sh
           )}
         </div>
       </div>
+    </div>
 
-      {/* Mobile Filters Drawer */}
+    {/* Mobile Floating Bottom Bar for Filters & Sorting */}
+    <div className={`lg:hidden fixed bottom-14 left-0 w-full h-12 ${isDarkTheme ? 'bg-stone-950 border-stone-850 text-white' : 'bg-white border-stone-200 text-stone-900'} border-t z-40 flex divide-x ${isDarkTheme ? 'divide-stone-850' : 'divide-stone-200'} shadow-md font-syne text-[10px] font-black tracking-widest uppercase`}>
+      <button 
+        onClick={() => setMobileFiltersOpen(true)}
+        className="flex-1 flex items-center justify-center space-x-2 active:bg-stone-100/10"
+      >
+        <SlidersHorizontal className="h-3.5 w-3.5" />
+        <span>Filters</span>
+      </button>
+      <button 
+        onClick={() => setMobileSortOpen(true)}
+        className="flex-1 flex items-center justify-center space-x-2 active:bg-stone-100/10"
+      >
+        <ArrowUpDown className="h-3.5 w-3.5" />
+        <span>Sort By</span>
+      </button>
+    </div>
+
+    {/* Mobile Sort Options Drawer */}
+    <AnimatePresence>
+      {mobileSortOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMobileSortOpen(false)}
+            className="fixed inset-0 bg-stone-950/45 backdrop-blur-xs z-50 lg:hidden"
+          />
+          {/* Drawer */}
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'tween', duration: 0.25 }}
+            className={`fixed bottom-0 left-0 w-full ${isDarkTheme ? 'bg-stone-900 text-stone-300' : 'bg-white text-stone-850'} rounded-t-xl shadow-2xl z-50 flex flex-col lg:hidden pb-6`}
+          >
+            <div className={`flex justify-between items-center px-6 py-4 border-b ${isDarkTheme ? 'border-stone-800' : 'border-stone-150'}`}>
+              <span className={`font-syne font-bold uppercase tracking-wider text-[10px] ${isDarkTheme ? 'text-white' : 'text-stone-900'}`}>
+                Sort By
+              </span>
+              <button
+                onClick={() => setMobileSortOpen(false)}
+                className="text-stone-500 hover:text-stone-900"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="px-6 py-3 flex flex-col space-y-1 text-xs font-semibold uppercase tracking-wider">
+              {[
+                { value: '', label: 'Featured' },
+                { value: 'low-high', label: 'Price: Low to High' },
+                { value: 'high-low', label: 'Price: High to Low' }
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => {
+                    setPriceSort(opt.value);
+                    setMobileSortOpen(false);
+                  }}
+                  className={`text-left py-3.5 border-b ${isDarkTheme ? 'border-stone-800/40' : 'border-stone-100'} last:border-b-0 ${
+                    priceSort === opt.value
+                      ? 'text-[#ffd200] font-black'
+                      : `${isDarkTheme ? 'text-stone-350' : 'text-stone-605'}`
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+
+    {/* Mobile Filters Drawer */}
       <AnimatePresence>
         {mobileFiltersOpen && (
           <>
