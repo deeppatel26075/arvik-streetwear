@@ -58,8 +58,8 @@ export default function AdminLayout({
       <AdminSidebar />
 
       {/* Main Content Area */}
-      <div className="flex-grow ml-64 min-h-screen flex flex-col">
-        <main className="flex-grow p-8 md:p-10 bg-stone-50 overflow-x-hidden">
+      <div className="flex-grow ml-0 lg:ml-64 pt-16 lg:pt-0 min-h-screen flex flex-col">
+        <main className="flex-grow p-4 sm:p-8 md:p-10 bg-stone-50 overflow-x-hidden">
           {children}
         </main>
       </div>
