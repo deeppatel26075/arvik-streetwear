@@ -57,7 +57,7 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
   return (
     <div className="w-full space-y-16">
       {/* 1. HERO SECTION */}
-      <section className="relative h-[90vh] w-full flex items-center justify-center bg-stone-900 overflow-hidden">
+      <section className="relative h-[65vh] sm:h-[72vh] min-h-[460px] w-full flex items-center justify-center bg-stone-900 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             src="/products/mard-paisa-maroon.jpg"

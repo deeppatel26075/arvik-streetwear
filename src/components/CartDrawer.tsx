@@ -262,13 +262,19 @@ export default function CartDrawer() {
                 </div>
 
                 {/* Checkout CTA */}
-                <Link
-                  href="/checkout"
-                  onClick={() => setIsOpen(false)}
-                  className="apple-button block w-full text-center text-xs tracking-widest uppercase shadow-xs"
-                >
-                  Proceed to Checkout
-                </Link>
+                <div className="space-y-2 pt-1">
+                  <Link
+                    href="/checkout"
+                    onClick={() => setIsOpen(false)}
+                    className="w-full bg-stone-950 hover:bg-stone-900 text-white font-extrabold text-xs tracking-widest uppercase py-4 rounded-xs shadow-md transition-all flex items-center justify-center space-x-2 border border-transparent hover:border-stone-800"
+                  >
+                    <span>PROCEED TO CHECKOUT</span>
+                    <span className="text-stone-300">→</span>
+                  </Link>
+                  <p className="text-[9px] text-stone-400 font-bold uppercase tracking-widest text-center flex items-center justify-center gap-1">
+                    <span>🔒 256-Bit Encrypted Secure Checkout</span>
+                  </p>
+                </div>
               </div>
             )}
           </motion.div>

@@ -613,6 +613,34 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         </div>
       )}
 
+      {/* Mobile Sticky Bottom Purchase Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md p-3 border-t border-stone-200/90 shadow-2xl flex items-center justify-between gap-3 select-none">
+        <div className="flex flex-col">
+          <span className="text-xs font-mono font-extrabold text-stone-950">{formatPrice(activePrice)}</span>
+          <span className="text-[9px] font-bold text-emerald-700 uppercase tracking-widest">Free Shipping</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <select
+            value={selectedSize}
+            onChange={(e) => setSelectedSize(e.target.value as any)}
+            className="bg-stone-100 border border-stone-300 text-stone-900 font-extrabold text-xs px-2.5 py-2.5 rounded-xs focus:outline-none"
+          >
+            <option value="">Size</option>
+            {sizes.map(sz => (
+              <option key={sz} value={sz}>{sz}</option>
+            ))}
+          </select>
+          <button
+            onClick={() => handleAddToCart(false)}
+            disabled={adding}
+            className="bg-stone-950 hover:bg-stone-900 text-white font-extrabold text-xs uppercase tracking-wider px-4 py-2.5 rounded-xs flex items-center gap-1.5 shadow-md"
+          >
+            <ShoppingBag className="h-4 w-4" />
+            <span>{adding ? 'Adding...' : 'Add to Bag'}</span>
+          </button>
+        </div>
+      </div>
+
     </div>
   );
 }
