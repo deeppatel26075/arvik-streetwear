@@ -246,167 +246,221 @@ export default function CheckoutPaymentPage() {
   const totalItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-6 space-y-6">
-      {/* Return */}
-      <div>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Return & Encrypted Banner */}
+      <div className="flex justify-between items-center pb-2 border-b border-stone-200">
         <Link
           href="/checkout"
-          className="inline-flex items-center space-x-1.5 text-xs text-[#666666] hover:text-[#111111] uppercase tracking-wider font-bold"
+          className="inline-flex items-center space-x-2 text-xs text-stone-600 hover:text-stone-950 uppercase tracking-widest font-bold transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>Back to Shipping</span>
+          <span>Return to Shipping Details</span>
         </Link>
+        <div className="flex items-center space-x-1.5 text-[10px] text-stone-500 font-bold uppercase tracking-widest">
+          <Lock className="h-3.5 w-3.5 text-emerald-600" />
+          <span>SSL 256-Bit Encrypted Checkout</span>
+        </div>
       </div>
 
       {/* Progress steps */}
-      <div className="flex items-center justify-center space-x-6 pb-2 border-b border-[#ECECEC]">
-        <div className="flex items-center space-x-1.5 text-xs font-bold text-[#16A34A]">
-          <span className="w-5 h-5 rounded-full bg-[#16A34A] text-white flex items-center justify-center text-[10px]">
-            <Check className="w-3 h-3" />
+      <div className="flex items-center justify-center space-x-6 pb-2">
+        <div className="flex items-center space-x-2 text-xs font-bold text-emerald-700">
+          <span className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">
+            <Check className="w-3.5 h-3.5 stroke-[3]" />
           </span>
-          <span className="uppercase tracking-wider text-[9px]">Shipping</span>
+          <span className="uppercase tracking-wider text-[10px]">Shipping</span>
         </div>
-        <div className="h-[1px] w-8 bg-[#16A34A]" />
-        <div className="flex items-center space-x-1.5 text-xs font-bold text-[#111111]">
-          <span className="w-5 h-5 rounded-full bg-[#111111] text-white flex items-center justify-center text-[10px]">2</span>
-          <span className="uppercase tracking-wider text-[9px]">Payment</span>
+        <div className="h-[1px] w-12 bg-emerald-600" />
+        <div className="flex items-center space-x-2 text-xs font-bold text-stone-950">
+          <span className="w-6 h-6 rounded-full bg-stone-950 text-white flex items-center justify-center text-[10px]">2</span>
+          <span className="uppercase tracking-wider text-[10px] font-extrabold">Payment Method</span>
         </div>
-        <div className="h-[1px] w-8 bg-[#ECECEC]" />
-        <div className="flex items-center space-x-1.5 text-xs font-bold text-[#666666]">
-          <span className="w-5 h-5 rounded-full bg-[#F7F7F7] border border-[#ECECEC] text-[#666666] flex items-center justify-center text-[10px]">3</span>
-          <span className="uppercase tracking-wider text-[9px]">Confirmation</span>
+        <div className="h-[1px] w-12 bg-stone-200" />
+        <div className="flex items-center space-x-2 text-xs font-bold text-stone-400">
+          <span className="w-6 h-6 rounded-full bg-stone-100 border border-stone-200 text-stone-500 flex items-center justify-center text-[10px]">3</span>
+          <span className="uppercase tracking-wider text-[10px]">Confirmation</span>
         </div>
       </div>
 
-      <h1 className="font-bold text-sm uppercase tracking-widest text-[#111111] pt-2">
-        SELECT PAYMENT METHOD
-      </h1>
-
-      {/* Payment Options */}
-      <div className="space-y-3">
-        {/* Razorpay Online Option */}
-        <label
-          className={`flex items-start justify-between p-4 rounded-xs border cursor-pointer transition-all ${
-            paymentMethod === 'razorpay'
-              ? 'border-stone-900 bg-stone-50/70 shadow-xs'
-              : 'border-stone-200 bg-white'
-          }`}
-        >
-          <div className="flex items-start space-x-3">
-            <input
-              type="radio"
-              name="paymentMethod"
-              checked={paymentMethod === 'razorpay'}
-              onChange={() => setPaymentMethod('razorpay')}
-              className="mt-0.5 text-stone-950 focus:ring-stone-950 h-4 w-4"
-            />
-            <div className="space-y-1">
-              <div className="flex items-center space-x-2">
-                <span className="text-xs font-extrabold text-stone-900 uppercase tracking-wider">
-                  Razorpay Secure Payment
-                </span>
-                <span className="bg-blue-50 text-blue-800 text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm uppercase tracking-widest border border-blue-100 flex items-center gap-1">
-                  <Zap className="h-2.5 w-2.5 fill-current" /> Instant
-                </span>
+      {/* 2-Column Responsive Payment Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+        
+        {/* Left Column: Payment Options & Shipping Address Summary */}
+        <div className="lg:col-span-7 space-y-6">
+          
+          {/* Shipping Address Summary Card */}
+          {shipping && (
+            <div className="p-4 bg-stone-50 border border-stone-200/80 rounded-xs space-y-2 text-xs">
+              <div className="flex justify-between items-center border-b border-stone-200/60 pb-2">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-stone-500">Delivering To:</span>
+                <Link href="/checkout" className="text-[10px] font-bold text-stone-900 underline uppercase tracking-wider">
+                  Change
+                </Link>
               </div>
-              <p className="text-[11px] text-stone-500 font-medium leading-relaxed">
-                UPI (Google Pay, PhonePe, Paytm), Credit / Debit Cards, NetBanking & Wallets.
-              </p>
-              <div className="flex items-center space-x-2 pt-1">
-                <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Supports:</span>
-                <span className="text-[9px] font-bold text-stone-600 uppercase tracking-wider bg-stone-100 px-1.5 py-0.5 rounded-xs">UPI</span>
-                <span className="text-[9px] font-bold text-stone-600 uppercase tracking-wider bg-stone-100 px-1.5 py-0.5 rounded-xs">GPay</span>
-                <span className="text-[9px] font-bold text-stone-600 uppercase tracking-wider bg-stone-100 px-1.5 py-0.5 rounded-xs">Cards</span>
-                <span className="text-[9px] font-bold text-stone-600 uppercase tracking-wider bg-stone-100 px-1.5 py-0.5 rounded-xs">NetBanking</span>
-              </div>
-            </div>
-          </div>
-          <CreditCard className="h-5 w-5 text-stone-700 flex-shrink-0 mt-0.5" />
-        </label>
-
-        {/* Cash on Delivery Option */}
-        <label
-          className={`flex items-center justify-between p-4 rounded-xs border cursor-pointer transition-all ${
-            paymentMethod === 'cod'
-              ? 'border-stone-900 bg-stone-50/70 shadow-xs'
-              : 'border-stone-200 bg-white'
-          }`}
-        >
-          <div className="flex items-center space-x-3">
-            <input
-              type="radio"
-              name="paymentMethod"
-              checked={paymentMethod === 'cod'}
-              onChange={() => setPaymentMethod('cod')}
-              className="text-stone-950 focus:ring-stone-950 h-4 w-4"
-            />
-            <div>
-              <span className="text-xs font-extrabold text-stone-900 uppercase tracking-wider block">
-                Cash on Delivery (COD)
-              </span>
-              <span className="text-[11px] text-stone-500 font-medium">
-                Pay in cash upon doorstep delivery.
-              </span>
-            </div>
-          </div>
-          <ShieldCheck className="h-5 w-5 text-stone-700 flex-shrink-0" />
-        </label>
-      </div>
-
-      {/* Summary Block */}
-      <div className="space-y-4 pt-4 border-t border-stone-200">
-        <h2 className="font-bold text-xs uppercase tracking-widest text-stone-900">
-          ORDER SUMMARY
-        </h2>
-        <div className="space-y-2 text-xs font-semibold text-stone-600">
-          <div className="flex justify-between">
-            <span>{totalItemCount} Items</span>
-            <span className="text-stone-900">{formatPrice(getCartSubtotal())}</span>
-          </div>
-          {coupon && (
-            <div className="flex justify-between text-emerald-600">
-              <span>Discount ({coupon.code})</span>
-              <span>-{formatPrice(getDiscountAmount())}</span>
+              <p className="font-bold text-stone-900 uppercase tracking-wide">{shipping.name} • {shipping.phone}</p>
+              <p className="text-stone-600">{shipping.address}{shipping.apartment ? `, ${shipping.apartment}` : ''}, {shipping.city}, {shipping.state} - {shipping.pincode}</p>
             </div>
           )}
-          <div className="flex justify-between pb-2 border-b border-stone-200">
-            <span>Shipping</span>
-            <span className="text-stone-900">
-              {getShippingFee() === 0 ? 'Free' : formatPrice(getShippingFee())}
-            </span>
-          </div>
-          <div className="flex justify-between text-sm font-bold text-stone-950 pt-1">
-            <span>Total Payable</span>
-            <span className="text-base font-extrabold">{formatPrice(getCartTotal())}</span>
+
+          <div className="bg-white border border-stone-200/80 p-6 lg:p-8 rounded-xs space-y-5 shadow-xs">
+            <h1 className="font-syne font-extrabold text-base uppercase tracking-wider text-stone-950 border-b border-stone-200 pb-3">
+              Select Payment Method
+            </h1>
+
+            {/* Payment Options Radio List */}
+            <div className="space-y-3">
+              {/* Razorpay Option */}
+              <label
+                className={`flex items-start justify-between p-4.5 rounded-xs border cursor-pointer transition-all ${
+                  paymentMethod === 'razorpay'
+                    ? 'border-stone-950 bg-stone-50/80 ring-2 ring-stone-950 shadow-xs'
+                    : 'border-stone-200 bg-white hover:border-stone-400'
+                }`}
+              >
+                <div className="flex items-start space-x-3.5">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    checked={paymentMethod === 'razorpay'}
+                    onChange={() => setPaymentMethod('razorpay')}
+                    className="mt-1 text-stone-950 focus:ring-stone-950 h-4 w-4"
+                  />
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs font-extrabold text-stone-900 uppercase tracking-wider">
+                        Razorpay Online Secure Checkout
+                      </span>
+                      <span className="bg-blue-100 text-blue-800 text-[9px] font-extrabold px-2 py-0.5 rounded-xs uppercase tracking-widest border border-blue-200 flex items-center gap-1">
+                        <Zap className="h-2.5 w-2.5 fill-current" /> Instant
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-stone-500 font-medium leading-relaxed">
+                      Pay via UPI (Google Pay, PhonePe, Paytm), Credit / Debit Cards, NetBanking, and Wallets.
+                    </p>
+                    <div className="flex items-center space-x-2 pt-1">
+                      <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Methods:</span>
+                      <span className="text-[9px] font-bold text-stone-700 bg-stone-100 px-1.5 py-0.5 rounded-xs border border-stone-200">UPI</span>
+                      <span className="text-[9px] font-bold text-stone-700 bg-stone-100 px-1.5 py-0.5 rounded-xs border border-stone-200">Google Pay</span>
+                      <span className="text-[9px] font-bold text-stone-700 bg-stone-100 px-1.5 py-0.5 rounded-xs border border-stone-200">Debit / Credit Card</span>
+                    </div>
+                  </div>
+                </div>
+                <CreditCard className="h-5 w-5 text-stone-800 flex-shrink-0 mt-1" />
+              </label>
+
+              {/* COD Option */}
+              <label
+                className={`flex items-center justify-between p-4.5 rounded-xs border cursor-pointer transition-all ${
+                  paymentMethod === 'cod'
+                    ? 'border-stone-950 bg-stone-50/80 ring-2 ring-stone-950 shadow-xs'
+                    : 'border-stone-200 bg-white hover:border-stone-400'
+                }`}
+              >
+                <div className="flex items-center space-x-3.5">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    checked={paymentMethod === 'cod'}
+                    onChange={() => setPaymentMethod('cod')}
+                    className="text-stone-950 focus:ring-stone-950 h-4 w-4"
+                  />
+                  <div>
+                    <span className="text-xs font-extrabold text-stone-900 uppercase tracking-wider block">
+                      Cash on Delivery (COD)
+                    </span>
+                    <span className="text-[11px] text-stone-500 font-medium">
+                      Pay cash upon doorstep parcel delivery.
+                    </span>
+                  </div>
+                </div>
+                <ShieldCheck className="h-5 w-5 text-stone-800 flex-shrink-0" />
+              </label>
+            </div>
+
+            {errorMsg && (
+              <div className="p-3.5 bg-red-50 border border-red-200 rounded-xs text-[11px] text-red-800 font-bold uppercase tracking-wider">
+                ⚠️ {errorMsg}
+              </div>
+            )}
+
+            <button
+              onClick={handlePlaceOrder}
+              disabled={loading}
+              className="w-full bg-stone-950 hover:bg-stone-900 text-white font-extrabold text-xs tracking-widest uppercase py-4 rounded-xs shadow-md transition-all flex items-center justify-center space-x-2 disabled:opacity-50 mt-4"
+            >
+              <span>
+                {loading
+                  ? 'Processing Order...'
+                  : paymentMethod === 'razorpay'
+                  ? `PAY ${formatPrice(getCartTotal())} VIA RAZORPAY`
+                  : `PLACE COD ORDER (${formatPrice(getCartTotal())})`}
+              </span>
+            </button>
           </div>
         </div>
-      </div>
 
-      {errorMsg && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-xs text-[11px] text-red-800 font-bold uppercase tracking-wider">
-          {errorMsg}
+        {/* Right Column: Order Summary Card */}
+        <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
+          <div className="bg-stone-50 border border-stone-200/80 p-6 rounded-xs space-y-5 shadow-xs">
+            <div className="border-b border-stone-200 pb-3 flex justify-between items-center">
+              <h2 className="font-syne font-extrabold text-sm uppercase tracking-wider text-stone-900">
+                Order Summary ({totalItemCount} Items)
+              </h2>
+            </div>
+
+            {/* Cart Items List */}
+            <div className="divide-y divide-stone-200 max-h-64 overflow-y-auto pr-1 space-y-3">
+              {cart.map((item, idx) => (
+                <div key={`${item.productId}-${item.size}-${idx}`} className="flex items-center space-x-3 pt-3 first:pt-0">
+                  <div className="relative w-14 h-16 bg-stone-200 rounded-xs overflow-hidden flex-shrink-0 border border-stone-300">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="object-cover w-full h-full"
+                    />
+                    <span className="absolute top-0 right-0 bg-stone-950 text-white text-[9px] font-bold px-1.5 py-0.2">
+                      x{item.quantity}
+                    </span>
+                  </div>
+                  <div className="flex-grow space-y-0.5">
+                    <h3 className="text-xs font-bold text-stone-900 uppercase tracking-wider line-clamp-1">
+                      {item.name}
+                    </h3>
+                    <p className="text-[10px] text-stone-500 uppercase tracking-widest font-semibold">
+                      Size: {item.size} • Qty: {item.quantity}
+                    </p>
+                    <p className="text-xs font-extrabold text-stone-950 font-mono">
+                      {formatPrice((item.discountPrice || item.price) * item.quantity)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Cost Breakdown */}
+            <div className="space-y-2.5 pt-3 border-t border-stone-200 text-xs font-semibold text-stone-600">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span className="text-stone-900">{formatPrice(getCartSubtotal())}</span>
+              </div>
+              {coupon && (
+                <div className="flex justify-between text-emerald-600">
+                  <span>Coupon ({coupon.code})</span>
+                  <span>-{formatPrice(getDiscountAmount())}</span>
+                </div>
+              )}
+              <div className="flex justify-between pb-2 border-b border-stone-200">
+                <span>Express Shipping</span>
+                <span className="text-emerald-700 font-bold uppercase tracking-wider">FREE</span>
+              </div>
+              <div className="flex justify-between text-base font-extrabold text-stone-950 pt-1">
+                <span>Total Amount</span>
+                <span className="font-mono">{formatPrice(getCartTotal())}</span>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
 
-      {/* CTA Button */}
-      <div className="pt-2 text-center space-y-3">
-        <button
-          onClick={handlePlaceOrder}
-          disabled={loading}
-          className="w-full bg-stone-950 hover:bg-stone-900 text-white font-extrabold text-xs tracking-widest uppercase py-4 rounded-xs shadow-md transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
-        >
-          <span>
-            {loading
-              ? 'Processing Payment...'
-              : paymentMethod === 'razorpay'
-              ? `PAY ${formatPrice(getCartTotal())} VIA RAZORPAY`
-              : `PLACE COD ORDER (${formatPrice(getCartTotal())})`}
-          </span>
-        </button>
-        <p className="text-[9px] text-stone-500 font-bold uppercase tracking-widest flex items-center justify-center gap-1.5">
-          <Lock className="h-3 w-3 text-stone-400" />
-          <span>256-Bit Encrypted Secure Razorpay Checkout</span>
-        </p>
       </div>
     </div>
   );
