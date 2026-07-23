@@ -43,12 +43,7 @@ export default function AdminCustomers() {
         }
         setCustomers(list);
       } else {
-        // Fallback mock customer list
-        setCustomers([
-          { id: 'u1', name: 'Rohan Sharma', phone: '9876543210', address: 'Flat 401 Skylark, Mumbai', orderCount: 2, totalSpent: 3897 },
-          { id: 'u2', name: 'Elena Rostova', phone: '9988776655', address: '42 Nevsky Prospect, Delhi', orderCount: 1, totalSpent: 1299 },
-          { id: 'u3', name: 'Karan Malhotra', phone: '9812345678', address: 'Green Meadows Villa, Bangalore', orderCount: 3, totalSpent: 6495 },
-        ]);
+        setCustomers([]);
       }
     } catch (e) {
       console.error(e);
@@ -91,15 +86,23 @@ export default function AdminCustomers() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-50">
-                {customers.map((cust) => (
-                  <tr key={cust.id} className="hover:bg-stone-50/50">
-                    <td className="py-4 font-semibold text-stone-900 uppercase tracking-wide">{cust.name}</td>
-                    <td className="py-4 font-medium text-stone-700">{cust.phone}</td>
-                    <td className="py-4 font-medium text-stone-500 line-clamp-1 max-w-xs">{cust.address}</td>
-                    <td className="py-4 font-semibold text-stone-850">{cust.orderCount} orders</td>
-                    <td className="py-4 font-mono font-bold text-stone-900">{formatPrice(cust.totalSpent)}</td>
+                {customers.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center text-stone-400 text-xs font-semibold uppercase tracking-wider">
+                      No registered customers yet. New customer signups will appear here automatically.
+                    </td>
                   </tr>
-                ))}
+                ) : (
+                  customers.map((cust) => (
+                    <tr key={cust.id} className="hover:bg-stone-50/50">
+                      <td className="py-4 font-semibold text-stone-900 uppercase tracking-wide">{cust.name}</td>
+                      <td className="py-4 font-medium text-stone-700">{cust.phone}</td>
+                      <td className="py-4 font-medium text-stone-500 line-clamp-1 max-w-xs">{cust.address}</td>
+                      <td className="py-4 font-semibold text-stone-850">{cust.orderCount} orders</td>
+                      <td className="py-4 font-mono font-bold text-stone-900">{formatPrice(cust.totalSpent)}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

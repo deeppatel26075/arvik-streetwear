@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/utils';
-import { X, Plus, Minus, Trash2, Tag, Percent } from 'lucide-react';
+import { X, Plus, Minus, Trash2, Tag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CartDrawer() {
@@ -28,14 +28,12 @@ export default function CartDrawer() {
     getCartTotal,
   } = useCart();
 
-  // Listen to open-cart events
   useEffect(() => {
     const handleOpenCart = () => setIsOpen(true);
     window.addEventListener('open-cart', handleOpenCart);
     return () => window.removeEventListener('open-cart', handleOpenCart);
   }, []);
 
-  // Update coupon error states
   useEffect(() => {
     if (couponError) {
       setCouponMsg({ type: 'error', text: couponError });
@@ -69,10 +67,10 @@ export default function CartDrawer() {
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: 0.3 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)}
-            className="fixed inset-0 bg-stone-950/45 backdrop-blur-xs z-50"
+            className="fixed inset-0 bg-black z-50"
           />
 
           {/* Drawer Panel */}
@@ -80,22 +78,22 @@ export default function CartDrawer() {
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'tween', duration: 0.35 }}
-            className="fixed top-0 right-0 h-full w-full max-w-md bg-stone-50 shadow-2xl z-50 flex flex-col"
+            transition={{ type: 'tween', duration: 0.25 }}
+            className="fixed top-0 right-0 h-full w-full max-w-md bg-white border-l border-[#ECECEC] shadow-2xl z-50 flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-stone-200 bg-white">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#ECECEC]">
               <div className="flex items-center space-x-2">
-                <span className="font-syne font-bold uppercase tracking-wider text-stone-900 text-sm">
+                <span className="font-bold uppercase tracking-wider text-[#111111] text-xs">
                   Shopping Bag
                 </span>
-                <span className="bg-stone-100 text-stone-800 text-xs font-semibold px-2 py-0.5 rounded-full">
+                <span className="bg-[#F7F7F7] text-[#111111] border border-[#ECECEC] text-[10px] font-bold px-2 py-0.5 rounded-full">
                   {cart.reduce((sum, item) => sum + item.quantity, 0)}
                 </span>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-stone-500 hover:text-stone-900 transition-colors"
+                className="text-[#666666] hover:text-[#111111] transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -105,13 +103,13 @@ export default function CartDrawer() {
             <div className="flex-grow overflow-y-auto px-6 py-4 space-y-4">
               {cart.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center space-y-4 pt-12">
-                  <p className="text-stone-400 text-sm font-semibold uppercase tracking-widest">
+                  <p className="text-[#666666] text-xs font-bold uppercase tracking-widest">
                     Your bag is empty
                   </p>
                   <Link
                     href="/shop"
                     onClick={() => setIsOpen(false)}
-                    className="text-xs bg-stone-900 text-white font-bold uppercase tracking-widest px-6 py-3 hover:opacity-85 transition-opacity"
+                    className="apple-button text-xs tracking-widest"
                   >
                     Shop Collection
                   </Link>
@@ -125,10 +123,10 @@ export default function CartDrawer() {
                   return (
                     <div
                       key={item.id}
-                      className="flex items-start space-x-4 pb-4 border-b border-stone-200/60 bg-white p-3 rounded-xs shadow-xs"
+                      className="flex items-start space-x-4 pb-4 border-b border-[#ECECEC] bg-white p-3 rounded-[18px] border border-[#ECECEC] shadow-xs"
                     >
                       {/* Product Image */}
-                      <div className="relative h-20 w-16 bg-stone-100 flex-shrink-0">
+                      <div className="relative h-20 w-16 bg-[#F7F7F7] flex-shrink-0 rounded-[10px] overflow-hidden">
                         <Image
                           src={item.image || '/placeholder-tee.jpg'}
                           alt={item.name}
@@ -144,31 +142,31 @@ export default function CartDrawer() {
                           <Link
                             href={`/shop/${item.slug}`}
                             onClick={() => setIsOpen(false)}
-                            className="font-semibold text-xs tracking-wider uppercase text-stone-900 hover:text-stone-500 line-clamp-1"
+                            className="font-bold text-xs tracking-wider uppercase text-[#111111] hover:text-[#666666] line-clamp-1"
                           >
                             {item.name}
                           </Link>
-                          <span className="text-xs font-semibold text-stone-900">
+                          <span className="text-xs font-bold text-[#111111]">
                             {formatPrice(activePrice * item.quantity)}
                           </span>
                         </div>
-                        <p className="text-[10px] text-stone-500 uppercase tracking-widest font-medium">
+                        <p className="text-[9px] text-[#666666] uppercase tracking-widest font-bold">
                           Size: {item.size}
                         </p>
                         
                         {/* Quantity controls */}
                         <div className="flex items-center justify-between pt-2">
-                          <div className="flex items-center border border-stone-200 rounded-sm">
+                          <div className="flex items-center border border-[#ECECEC] rounded-[8px] bg-[#F7F7F7] text-xs">
                             <button
                               onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1)}
-                              className="px-2 py-1 text-stone-600 hover:text-stone-900"
+                              className="px-2.5 py-1 text-[#666666] hover:text-[#111111] font-bold"
                             >
                               <Minus className="h-3 w-3" />
                             </button>
-                            <span className="text-xs font-semibold px-2">{item.quantity}</span>
+                            <span className="font-bold px-2 text-[#111111]">{item.quantity}</span>
                             <button
                               onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1)}
-                              className="px-2 py-1 text-stone-600 hover:text-stone-900"
+                              className="px-2.5 py-1 text-[#666666] hover:text-[#111111] font-bold"
                             >
                               <Plus className="h-3 w-3" />
                             </button>
@@ -176,7 +174,7 @@ export default function CartDrawer() {
                           
                           <button
                             onClick={() => removeFromCart(item.productId, item.size)}
-                            className="text-stone-400 hover:text-red-700 transition-colors"
+                            className="text-[#666666] hover:text-[#DC2626] transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -190,35 +188,35 @@ export default function CartDrawer() {
 
             {/* Footer Calculator / Summary */}
             {cart.length > 0 && (
-              <div className="bg-white border-t border-stone-200 px-6 py-5 space-y-4">
+              <div className="bg-white border-t border-[#ECECEC] px-6 py-5 space-y-4">
                 {/* Coupon area */}
                 <div className="space-y-2">
                   {coupon ? (
-                    <div className="flex items-center justify-between bg-stone-50 border border-stone-200/80 px-3 py-2 rounded-sm">
-                      <div className="flex items-center space-x-2 text-xs font-medium text-emerald-800">
+                    <div className="flex items-center justify-between bg-[#F7F7F7] border border-[#ECECEC] px-3 py-2 rounded-[10px]">
+                      <div className="flex items-center space-x-2 text-xs font-bold text-[#16A34A] uppercase tracking-wider">
                         <Tag className="h-4 w-4" />
                         <span>Code: {coupon.code} ({coupon.discountPercent}% OFF)</span>
                       </div>
                       <button
                         onClick={handleRemoveCoupon}
-                        className="text-[10px] text-red-700 font-bold uppercase tracking-wider hover:opacity-85"
+                        className="text-[10px] text-[#666666] hover:text-[#111111] font-bold uppercase tracking-wider"
                       >
                         Remove
                       </button>
                     </div>
                   ) : (
-                    <form onSubmit={handleApplyCoupon} className="flex">
+                    <form onSubmit={handleApplyCoupon} className="flex gap-2">
                       <input
                         type="text"
                         placeholder="COUPON CODE"
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                        className="flex-grow bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-l-sm"
+                        className="apple-input flex-grow text-[10px] uppercase font-bold py-2 px-3"
                       />
                       <button
                         type="submit"
                         disabled={loadingCoupon}
-                        className="bg-stone-900 text-white text-[10px] font-bold uppercase px-4 hover:opacity-90 rounded-r-sm"
+                        className="bg-[#111111] text-white text-[10px] font-bold uppercase px-4 hover:opacity-90 rounded-[10px] transition-colors"
                       >
                         Apply
                       </button>
@@ -226,8 +224,8 @@ export default function CartDrawer() {
                   )}
                   {couponMsg && (
                     <p
-                      className={`text-[10px] font-medium ${
-                        couponMsg.type === 'success' ? 'text-emerald-800' : 'text-red-700'
+                      className={`text-[9px] font-bold uppercase tracking-wider ${
+                        couponMsg.type === 'success' ? 'text-[#16A34A]' : 'text-[#DC2626]'
                       }`}
                     >
                       {couponMsg.text}
@@ -236,13 +234,13 @@ export default function CartDrawer() {
                 </div>
 
                 {/* Subtotals list */}
-                <div className="space-y-1.5 text-xs text-stone-600 border-b border-stone-100 pb-3">
+                <div className="space-y-1.5 text-xs text-[#666666] border-b border-[#ECECEC] pb-3 font-semibold">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span className="font-semibold text-stone-900">{formatPrice(getCartSubtotal())}</span>
+                    <span className="text-[#111111]">{formatPrice(getCartSubtotal())}</span>
                   </div>
                   {coupon && (
-                    <div className="flex justify-between text-emerald-700">
+                    <div className="flex justify-between text-[#16A34A]">
                       <span>Discount ({coupon.discountPercent}%)</span>
                       <span>-{formatPrice(getDiscountAmount())}</span>
                     </div>
@@ -257,8 +255,8 @@ export default function CartDrawer() {
 
                 {/* Final Total */}
                 <div className="flex justify-between items-baseline pt-1">
-                  <span className="font-syne font-bold uppercase text-stone-900 text-sm">Total</span>
-                  <span className="font-syne font-extrabold text-stone-900 text-lg">
+                  <span className="font-bold uppercase text-[#111111] text-xs tracking-widest">Total</span>
+                  <span className="font-bold text-[#111111] text-lg">
                     {formatPrice(getCartTotal())}
                   </span>
                 </div>
@@ -267,7 +265,7 @@ export default function CartDrawer() {
                 <Link
                   href="/checkout"
                   onClick={() => setIsOpen(false)}
-                  className="block w-full bg-stone-950 text-white text-xs font-bold text-center uppercase tracking-widest py-4 hover:opacity-90 transition-opacity rounded-xs shadow-sm"
+                  className="apple-button block w-full text-center text-xs tracking-widest uppercase shadow-xs"
                 >
                   Proceed to Checkout
                 </Link>

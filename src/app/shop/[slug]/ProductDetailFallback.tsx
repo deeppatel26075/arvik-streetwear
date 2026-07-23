@@ -31,7 +31,7 @@ export default function ProductDetailFallback({ slug }: ProductDetailFallbackPro
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-24 text-xs font-bold uppercase tracking-widest text-stone-400">
+      <div className="flex justify-center items-center py-24 text-[10px] font-bold uppercase tracking-widest text-[#666666]">
         Loading product details...
       </div>
     );
@@ -39,19 +39,21 @@ export default function ProductDetailFallback({ slug }: ProductDetailFallbackPro
 
   if (!product) {
     return (
-      <div className="text-center py-20 space-y-6">
-        <h1 className="font-syne font-extrabold text-2xl uppercase tracking-wider text-stone-900">
+      <div className="text-center py-20 space-y-4">
+        <h1 className="font-bold text-xl uppercase tracking-wider text-[#111111]">
           Product Not Found
         </h1>
-        <p className="text-stone-500 text-xs font-light max-w-sm mx-auto uppercase tracking-wider">
+        <p className="text-[#666666] text-xs font-medium max-w-sm mx-auto uppercase tracking-wider">
           The streetwear piece you are looking for does not exist or has been removed.
         </p>
-        <Link
-          href="/shop"
-          className="inline-block bg-stone-950 text-white font-bold uppercase text-xs tracking-widest px-6 py-3 hover:opacity-95 rounded-sm"
-        >
-          Back to Shop
-        </Link>
+        <div className="pt-2">
+          <Link
+            href="/shop"
+            className="apple-button inline-block text-xs tracking-widest shadow-xs hover:opacity-90"
+          >
+            Back to Shop
+          </Link>
+        </div>
       </div>
     );
   }

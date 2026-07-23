@@ -44,62 +44,12 @@ export default function AdminOrders() {
       // Combine both lists (local first, then DB)
       const combined = [...localOrdersList, ...dbOrders];
 
-      if (combined.length > 0) {
-        setOrders(combined);
-      } else {
-        // Fallback mock orders
-        const mockList = [
-          {
-            id: 'ORD-89472',
-            created_at: new Date().toISOString(),
-            shipping_name: 'Rohan Sharma',
-            shipping_email: 'rohan@gmail.com',
-            shipping_phone: '9876543210',
-            shipping_address: 'Flat 401, Skylark Heights, Sector 15',
-            shipping_city: 'Mumbai',
-            shipping_state: 'Maharashtra',
-            shipping_pincode: '400011',
-            total_amount: 2598,
-            status: 'pending',
-            order_items: [
-              { size: 'M', quantity: 2, price: 1299, products: { name: 'FAREBI OVERSIZED OLIVE TEE' } }
-            ]
-          },
-          {
-            id: 'ORD-89469',
-            created_at: new Date(Date.now() - 86400000).toISOString(),
-            shipping_name: 'Elena Rostova',
-            shipping_email: 'elena@gmail.com',
-            shipping_phone: '9988776655',
-            shipping_address: '42, Nevsky Prospect, Appt 5',
-            shipping_city: 'Delhi',
-            shipping_state: 'Delhi',
-            shipping_pincode: '110001',
-            total_amount: 1299,
-            status: 'delivered',
-            order_items: [
-              { size: 'S', quantity: 1, price: 1299, products: { name: 'POLARIZE VINTAGE CREAM TEE' } }
-            ]
-          },
-          {
-            id: 'ORD-89468',
-            created_at: new Date(Date.now() - 172800000).toISOString(),
-            shipping_name: 'Karan Malhotra',
-            shipping_email: 'karan@gmail.com',
-            shipping_phone: '9812345678',
-            shipping_address: 'Green Meadows Villa 12, Whitefield',
-            shipping_city: 'Bangalore',
-            shipping_state: 'Karnataka',
-            shipping_pincode: '560066',
-            total_amount: 3897,
-            status: 'packing',
-            order_items: [
-              { size: 'L', quantity: 3, price: 1299, products: { name: 'MARD PAISA BURGUNDY TEE' } }
-            ]
-          }
-        ];
-        setOrders(mockList);
-        localStorage.setItem('arviik_custom_orders', JSON.stringify(mockList));
+      // Set loaded orders list
+      setOrders(combined);
+      // Clean stale mock orders from localStorage if any exist
+      if (localOrdersList.some(o => o.id === 'ORD-89472' || o.id === 'ORD-89469' || o.id === 'ORD-89468')) {
+        const cleaned = localOrdersList.filter(o => o.id !== 'ORD-89472' && o.id !== 'ORD-89469' && o.id !== 'ORD-89468');
+        localStorage.setItem('arviik_custom_orders', JSON.stringify(cleaned));
       }
     } catch (e) {
       console.error(e);
@@ -185,26 +135,34 @@ export default function AdminOrders() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-50">
-                  {orders.map((order) => (
-                    <tr key={order.id} className="hover:bg-stone-50/50">
-                      <td className="py-4 font-mono font-semibold text-stone-900">{order.id}</td>
-                      <td className="py-4 font-medium text-stone-850">{order.shipping_name}</td>
-                      <td className="py-4 font-semibold text-stone-900">{formatPrice(order.total_amount)}</td>
-                      <td className="py-4">
-                        <span className={`px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-wider border ${getStatusColor(order.status)}`}>
-                          {order.status}
-                        </span>
-                      </td>
-                      <td className="py-4">
-                        <button
-                          onClick={() => setSelectedOrder(order)}
-                          className="text-stone-400 hover:text-stone-900 p-1 transition-colors"
-                        >
-                          <Info className="h-4.5 w-4.5" />
-                        </button>
+                  {orders.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="py-12 text-center text-stone-400 text-xs font-semibold uppercase tracking-wider">
+                        No orders placed yet. Customer orders will appear here automatically.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    orders.map((order) => (
+                      <tr key={order.id} className="hover:bg-stone-50/50">
+                        <td className="py-4 font-mono font-semibold text-stone-900">{order.id}</td>
+                        <td className="py-4 font-medium text-stone-850">{order.shipping_name}</td>
+                        <td className="py-4 font-semibold text-stone-900">{formatPrice(order.total_amount)}</td>
+                        <td className="py-4">
+                          <span className={`px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-wider border ${getStatusColor(order.status)}`}>
+                            {order.status}
+                          </span>
+                        </td>
+                        <td className="py-4">
+                          <button
+                            onClick={() => setSelectedOrder(order)}
+                            className="text-stone-400 hover:text-stone-900 p-1 transition-colors"
+                          >
+                            <Info className="h-4.5 w-4.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

@@ -33,7 +33,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
+  const checkIsAdminEmail = (email?: string | null) => {
+    if (!email) return false;
+    const lower = email.toLowerCase().trim();
+    return lower === 'rishipatel1610@gmail.com' || lower === 'admin@arviik.com' || lower === 'admin@arvik.com';
+  };
+
+  const fetchProfile = async (userId: string, userEmail?: string | null) => {
+    const isAdminEmail = checkIsAdminEmail(userEmail);
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -41,72 +48,94 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', userId)
         .single();
 
-      if (error) {
-        console.error('Error fetching profile:', error);
-        setProfile(null);
+      if (data) {
+        const fetchedProfile = data as UserProfile;
+        if (isAdminEmail && fetchedProfile.role !== 'admin') {
+          fetchedProfile.role = 'admin';
+          // Try to update DB role as well
+          supabase.from('profiles').update({ role: 'admin' }).eq('id', userId).then();
+        }
+        setProfile(fetchedProfile);
       } else {
-        setProfile(data as UserProfile);
+        // Fallback default profile if not in DB yet
+        const defaultProfile: UserProfile = {
+          id: userId,
+          full_name: userEmail?.split('@')[0] || 'User',
+          phone: null,
+          role: isAdminEmail ? 'admin' : 'customer',
+          shipping_address: null,
+          shipping_city: null,
+          shipping_state: null,
+          shipping_pincode: null,
+          created_at: new Date().toISOString(),
+        };
+        setProfile(defaultProfile);
       }
     } catch (err) {
-      console.error('Profile fetch failed:', err);
-      setProfile(null);
+      console.error('Profile fetch error:', err);
+      setProfile({
+        id: userId,
+        full_name: userEmail?.split('@')[0] || 'User',
+        phone: null,
+        role: isAdminEmail ? 'admin' : 'customer',
+        shipping_address: null,
+        shipping_city: null,
+        shipping_state: null,
+        shipping_pincode: null,
+        created_at: new Date().toISOString(),
+      });
     }
   };
 
   const refreshProfile = async () => {
-    if (user && user.id !== 'mock-admin-id' && user.id !== 'mock-customer-id') {
-      await fetchProfile(user.id);
+    if (user) {
+      await fetchProfile(user.id, user.email);
     }
   };
 
   const signInMock = (email: string) => {
-    const isMockAdmin = email.toLowerCase() === 'admin@arviik.com';
+    const isAdminEmail = checkIsAdminEmail(email);
     const mockUser = {
-      id: isMockAdmin ? 'mock-admin-id' : 'mock-customer-id',
+      id: isAdminEmail ? 'admin-user-id' : `customer-${Date.now()}`,
       email,
-      user_metadata: { full_name: isMockAdmin ? 'Arviik Admin' : 'Demo Customer' },
+      user_metadata: { full_name: isAdminEmail ? 'Rishi Patel' : 'Customer' },
     } as any;
     
     const mockProfile: UserProfile = {
       id: mockUser.id,
-      full_name: isMockAdmin ? 'Arviik Admin' : 'Demo Customer',
-      phone: '9999999999',
-      role: isMockAdmin ? 'admin' : 'customer',
-      shipping_address: '123 Fashion Street',
-      shipping_city: 'Mumbai',
-      shipping_state: 'Maharashtra',
-      shipping_pincode: '400001',
+      full_name: isAdminEmail ? 'Rishi Patel' : 'Customer',
+      phone: '',
+      role: isAdminEmail ? 'admin' : 'customer',
+      shipping_address: null,
+      shipping_city: null,
+      shipping_state: null,
+      shipping_pincode: null,
       created_at: new Date().toISOString(),
     };
 
     try {
-      localStorage.setItem('arviik_mock_session', JSON.stringify({ user: mockUser, profile: mockProfile }));
-    } catch (e) {
-      console.error('Failed to write mock session:', e);
-    }
+      localStorage.setItem('arviik_session', JSON.stringify({ user: mockUser, profile: mockProfile }));
+    } catch (e) {}
     
     setUser(mockUser);
     setProfile(mockProfile);
   };
 
   useEffect(() => {
-    // 1. Get initial session
     const getInitialSession = async () => {
       try {
-        // Check local storage for mock session first
-        const storedMock = localStorage.getItem('arviik_mock_session');
-        if (storedMock) {
-          const parsed = JSON.parse(storedMock);
-          setUser(parsed.user);
-          setProfile(parsed.profile);
-          setLoading(false);
-          return;
-        }
-
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setUser(session.user);
-          await fetchProfile(session.user.id);
+          await fetchProfile(session.user.id, session.user.email);
+        } else {
+          // Check local session storage if available
+          const stored = localStorage.getItem('arviik_session');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            setUser(parsed.user);
+            setProfile(parsed.profile);
+          }
         }
       } catch (err) {
         console.error('Error getting initial session:', err);
@@ -117,19 +146,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     getInitialSession();
 
-    // 2. Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // Ignore auth changes if using mock session
-        if (localStorage.getItem('arviik_mock_session')) {
-          return;
-        }
-
         setLoading(true);
         if (session?.user) {
           setUser(session.user);
-          await fetchProfile(session.user.id);
-        } else {
+          await fetchProfile(session.user.id, session.user.email);
+        } else if (!localStorage.getItem('arviik_session')) {
           setUser(null);
           setProfile(null);
         }
@@ -150,6 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Supabase signout failed:', err);
     }
     try {
+      localStorage.removeItem('arviik_session');
       localStorage.removeItem('arviik_mock_session');
     } catch (e) {}
     setUser(null);
@@ -157,7 +181,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   };
 
-  const isAdmin = profile?.role === 'admin';
+  const isAdmin = profile?.role === 'admin' || checkIsAdminEmail(user?.email);
 
   return (
     <AuthContext.Provider value={{ user, profile, loading, isAdmin, signOut, refreshProfile, signInMock }}>

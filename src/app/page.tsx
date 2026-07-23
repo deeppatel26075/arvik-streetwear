@@ -1,131 +1,89 @@
-import Link from 'next/link';
-import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
-import ProductCard from '@/components/ProductCard';
 import HomeClientWrapper from './HomeClientWrapper';
 
-// Define the mock products to display if Supabase fails or doesn't have data yet
+export const dynamic = 'force-dynamic';
+
 export const MOCK_PRODUCTS = [
   {
-    id: 'prod-001',
-    name: 'FAREBI OVERSIZED OLIVE TEE',
-    slug: 'farebi-oversized-olive-tee',
-    price: 1499,
+    id: '00000000-0000-0000-0000-000000000001',
+    name: 'Eternal Vision',
+    slug: 'eternal-vision-black-tee',
+    category: 'Limited Edition',
+    price: 1299,
+    mrp: 1299,
     discount_price: 1299,
-    fabric: '100% Premium French Terry Cotton',
-    gsm: '240 GSM Heavyweight',
-    fit_type: 'Oversized Boxy Fit',
-    description: 'Heavyweight oversized drop shoulder Dark Olive T-shirt featuring a high-density "FAREBI" print on the chest and an artistic graphic illustration on the back. Designed for ultimate premium comfort.',
-    category: { name: 'Graphic Prints' },
-    product_images: [
-      { image_url: '/products/farebi-olive.jpg' },
-      { image_url: '/products/farebi-olive.jpg' }
-    ],
-    inventory: [
-      { size: 'S', quantity: 12 },
-      { size: 'M', quantity: 18 },
-      { size: 'L', quantity: 24 },
-      { size: 'XL', quantity: 10 },
-      { size: 'XXL', quantity: 5 }
-    ]
+    product_images: [{ image_url: '/products/farebi-olive.jpg' }]
   },
   {
-    id: 'prod-002',
-    name: 'POLARIZE VINTAGE CREAM TEE',
-    slug: 'polarize-vintage-cream-tee',
-    price: 1299,
-    discount_price: 999,
-    fabric: '100% Ring-spun Premium Cotton',
-    gsm: '240 GSM Heavyweight',
-    fit_type: 'Oversized Boxy Fit',
-    description: 'A clean and minimalist approach. Front "POLARIZE" logo block with detailed wings-design graphic art back print on a Vintage Cream silhouette. Perfect streetwear piece.',
-    category: { name: 'Graphic Prints' },
-    product_images: [
-      { image_url: '/products/polarize-cream.jpg' },
-      { image_url: '/products/polarize-cream.jpg' }
-    ],
-    inventory: [
-      { size: 'S', quantity: 8 },
-      { size: 'M', quantity: 15 },
-      { size: 'L', quantity: 20 },
-      { size: 'XL', quantity: 12 },
-      { size: 'XXL', quantity: 0 }
-    ]
-  },
-  {
-    id: 'prod-003',
-    name: 'MARD PAISA BURGUNDY TEE',
-    slug: 'mard-paisa-burgundy-tee',
-    price: 1499,
+    id: '00000000-0000-0000-0000-000000000002',
+    name: 'Chaos Bloom',
+    slug: 'chaos-bloom-ivory-tee',
+    category: 'On Fire',
+    price: 1199,
+    mrp: 1199,
     discount_price: 1199,
-    fabric: '100% Combed Premium Cotton',
-    gsm: '240 GSM Heavyweight',
-    fit_type: 'Oversized Boxy Fit',
-    description: 'Edgy Burgundy Maroon oversized drop shoulder t-shirt featuring a bold typography "Aadmi MARD nahi hota, Mard PAISA hota hai" back print with a central flower design.',
-    category: { name: 'Minimalist Typo' },
-    product_images: [
-      { image_url: '/products/mard-paisa-maroon.jpg' },
-      { image_url: '/products/mard-paisa-maroon.jpg' }
-    ],
-    inventory: [
-      { size: 'S', quantity: 15 },
-      { size: 'M', quantity: 10 },
-      { size: 'L', quantity: 14 },
-      { size: 'XL', quantity: 8 },
-      { size: 'XXL', quantity: 4 }
-    ]
+    product_images: [{ image_url: '/products/polarize-cream.jpg' }]
   },
   {
-    id: 'prod-004',
-    name: 'POLARIZE NAVY BLUE TEE',
-    slug: 'polarize-navy-blue-tee',
+    id: '00000000-0000-0000-0000-000000000003',
+    name: 'Midnight Tales',
+    slug: 'midnight-tales-black-tee',
+    category: 'Graphic Tee',
     price: 1299,
-    fabric: '100% Combed Cotton',
-    gsm: '240 GSM',
-    fit_type: 'Oversized Fit',
-    description: 'Deep Navy Blue oversized streetwear tee featuring "POLARIZE" front chest block logo and a matching electric blue illustration print on the back.',
-    category: { name: 'Minimalist Typo' },
-    product_images: [
-      { image_url: '/products/polarize-navy.jpg' },
-      { image_url: '/products/polarize-navy.jpg' }
-    ],
-    inventory: [
-      { size: 'S', quantity: 6 },
-      { size: 'M', quantity: 14 },
-      { size: 'L', quantity: 18 },
-      { size: 'XL', quantity: 5 },
-      { size: 'XXL', quantity: 2 }
-    ]
+    mrp: 1299,
+    discount_price: 1299,
+    product_images: [{ image_url: '/products/polarize-navy.jpg' }]
+  },
+  {
+    id: '00000000-0000-0000-0000-000000000004',
+    name: 'Lost Paradise',
+    slug: 'lost-paradise-black-tee',
+    category: 'Psychology Edition',
+    price: 1299,
+    mrp: 1299,
+    discount_price: 1299,
+    product_images: [{ image_url: '/products/mard-paisa-maroon.jpg' }]
   }
 ];
 
 export default async function HomePage() {
-  let dbProducts = [];
+  let dbProducts: any[] = [];
+
   try {
-    const { data } = await supabase
+    const { data: prods } = await supabase
       .from('products')
       .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
       .eq('is_hidden', false)
-      .limit(4);
+      .order('created_at', { ascending: false });
     
-    if (data && data.length > 0) {
-      dbProducts = data.map(prod => ({
-        ...prod,
-        category: prod.category ? { name: (prod.category as any).name } : undefined,
-        product_images: prod.product_images || [],
-        inventory: prod.inventory || []
-      }));
+    if (prods && prods.length > 0) {
+      dbProducts = prods.map((prod, index) => {
+        const fallbacks = [
+          '/products/farebi-olive.jpg',
+          '/products/polarize-cream.jpg',
+          '/products/polarize-navy.jpg',
+          '/products/mard-paisa-maroon.jpg'
+        ];
+        const rawImages = prod.product_images || [];
+        const validImages = rawImages.length > 0
+          ? rawImages
+          : [{ image_url: fallbacks[index % fallbacks.length] }];
+
+        return {
+          ...prod,
+          category: prod.category ? (prod.category as any).name : 'Oversized Tees',
+          product_images: validImages,
+          inventory: prod.inventory || []
+        };
+      });
     }
   } catch (err) {
-    console.error('Error loading Supabase products, using mock data:', err);
+    console.error('Error loading Supabase products:', err);
   }
 
   const displayProducts = dbProducts.length > 0 ? dbProducts : MOCK_PRODUCTS;
 
   return (
-    <div className="space-y-16">
-      {/* Client-side animations wrapper */}
-      <HomeClientWrapper products={displayProducts as any} />
-    </div>
+    <HomeClientWrapper products={displayProducts} />
   );
 }

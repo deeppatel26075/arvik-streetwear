@@ -1,97 +1,123 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { ShoppingBag, Heart, User, Menu, X, Search } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, Search, ShoppingBag, Heart, User } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { cart, wishlist } = useCart();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Detect scroll to add shadow/border
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Skip rendering Navbar on Admin Panel routes
   if (pathname?.startsWith('/admin')) {
     return null;
   }
 
   const totalCartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const wishlistCount = wishlist.length;
 
   const triggerCartOpen = () => {
-    // Dispatch custom event to open the CartDrawer
     const event = new CustomEvent('open-cart');
     window.dispatchEvent(event);
   };
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/shop?query=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setSearchQuery('');
+    }
+  };
+
   return (
     <>
-      <header
-        className={`fixed top-0 left-0 w-full z-40 transition-all duration-300 ${
-          scrolled
-            ? 'bg-stone-50/80 backdrop-blur-md border-b border-stone-200/50 shadow-sm'
-            : 'bg-transparent border-b border-transparent'
-        }`}
-      >
-        {/* Promotional Scrolling Marquee Banner */}
+      <header className="fixed top-0 left-0 w-full z-40 transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-stone-200/40 select-none">
+        {/* Top Marquee Announcement Bar */}
         <div className="bg-stone-950 text-lime-400 py-2 overflow-hidden border-b border-stone-900/10 text-[9px] font-bold uppercase tracking-[0.2em] select-none">
           <div className="whitespace-nowrap flex animate-marquee">
-            <span className="flex-shrink-0">⚡ BUY ANY 3 T-SHIRTS AT ₹1199 — USE CODE: B31199 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ FREE SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹1499 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ 10% OFF ON ALL PREPAID ORDERS &nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span className="flex-shrink-0">⚡ BUY ANY 3 T-SHIRTS AT ₹1199 — USE CODE: B31199 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ FREE SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹1499 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ 10% OFF ON ALL PREPAID ORDERS &nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span className="flex-shrink-0">⚡ BUY ANY 3 T-SHIRTS AT ₹1199 — USE CODE: B31199 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ FREE SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹1499 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ 10% OFF ON ALL PREPAID ORDERS &nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span className="flex-shrink-0">⚡ BUY ANY 3 T-SHIRTS AT ₹1199 — USE CODE: B31199 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ FREE SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹1499 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ 10% OFF ON ALL PREPAID ORDERS &nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span className="flex-shrink-0">
+              ⚡ BUY ANY 3 T-SHIRTS AT ₹1199 — USE CODE: B31199 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ FREE SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹1499 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ 10% OFF ON ALL PREPAID ORDERS &nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+            <span className="flex-shrink-0">
+              ⚡ BUY ANY 3 T-SHIRTS AT ₹1199 — USE CODE: B31199 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ FREE SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹1499 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ 10% OFF ON ALL PREPAID ORDERS &nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+            <span className="flex-shrink-0">
+              ⚡ BUY ANY 3 T-SHIRTS AT ₹1199 — USE CODE: B31199 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ FREE SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹1499 &nbsp;&nbsp;&nbsp;&nbsp; ⚡ 10% OFF ON ALL PREPAID ORDERS &nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
           </div>
         </div>
 
-        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
-          scrolled ? 'py-3' : 'py-5'
-        }`}>
+        {/* Main Navbar */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 py-4">
           <div className="flex items-center justify-between">
-            {/* Mobile Menu Trigger */}
+            {/* Mobile Hamburger */}
             <div className="flex lg:hidden">
               <button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => setMobileOpen(!mobileOpen)}
                 className="text-stone-900 focus:outline-none"
+                aria-label="Toggle Menu"
               >
-                {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
             </div>
 
-            {/* Left Nav (Desktop) */}
-            <nav className="hidden lg:flex space-x-8 text-xs font-semibold tracking-widest uppercase">
+            {/* Desktop Nav Links */}
+            <nav className="hidden lg:flex items-center space-x-7 text-xs font-semibold tracking-widest uppercase">
               <Link href="/shop" className="text-stone-900 hover:text-stone-500 transition-colors">
                 Shop
               </Link>
+              
+              {/* Categories Dropdown */}
+              <div className="relative group py-2">
+                <button className="text-stone-900 hover:text-stone-500 transition-colors flex items-center gap-1 uppercase tracking-widest font-semibold focus:outline-none">
+                  <span>Categories</span>
+                  <span className="text-[10px]">▼</span>
+                </button>
+                <div className="absolute top-full left-0 hidden group-hover:block w-52 bg-white border border-stone-200 shadow-lg rounded-sm py-2 z-50 animate-fade-in">
+                  <Link
+                    href="/shop?category=Limited+Edition"
+                    className="block px-4 py-2 text-[11px] font-bold text-stone-800 hover:bg-stone-100 hover:text-stone-950 transition-colors uppercase tracking-wider"
+                  >
+                    🔥 Limited Edition
+                  </Link>
+                  <Link
+                    href="/shop?category=On+Fire"
+                    className="block px-4 py-2 text-[11px] font-bold text-stone-800 hover:bg-stone-100 hover:text-stone-950 transition-colors uppercase tracking-wider"
+                  >
+                    ⚡ On Fire
+                  </Link>
+                  <Link
+                    href="/shop?category=Graphic+Tee"
+                    className="block px-4 py-2 text-[11px] font-bold text-stone-800 hover:bg-stone-100 hover:text-stone-950 transition-colors uppercase tracking-wider"
+                  >
+                    🎨 Graphic Tee
+                  </Link>
+                  <Link
+                    href="/shop?category=Psychology+Edition"
+                    className="block px-4 py-2 text-[11px] font-bold text-stone-800 hover:bg-stone-100 hover:text-stone-950 transition-colors uppercase tracking-wider"
+                  >
+                    🧠 Psychology Edition
+                  </Link>
+                </div>
+              </div>
+
               <Link href="/shop?filter=featured" className="text-stone-900 hover:text-stone-500 transition-colors">
                 Featured
               </Link>
-              <Link href="/#story" className="text-stone-900 hover:text-stone-500 transition-colors">
-                Our Story
+              <Link href="/#founders" className="text-stone-900 hover:text-stone-500 transition-colors">
+                Founders
               </Link>
             </nav>
 
-            {/* Center Logo */}
+            {/* Logo */}
             <div className="flex-shrink-0">
               <Link
                 href="/"
@@ -101,30 +127,33 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Right Icons */}
+            {/* Right Action Icons */}
             <div className="flex items-center space-x-4 sm:space-x-6">
               <button
                 onClick={() => setSearchOpen(true)}
                 className="text-stone-900 hover:opacity-70 transition-opacity"
+                aria-label="Search"
               >
                 <Search className="h-5 w-5" />
               </button>
 
               <Link
-                href="/profile"
+                href="/wishlist"
                 className="text-stone-900 hover:opacity-70 transition-opacity relative"
+                aria-label="Wishlist"
               >
                 <Heart className="h-5 w-5" />
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 bg-accent text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                    {wishlistCount}
+                {wishlist.length > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-stone-900 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                    {wishlist.length}
                   </span>
                 )}
               </Link>
 
               <Link
-                href={user ? '/profile' : '/login'}
+                href={user ? "/profile" : "/login"}
                 className="text-stone-900 hover:opacity-70 transition-opacity"
+                aria-label="Account"
               >
                 <User className="h-5 w-5" />
               </Link>
@@ -132,6 +161,7 @@ export default function Navbar() {
               <button
                 onClick={triggerCartOpen}
                 className="text-stone-900 hover:opacity-70 transition-opacity relative"
+                aria-label="Cart"
               >
                 <ShoppingBag className="h-5 w-5" />
                 {totalCartItems > 0 && (
@@ -143,97 +173,105 @@ export default function Navbar() {
             </div>
           </div>
         </div>
-      </header>
 
-      {/* Spacer to push content down when Navbar is transparent but page loads */}
-      <div className="h-28 w-full" />
-
-      {/* Mobile Drawer Navigation */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="fixed top-28 left-0 w-full bg-stone-50 border-b border-stone-200 z-30 lg:hidden shadow-lg"
-          >
-            <div className="px-6 py-8 flex flex-col space-y-6 text-sm font-semibold tracking-widest uppercase text-stone-950">
-              <Link href="/shop" onClick={() => setIsOpen(false)} className="hover:text-stone-500">
-                Shop T-Shirts
-              </Link>
-              <Link href="/shop?filter=featured" onClick={() => setIsOpen(false)} className="hover:text-stone-500">
-                Featured Drops
-              </Link>
-              <Link href="/#story" onClick={() => setIsOpen(false)} className="hover:text-stone-500">
-                Our Story
-              </Link>
-              {profile?.role === 'admin' && (
-                <Link href="/admin" onClick={() => setIsOpen(false)} className="text-accent hover:opacity-80">
-                  Admin Panel
-                </Link>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Search Overlay */}
-      <AnimatePresence>
-        {searchOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-stone-950/40 backdrop-blur-sm z-50 flex items-start justify-center pt-24 px-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: -20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: -20 }}
-              className="bg-white w-full max-w-xl p-6 shadow-2xl rounded-sm border border-stone-100"
+        {/* Mobile Menu Drawer */}
+        {mobileOpen && (
+          <div className="lg:hidden bg-white border-b border-stone-200 px-6 py-6 space-y-4">
+            <Link
+              href="/shop"
+              onClick={() => setMobileOpen(false)}
+              className="block text-sm font-bold uppercase tracking-widest text-stone-900"
             >
-              <div className="flex items-center justify-between border-b border-stone-200 pb-3 mb-4">
-                <h3 className="font-syne font-bold uppercase text-stone-900 tracking-wider text-sm">
-                  Search ARVIIK
+              Shop All
+            </Link>
+
+            <div className="pt-2 border-t border-stone-100 space-y-2">
+              <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">
+                Categories
+              </span>
+              <Link
+                href="/shop?category=Limited+Edition"
+                onClick={() => setMobileOpen(false)}
+                className="block text-xs font-semibold uppercase tracking-wider text-stone-800 hover:text-stone-950 pl-2"
+              >
+                🔥 Limited Edition
+              </Link>
+              <Link
+                href="/shop?category=On+Fire"
+                onClick={() => setMobileOpen(false)}
+                className="block text-xs font-semibold uppercase tracking-wider text-stone-800 hover:text-stone-950 pl-2"
+              >
+                ⚡ On Fire
+              </Link>
+              <Link
+                href="/shop?category=Graphic+Tee"
+                onClick={() => setMobileOpen(false)}
+                className="block text-xs font-semibold uppercase tracking-wider text-stone-800 hover:text-stone-950 pl-2"
+              >
+                🎨 Graphic Tee
+              </Link>
+              <Link
+                href="/shop?category=Psychology+Edition"
+                onClick={() => setMobileOpen(false)}
+                className="block text-xs font-semibold uppercase tracking-wider text-stone-800 hover:text-stone-950 pl-2"
+              >
+                🧠 Psychology Edition
+              </Link>
+            </div>
+
+            <div className="pt-2 border-t border-stone-100 space-y-3">
+              <Link
+                href="/shop?filter=featured"
+                onClick={() => setMobileOpen(false)}
+                className="block text-sm font-bold uppercase tracking-widest text-stone-900"
+              >
+                Featured
+              </Link>
+              <Link
+                href="/#founders"
+                onClick={() => setMobileOpen(false)}
+                className="block text-sm font-bold uppercase tracking-widest text-stone-900"
+              >
+                Founders
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Search Modal */}
+        {searchOpen && (
+          <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-start justify-center pt-24 px-4">
+            <div className="bg-white w-full max-w-xl p-6 rounded-sm shadow-xl relative space-y-4">
+              <div className="flex justify-between items-center border-b border-stone-200 pb-3">
+                <h3 className="font-syne font-bold text-sm uppercase tracking-wider text-stone-900">
+                  Search Products
                 </h3>
-                <button
-                  onClick={() => setSearchOpen(false)}
-                  className="text-stone-500 hover:text-stone-900"
-                >
+                <button onClick={() => setSearchOpen(false)} className="text-stone-500 hover:text-stone-900">
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (searchQuery.trim()) {
-                    window.location.href = `/shop?search=${encodeURIComponent(searchQuery.trim())}`;
-                    setSearchOpen(false);
-                  }
-                }}
-              >
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search for printed oversized t-shirts..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-200 px-4 py-3 text-sm focus:outline-none focus:border-stone-900"
-                    autoFocus
-                  />
-                  <button
-                    type="submit"
-                    className="absolute right-3 top-3.5 text-stone-500 hover:text-stone-900"
-                  >
-                    <Search className="h-5 w-5" />
-                  </button>
-                </div>
+              <form onSubmit={handleSearchSubmit} className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Search oversized tees, graphics..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                  className="flex-grow border border-stone-300 rounded-sm px-4 py-2.5 text-xs text-stone-900 focus:outline-none focus:border-stone-900"
+                />
+                <button
+                  type="submit"
+                  className="bg-stone-900 text-white font-bold text-xs uppercase px-5 py-2.5 rounded-sm hover:bg-stone-800 transition-colors"
+                >
+                  Search
+                </button>
               </form>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
+      </header>
+      {/* Spacer for fixed header */}
+      <div className="h-24 sm:h-28 w-full" />
     </>
   );
 }

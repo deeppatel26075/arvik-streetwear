@@ -7,12 +7,12 @@ import { DollarSign, ShoppingCart, Users, AlertTriangle, TrendingUp, RefreshCw }
 
 export default function AdminDashboard() {
   const [metrics, setMetrics] = useState({
-    todayRevenue: 15580,
-    monthlyRevenue: 345900,
-    totalOrders: 215,
-    pendingOrders: 14,
-    totalCustomers: 180,
-    lowStockCount: 2,
+    todayRevenue: 0,
+    monthlyRevenue: 0,
+    totalOrders: 0,
+    pendingOrders: 0,
+    totalCustomers: 0,
+    lowStockCount: 0,
   });
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,6 +21,16 @@ export default function AdminDashboard() {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
+
+        // Fetch local custom orders if any
+        let localOrders: any[] = [];
+        try {
+          const stored = localStorage.getItem('arviik_custom_orders');
+          if (stored) {
+            localOrders = JSON.parse(stored).filter((o: any) => o.id !== 'ORD-89472' && o.id !== 'ORD-89469' && o.id !== 'ORD-89468');
+          }
+        } catch (e) {}
+
         // 1. Fetch metrics from Supabase
         const { data: orders } = await supabase
           .from('orders')
@@ -36,48 +46,51 @@ export default function AdminDashboard() {
           .select('id')
           .eq('role', 'customer');
 
-        if (orders && orders.length > 0) {
-          // Calculate revenue
-          const totalPaid = orders
-            .filter(o => o.status !== 'cancelled')
-            .reduce((sum, o) => sum + parseFloat(o.total_amount), 0);
-          
-          const pending = orders.filter(o => o.status === 'pending').length;
+        const allOrders = [...localOrders, ...(orders || [])];
 
-          // Split dates for monthly vs today (assuming dates are in ISO format)
+        if (allOrders.length > 0) {
+          // Calculate revenue
+          const totalPaid = allOrders
+            .filter(o => o.status !== 'cancelled')
+            .reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+          
+          const pending = allOrders.filter(o => o.status === 'pending').length;
+
           const todayStr = new Date().toISOString().split('T')[0];
-          const todayRevenue = orders
-            .filter(o => o.created_at.startsWith(todayStr) && o.status !== 'cancelled')
-            .reduce((sum, o) => sum + parseFloat(o.total_amount), 0);
+          const todayRevenue = allOrders
+            .filter(o => o.created_at && o.created_at.startsWith(todayStr) && o.status !== 'cancelled')
+            .reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
 
           setMetrics({
-            todayRevenue: todayRevenue || 1299, // Fallback demo
-            monthlyRevenue: totalPaid || 14590, // Fallback demo
-            totalOrders: orders.length,
+            todayRevenue,
+            monthlyRevenue: totalPaid,
+            totalOrders: allOrders.length,
             pendingOrders: pending,
-            totalCustomers: profiles?.length || 1,
+            totalCustomers: profiles?.length || 0,
             lowStockCount: inventory?.length || 0,
           });
 
           // Set recent orders list
-          const formattedOrders = orders
+          const formattedOrders = allOrders
             .slice(0, 5)
             .map(o => ({
               id: o.id,
-              name: o.shipping_name,
-              total: o.total_amount,
-              status: o.status,
-              date: new Date(o.created_at).toLocaleDateString('en-IN'),
+              name: o.shipping_name || 'Customer',
+              total: o.total_amount || 0,
+              status: o.status || 'pending',
+              date: o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN') : 'Today',
             }));
           setRecentOrders(formattedOrders);
         } else {
-          // Use Mock data metrics if DB is fresh
-          setRecentOrders([
-            { id: 'ORD-89472', name: 'Rohan Sharma', total: 2598, status: 'pending', date: '07/06/2026' },
-            { id: 'ORD-89469', name: 'Elena Rostova', total: 1299, status: 'delivered', date: '06/06/2026' },
-            { id: 'ORD-89468', name: 'Karan Malhotra', total: 3897, status: 'packing', date: '05/06/2026' },
-            { id: 'ORD-89457', name: 'Amit Verma', total: 1499, status: 'shipped', date: '04/06/2026' },
-          ]);
+          setMetrics({
+            todayRevenue: 0,
+            monthlyRevenue: 0,
+            totalOrders: 0,
+            pendingOrders: 0,
+            totalCustomers: profiles?.length || 0,
+            lowStockCount: inventory?.length || 0,
+          });
+          setRecentOrders([]);
         }
       } catch (err) {
         console.error('Failed to load admin stats:', err);
@@ -151,23 +164,31 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-50">
-              {recentOrders.map((order, index) => (
-                <tr key={index} className="hover:bg-stone-50/50">
-                  <td className="py-3.5 font-mono text-stone-900 font-semibold">{order.id}</td>
-                  <td className="py-3.5 text-stone-850 font-medium">{order.name}</td>
-                  <td className="py-3.5 font-semibold text-stone-900">{formatPrice(order.total)}</td>
-                  <td className="py-3.5">
-                    <span className={`px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-wider border ${
-                      order.status === 'delivered' ? 'bg-emerald-50 text-emerald-800 border-emerald-100' :
-                      order.status === 'pending' ? 'bg-amber-50 text-amber-800 border-amber-100' :
-                      'bg-stone-100 text-stone-850 border-stone-200'
-                    }`}>
-                      {order.status}
-                    </span>
+              {recentOrders.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-stone-400 text-xs font-semibold uppercase tracking-wider">
+                    No orders recorded yet. New customer orders will be listed here.
                   </td>
-                  <td className="py-3.5 font-medium">{order.date}</td>
                 </tr>
-              ))}
+              ) : (
+                recentOrders.map((order, index) => (
+                  <tr key={index} className="hover:bg-stone-50/50">
+                    <td className="py-3.5 font-mono text-stone-900 font-semibold">{order.id}</td>
+                    <td className="py-3.5 text-stone-850 font-medium">{order.name}</td>
+                    <td className="py-3.5 font-semibold text-stone-900">{formatPrice(order.total)}</td>
+                    <td className="py-3.5">
+                      <span className={`px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-wider border ${
+                        order.status === 'delivered' ? 'bg-emerald-50 text-emerald-800 border-emerald-100' :
+                        order.status === 'pending' ? 'bg-amber-50 text-amber-800 border-amber-100' :
+                        'bg-stone-100 text-stone-850 border-stone-200'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="py-3.5 font-medium">{order.date}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

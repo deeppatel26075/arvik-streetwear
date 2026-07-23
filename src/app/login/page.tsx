@@ -41,11 +41,14 @@ export default function LoginPage() {
     setSuccessMsg(null);
     setAuthLoading(true);
 
+    const cleanEmail = email.toLowerCase().trim();
+    const isAdminAccount = cleanEmail === 'rishipatel1610@gmail.com';
+
     try {
       if (isRegister) {
-        // Register customer
+        // Real user registration
         const { data, error } = await supabase.auth.signUp({
-          email,
+          email: cleanEmail,
           password,
           options: {
             data: {
@@ -56,41 +59,63 @@ export default function LoginPage() {
         });
 
         if (error) throw error;
+
+        // Automatically create or update profile
+        if (data.user) {
+          await supabase.from('profiles').upsert({
+            id: data.user.id,
+            full_name: fullName || (isAdminAccount ? 'Rishi Patel' : 'Customer'),
+            phone: phone || '',
+            role: isAdminAccount ? 'admin' : 'customer',
+          });
+        }
         
-        setSuccessMsg('Registration successful! Please check your email for confirmation (if enabled) or sign in.');
+        setSuccessMsg('Account registered successfully! You can now sign in with your credentials.');
         setIsRegister(false);
         setPassword('');
       } else {
-        // Local bypass for mock testing
-        const isBypassAdmin = email.toLowerCase() === 'admin@arviik.com' && password === 'admin123';
-        const isBypassCustomer = email.toLowerCase() === 'customer@arviik.com' && password === 'customer123';
-        
-        if (isBypassAdmin || isBypassCustomer) {
-          signInMock(email);
-          if (isBypassAdmin) {
-            router.push('/admin');
+        // Real user sign in
+        let authUser = null;
+        let authError = null;
+
+        try {
+          const { data: authData, error: sbError } = await supabase.auth.signInWithPassword({
+            email: cleanEmail,
+            password,
+          });
+          if (sbError) {
+            authError = sbError;
           } else {
-            router.push('/profile');
+            authUser = authData.user;
           }
+        } catch (sbErr: any) {
+          authError = sbErr;
+        }
+
+        // If Supabase auth error occurs but credentials match designated admin (Rishi Patel)
+        if (!authUser && isAdminAccount && password === 'Rishi1610') {
+          signInMock('rishipatel1610@gmail.com');
+          router.push('/admin');
           return;
         }
 
-        // Sign In
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        if (authError && !authUser) {
+          throw authError;
+        }
 
-        if (error) throw error;
+        // Fetch user profile role
+        let role = isAdminAccount ? 'admin' : 'customer';
+        if (authUser) {
+          const { data: prof } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', authUser.id)
+            .single();
 
-        // Fetch user role directly to route immediately
-        const { data: prof } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user?.id)
-          .single();
+          if (prof?.role) role = prof.role;
+        }
 
-        if (prof?.role === 'admin') {
+        if (role === 'admin' || isAdminAccount) {
           router.push('/admin');
         } else {
           router.push('/profile');
@@ -251,13 +276,6 @@ export default function LoginPage() {
             <ArrowRight className="h-4 w-4" />
           </button>
         </form>
-
-        {/* Demo/Testing instructions */}
-        <div className="bg-stone-50 border border-stone-150 p-4 rounded-sm space-y-1 text-[10px] text-stone-500 uppercase tracking-wider font-semibold">
-          <p className="text-stone-900 font-bold">Demo Logins (Once DB is active):</p>
-          <p>Admin: <strong className="text-stone-700">admin@arviik.com</strong> / <span className="text-stone-600">admin123</span></p>
-          <p>Customer: <strong className="text-stone-700">customer@arviik.com</strong> / <span className="text-stone-600">customer123</span></p>
-        </div>
 
       </div>
     </div>

@@ -146,18 +146,19 @@ RETURNS TRIGGER AS $$
 DECLARE
   default_role VARCHAR(50) := 'customer';
 BEGIN
-  -- If we want to set a specific email as admin, we can check here
-  IF NEW.email = 'admin@arviik.com' THEN
+  -- If email matches designated admin email, grant admin role
+  IF LOWER(NEW.email) = 'rishipatel1610@gmail.com' OR LOWER(NEW.email) = 'admin@arviik.com' THEN
     default_role := 'admin';
   END IF;
 
   INSERT INTO public.profiles (id, full_name, phone, role)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', 'Rishi Patel'),
     COALESCE(NEW.raw_user_meta_data->>'phone', ''),
     default_role
-  );
+  )
+  ON CONFLICT (id) DO UPDATE SET role = EXCLUDED.role;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -236,3 +237,12 @@ CREATE POLICY "Allow public read site settings" ON public.site_settings FOR SELE
 CREATE POLICY "Allow admin write site settings" ON public.site_settings FOR ALL TO authenticated 
     USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'))
     WITH CHECK (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
+
+-- Initial Categories Seed
+INSERT INTO public.categories (name, slug) VALUES
+    ('Limited Edition', 'limited-edition'),
+    ('On Fire', 'on-fire'),
+    ('Graphic Tee', 'graphic-tee'),
+    ('Psychology Edition', 'psychology-edition')
+ON CONFLICT (slug) DO NOTHING;
+

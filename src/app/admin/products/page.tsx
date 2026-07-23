@@ -24,8 +24,7 @@ export default function AdminProducts() {
   const [gsm, setGsm] = useState('240 GSM');
   const [fitType, setFitType] = useState('Oversized Fit');
   const [washInstructions, setWashInstructions] = useState('Cold wash inside out');
-  const [imageUrl1, setImageUrl1] = useState('');
-  const [imageUrl2, setImageUrl2] = useState('');
+  const [productImages, setProductImages] = useState<string[]>(['', '', '', '', '']);
 
   // Stock sizes
   const [stockS, setStockS] = useState('10');
@@ -34,20 +33,30 @@ export default function AdminProducts() {
   const [stockXL, setStockXL] = useState('10');
   const [stockXXL, setStockXXL] = useState('5');
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, num: 1 | 2) => {
+  const handleSingleImageUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result as string;
-      if (num === 1) {
-        setImageUrl1(base64String);
-      } else {
-        setImageUrl2(base64String);
-      }
+      const next = [...productImages];
+      next[index] = base64String;
+      setProductImages(next);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleImageUrlChange = (index: number, value: string) => {
+    const next = [...productImages];
+    next[index] = value;
+    setProductImages(next);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const next = [...productImages];
+    next[index] = '';
+    setProductImages(next);
   };
 
   // Load products & categories
@@ -56,7 +65,14 @@ export default function AdminProducts() {
       setLoading(true);
 
       // Check categories
-      let loadedCats = [];
+      let loadedCats: any[] = [];
+      const defaultCategories = [
+        { id: 'cat-limited-edition', name: 'Limited Edition', slug: 'limited-edition' },
+        { id: 'cat-on-fire', name: 'On Fire', slug: 'on-fire' },
+        { id: 'cat-graphic-tee', name: 'Graphic Tee', slug: 'graphic-tee' },
+        { id: 'cat-psychology-edition', name: 'Psychology Edition', slug: 'psychology-edition' }
+      ];
+
       const storedCats = localStorage.getItem('arviik_custom_categories');
       if (storedCats) {
         loadedCats = JSON.parse(storedCats);
@@ -65,19 +81,19 @@ export default function AdminProducts() {
           const { data: cats } = await supabase.from('categories').select('*');
           if (cats && cats.length > 0) {
             loadedCats = cats;
-            localStorage.setItem('arviik_custom_categories', JSON.stringify(cats));
           }
         } catch (catErr) {
           console.error('Failed to load DB categories:', catErr);
         }
       }
-      if (loadedCats.length === 0) {
-        loadedCats = [
-          { id: 'cat-001', name: 'Graphic Prints', slug: 'graphic-prints' },
-          { id: 'cat-002', name: 'Minimalist Typo', slug: 'minimalist-typo' }
-        ];
-        localStorage.setItem('arviik_custom_categories', JSON.stringify(loadedCats));
+
+      // Merge default categories if any are missing
+      for (const defCat of defaultCategories) {
+        if (!loadedCats.some((c: any) => c.slug === defCat.slug || c.name.toLowerCase() === defCat.name.toLowerCase())) {
+          loadedCats.push(defCat);
+        }
       }
+      localStorage.setItem('arviik_custom_categories', JSON.stringify(loadedCats));
       setCategories(loadedCats);
 
       // Check products
@@ -87,12 +103,12 @@ export default function AdminProducts() {
         const parsed = JSON.parse(storedProds);
         const hasOldMocks = parsed.some((p: any) => p.name === 'ARCHIVE-01 GRAPHIC TEE' || p.name === 'ESSENTIALS LOGO TEE');
         if (hasOldMocks) {
-          loadedProds = MOCK_PRODUCTS.map(p => ({
+          loadedProds = MOCK_PRODUCTS.map((p: any) => ({
             ...p,
-            categoryName: p.category.name,
-            images: p.product_images.map(img => img.image_url),
-            sizes: p.inventory,
-            inventory: p.inventory
+            categoryName: typeof p.category === 'object' ? p.category?.name : (p.category || 'Limited Edition'),
+            images: p.product_images?.map((img: any) => img.image_url) || [],
+            sizes: p.inventory || [{ size: 'S', quantity: 10 }, { size: 'M', quantity: 15 }, { size: 'L', quantity: 20 }, { size: 'XL', quantity: 10 }, { size: 'XXL', quantity: 5 }],
+            inventory: p.inventory || [{ size: 'S', quantity: 10 }, { size: 'M', quantity: 15 }, { size: 'L', quantity: 20 }, { size: 'XL', quantity: 10 }, { size: 'XXL', quantity: 5 }]
           }));
           localStorage.setItem('arviik_custom_products', JSON.stringify(loadedProds));
         } else {
@@ -119,12 +135,12 @@ export default function AdminProducts() {
       }
 
       if (loadedProds.length === 0) {
-        loadedProds = MOCK_PRODUCTS.map(p => ({
+        loadedProds = MOCK_PRODUCTS.map((p: any) => ({
           ...p,
-          categoryName: p.category.name,
-          images: p.product_images.map(img => img.image_url),
-          sizes: p.inventory,
-          inventory: p.inventory
+          categoryName: typeof p.category === 'object' ? p.category?.name : (p.category || 'Limited Edition'),
+          images: p.product_images?.map((img: any) => img.image_url) || [],
+          sizes: p.inventory || [{ size: 'S', quantity: 10 }, { size: 'M', quantity: 15 }, { size: 'L', quantity: 20 }, { size: 'XL', quantity: 10 }, { size: 'XXL', quantity: 5 }],
+          inventory: p.inventory || [{ size: 'S', quantity: 10 }, { size: 'M', quantity: 15 }, { size: 'L', quantity: 20 }, { size: 'XL', quantity: 10 }, { size: 'XXL', quantity: 5 }]
         }));
         localStorage.setItem('arviik_custom_products', JSON.stringify(loadedProds));
       }
@@ -146,13 +162,12 @@ export default function AdminProducts() {
     setDescription('');
     setPrice('');
     setDiscountPrice('');
-    setCategoryId(categories[0]?.id || 'cat-001');
+    setCategoryId(categories[0]?.id || 'cat-limited-edition');
     setFabric('100% Premium Cotton');
     setGsm('240 GSM');
     setFitType('Oversized Fit');
     setWashInstructions('Cold machine wash inside out. Do not iron print.');
-    setImageUrl1('');
-    setImageUrl2('');
+    setProductImages(['', '', '', '', '']);
     setStockS('10');
     setStockM('15');
     setStockL('20');
@@ -167,13 +182,20 @@ export default function AdminProducts() {
     setDescription(prod.description || '');
     setPrice(prod.price.toString());
     setDiscountPrice(prod.discount_price ? prod.discount_price.toString() : '');
-    setCategoryId(prod.category_id || categories[0]?.id || 'cat-001');
+    setCategoryId(prod.category_id || categories[0]?.id || 'cat-limited-edition');
     setFabric(prod.fabric || '100% Premium Cotton');
     setGsm(prod.gsm || '240 GSM');
     setFitType(prod.fit_type || 'Oversized Fit');
     setWashInstructions(prod.wash_instructions || 'Cold wash inside out');
-    setImageUrl1(prod.images?.[0] || '');
-    setImageUrl2(prod.images?.[1] || '');
+    
+    const existingImgs = prod.images || prod.product_images?.map((i: any) => i.image_url) || [];
+    setProductImages([
+      existingImgs[0] || '',
+      existingImgs[1] || '',
+      existingImgs[2] || '',
+      existingImgs[3] || '',
+      existingImgs[4] || '',
+    ]);
 
     // Set stock values from sizes array
     const getQty = (sz: string) => {
@@ -205,6 +227,8 @@ export default function AdminProducts() {
       wash_instructions: washInstructions,
     };
 
+    const validImages = productImages.filter((img) => img && img.trim() !== '');
+
     const mockNewItem = {
       id: editingId || `prod-${Math.random()}`,
       name,
@@ -212,18 +236,15 @@ export default function AdminProducts() {
       description,
       price: parseFloat(price),
       discount_price: discountPrice ? parseFloat(discountPrice) : undefined,
-      category: { name: categories.find(c => c.id === categoryId)?.name || 'Graphic Prints' },
-      categoryName: categories.find(c => c.id === categoryId)?.name || 'Graphic Prints',
+      category: { name: categories.find(c => c.id === categoryId)?.name || 'Limited Edition' },
+      categoryName: categories.find(c => c.id === categoryId)?.name || 'Limited Edition',
       category_id: categoryId,
       fabric,
       gsm,
       fit_type: fitType,
       wash_instructions: washInstructions,
-      images: [imageUrl1, imageUrl2].filter(Boolean),
-      product_images: [
-        imageUrl1 ? { image_url: imageUrl1 } : null,
-        imageUrl2 ? { image_url: imageUrl2 } : null
-      ].filter(Boolean) as any[],
+      images: validImages,
+      product_images: validImages.map((imgUrl) => ({ image_url: imgUrl })),
       sizes: [
         { size: 'S', quantity: parseInt(stockS) },
         { size: 'M', quantity: parseInt(stockM) },
@@ -247,8 +268,9 @@ export default function AdminProducts() {
         if (error) throw error;
 
         await supabase.from('product_images').delete().eq('product_id', editingId);
-        if (imageUrl1) await supabase.from('product_images').insert({ product_id: editingId, image_url: imageUrl1, display_order: 0 });
-        if (imageUrl2) await supabase.from('product_images').insert({ product_id: editingId, image_url: imageUrl2, display_order: 1 });
+        for (let i = 0; i < validImages.length; i++) {
+          await supabase.from('product_images').insert({ product_id: editingId, image_url: validImages[i], display_order: i });
+        }
 
         const sizesToUpdate = [
           { size: 'S', qty: parseInt(stockS) },
@@ -275,8 +297,9 @@ export default function AdminProducts() {
         const newId = newProd.id;
         mockNewItem.id = newId;
 
-        if (imageUrl1) await supabase.from('product_images').insert({ product_id: newId, image_url: imageUrl1, display_order: 0 });
-        if (imageUrl2) await supabase.from('product_images').insert({ product_id: newId, image_url: imageUrl2, display_order: 1 });
+        for (let i = 0; i < validImages.length; i++) {
+          await supabase.from('product_images').insert({ product_id: newId, image_url: validImages[i], display_order: i });
+        }
 
         const inventoryPayload = [
           { product_id: newId, size: 'S', quantity: parseInt(stockS) },
@@ -560,85 +583,57 @@ export default function AdminProducts() {
                 />
               </div>
 
-              {/* Image Upload / Links */}
+              {/* Image Upload / Links (Up to 5 Photos) */}
               <div className="space-y-4 p-4 bg-stone-50 rounded-sm border border-stone-200/60">
-                <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider block border-b pb-1 mb-2">Product Images</span>
+                <div className="flex justify-between items-center border-b pb-1.5 mb-2">
+                  <span className="text-[10px] text-stone-600 font-extrabold uppercase tracking-wider">Product Gallery Photos (Upload up to 5 photos)</span>
+                  <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">{productImages.filter(Boolean).length} / 5 Uploaded</span>
+                </div>
                 
-                {/* Image 1 (Front View) */}
-                <div className="space-y-2">
-                  <label className="text-[10px] text-stone-600 font-bold uppercase tracking-wider block">Front View Image (Primary)</label>
-                  <div className="flex items-center space-x-4">
-                    {imageUrl1 ? (
-                      <div className="relative w-16 h-20 bg-stone-100 border border-stone-200 rounded-sm overflow-hidden flex-shrink-0">
-                        <img src={imageUrl1} alt="Front View" className="object-cover w-full h-full" />
-                        <button
-                          type="button"
-                          onClick={() => setImageUrl1('')}
-                          className="absolute top-1 right-1 bg-red-650 text-white rounded-full p-0.5 shadow-sm hover:opacity-90 transition-opacity"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
+                {[
+                  'Photo 1: Main / Front View (Primary)',
+                  'Photo 2: Back View',
+                  'Photo 3: Detail / Fabric Close-up',
+                  'Photo 4: Fit / Side View',
+                  'Photo 5: Studio / On-Model View'
+                ].map((label, idx) => (
+                  <div key={idx} className="space-y-1.5 p-2.5 bg-white border border-stone-200 rounded-sm">
+                    <label className="text-[9px] text-stone-700 font-bold uppercase tracking-wider block">{label}</label>
+                    <div className="flex items-center space-x-3">
+                      {productImages[idx] ? (
+                        <div className="relative w-14 h-16 bg-stone-100 border border-stone-200 rounded-sm overflow-hidden flex-shrink-0 shadow-xs">
+                          <img src={productImages[idx]} alt={`Photo ${idx + 1}`} className="object-cover w-full h-full" />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(idx)}
+                            className="absolute top-0.5 right-0.5 bg-red-650 text-white rounded-full p-0.5 shadow-sm hover:opacity-90 transition-opacity"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-14 h-16 border border-dashed border-stone-300 rounded-sm flex flex-col items-center justify-center text-stone-400 flex-shrink-0 text-[9px] font-bold">
+                          <span>Slot {idx + 1}</span>
+                        </div>
+                      )}
+                      <div className="flex-grow space-y-1">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleSingleImageUpload(idx, e)}
+                          className="w-full text-[11px] text-stone-500 file:mr-2 file:py-0.5 file:px-2 file:rounded-sm file:border-0 file:text-[9px] file:font-bold file:uppercase file:bg-stone-950 file:text-white hover:file:opacity-90"
+                        />
+                        <input
+                          type="text"
+                          placeholder={`Or paste photo ${idx + 1} URL...`}
+                          value={productImages[idx]?.startsWith('data:') ? '' : productImages[idx] || ''}
+                          onChange={(e) => handleImageUrlChange(idx, e.target.value)}
+                          className="w-full bg-stone-50 border border-stone-200 px-2.5 py-1 text-[11px] focus:outline-none focus:border-stone-900 rounded-sm"
+                        />
                       </div>
-                    ) : (
-                      <div className="w-16 h-20 border border-dashed border-stone-300 rounded-sm flex items-center justify-center text-stone-400 flex-shrink-0 text-[10px] font-bold">
-                        No Image
-                      </div>
-                    )}
-                    <div className="flex-grow space-y-1.5">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleImageUpload(e, 1)}
-                        className="w-full text-xs text-stone-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-sm file:border-0 file:text-[10px] file:font-bold file:uppercase file:bg-stone-950 file:text-white hover:file:opacity-90"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Or paste front image URL..."
-                        value={imageUrl1.startsWith('data:') ? '' : imageUrl1}
-                        onChange={(e) => setImageUrl1(e.target.value)}
-                        className="w-full bg-white border border-stone-200 px-3 py-1.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
-                      />
                     </div>
                   </div>
-                </div>
-
-                {/* Image 2 (Back View) */}
-                <div className="space-y-2">
-                  <label className="text-[10px] text-stone-600 font-bold uppercase tracking-wider block">Back View Image (Optional)</label>
-                  <div className="flex items-center space-x-4">
-                    {imageUrl2 ? (
-                      <div className="relative w-16 h-20 bg-stone-100 border border-stone-200 rounded-sm overflow-hidden flex-shrink-0">
-                        <img src={imageUrl2} alt="Back View" className="object-cover w-full h-full" />
-                        <button
-                          type="button"
-                          onClick={() => setImageUrl2('')}
-                          className="absolute top-1 right-1 bg-red-650 text-white rounded-full p-0.5 shadow-sm hover:opacity-90 transition-opacity"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="w-16 h-20 border border-dashed border-stone-300 rounded-sm flex items-center justify-center text-stone-400 flex-shrink-0 text-[10px] font-bold">
-                        No Image
-                      </div>
-                    )}
-                    <div className="flex-grow space-y-1.5">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleImageUpload(e, 2)}
-                        className="w-full text-xs text-stone-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-sm file:border-0 file:text-[10px] file:font-bold file:uppercase file:bg-stone-950 file:text-white hover:file:opacity-90"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Or paste back image URL..."
-                        value={imageUrl2.startsWith('data:') ? '' : imageUrl2}
-                        onChange={(e) => setImageUrl2(e.target.value)}
-                        className="w-full bg-white border border-stone-200 px-3 py-1.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
 
               {/* Inventory Sizes */}

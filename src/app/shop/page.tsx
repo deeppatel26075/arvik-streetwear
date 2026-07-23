@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { MOCK_PRODUCTS } from '../page';
 import ShopClient from './ShopClient';
+import PageLoader from '@/components/PageLoader';
 import { Suspense } from 'react';
 
 export default async function ShopPage() {
@@ -35,18 +36,26 @@ export default async function ShopPage() {
   const finalProducts = dbProducts.length > 0 ? dbProducts : MOCK_PRODUCTS;
   
   // Set default categories if database is empty
-  const finalCategories = dbCategories.length > 0 ? dbCategories : [
-    { id: 'cat-001', name: 'Graphic Prints', slug: 'graphic-prints' },
-    { id: 'cat-002', name: 'Minimalist Typo', slug: 'minimalist-typo' }
+  const defaultCategories = [
+    { id: 'cat-limited-edition', name: 'Limited Edition', slug: 'limited-edition' },
+    { id: 'cat-on-fire', name: 'On Fire', slug: 'on-fire' },
+    { id: 'cat-graphic-tee', name: 'Graphic Tee', slug: 'graphic-tee' },
+    { id: 'cat-psychology-edition', name: 'Psychology Edition', slug: 'psychology-edition' }
   ];
+
+  // Merge database categories with default categories to ensure all 4 exist
+  const combinedCategories = [...dbCategories];
+  for (const defCat of defaultCategories) {
+    if (!combinedCategories.some(c => c.slug === defCat.slug || c.name.toLowerCase() === defCat.name.toLowerCase())) {
+      combinedCategories.push(defCat);
+    }
+  }
+
+  const finalCategories = combinedCategories.length > 0 ? combinedCategories : defaultCategories;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <Suspense fallback={
-        <div className="flex justify-center items-center py-20 text-xs font-bold uppercase tracking-widest text-stone-400">
-          Loading drops...
-        </div>
-      }>
+      <Suspense fallback={<PageLoader fullScreen={false} />}>
         <ShopClient initialProducts={finalProducts as any} categories={finalCategories as any} />
       </Suspense>
     </div>
