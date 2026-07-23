@@ -134,26 +134,26 @@ export default function ProductCard({ product }: ProductCardProps) {
       </Link>
 
       {/* Info Container */}
-      <div className="p-3 sm:p-4 flex flex-col flex-grow bg-white border-t border-stone-100">
-        <span className="text-[9px] text-stone-400 font-bold uppercase tracking-widest mb-1">
+      <div className="p-3 sm:p-3.5 flex flex-col flex-grow bg-white border-t border-stone-100">
+        <span className="text-[9px] text-stone-400 font-extrabold uppercase tracking-widest mb-0.5">
           {categoryName}
         </span>
         <Link
           href={`/shop/${product.slug}`}
-          className="font-syne font-bold text-xs uppercase text-stone-900 tracking-wider hover:opacity-85 transition-opacity line-clamp-1 mb-1.5"
+          className="font-syne font-extrabold text-xs uppercase text-stone-950 tracking-wider hover:text-stone-700 transition-colors line-clamp-1 mb-1"
         >
           {product.name}
         </Link>
-        <div className="flex items-center space-x-2 mb-3">
-          <span className="text-xs font-semibold text-stone-950">₹{price.toLocaleString('en-IN')}</span>
+        <div className="flex items-center space-x-2 mb-2.5">
+          <span className="text-xs font-mono font-extrabold text-stone-950">₹{price.toLocaleString('en-IN')}</span>
           {mrp > price && (
-            <span className="text-[10px] text-stone-400 line-through">₹{mrp.toLocaleString('en-IN')}</span>
+            <span className="text-[10px] font-mono text-stone-400 line-through">₹{mrp.toLocaleString('en-IN')}</span>
           )}
         </div>
-        <div className="mt-auto pt-2 border-t border-stone-100/60">
+        <div className="mt-auto pt-2 border-t border-stone-100/70">
           <button
             onClick={(e) => handleQuickAdd('M', e)}
-            className="w-full border border-stone-200 text-stone-900 bg-white hover:bg-stone-950 hover:text-white text-[10px] font-bold uppercase tracking-widest py-2 rounded-sm transition-colors duration-200 flex items-center justify-center space-x-1.5 cursor-pointer"
+            className="w-full border border-stone-200 text-stone-900 bg-white hover:bg-stone-950 hover:text-white text-[10px] font-extrabold uppercase tracking-widest py-2 rounded-xs transition-colors duration-200 flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs"
           >
             <ShoppingBag className="h-3.5 w-3.5" />
             <span>Add to Cart</span>
