@@ -259,34 +259,43 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
             {/* Three Founders Mentioned Inside The Single Box */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center divide-y md:divide-y-0 md:divide-x divide-stone-800">
               
-              {/* Founder 1 */}
-              <div className="space-y-1.5 pt-3 md:pt-0 md:px-4">
-                <span className="inline-block text-[9px] font-extrabold tracking-widest text-lime-400 uppercase bg-stone-950 px-3 py-0.5 rounded-full border border-stone-800">
-                  Co-Founder
+              {/* Founder 1: Rishi Patel */}
+              <div className="space-y-2 pt-4 md:pt-0 md:px-4">
+                <span className="inline-block text-[9px] font-extrabold tracking-widest text-lime-400 uppercase bg-stone-950 px-3 py-1 rounded-full border border-stone-800">
+                  Co-Founder & Operations
                 </span>
                 <h3 className="font-syne font-extrabold text-lg uppercase tracking-wider text-white">
                   RISHI PATEL
                 </h3>
+                <p className="text-xs text-stone-300 font-light leading-relaxed">
+                  Oversees manufacturing, sourcing, quality control, and ensures every product meets ARVIIK’s standards.
+                </p>
               </div>
 
-              {/* Founder 2 */}
-              <div className="space-y-1.5 pt-4 md:pt-0 md:px-4">
-                <span className="inline-block text-[9px] font-extrabold tracking-widest text-lime-400 uppercase bg-stone-950 px-3 py-0.5 rounded-full border border-stone-800">
-                  Co-Founder
-                </span>
-                <h3 className="font-syne font-extrabold text-lg uppercase tracking-wider text-white">
-                  KEYUR VAGELA
-                </h3>
-              </div>
-
-              {/* Founder 3 */}
-              <div className="space-y-1.5 pt-4 md:pt-0 md:px-4">
-                <span className="inline-block text-[9px] font-extrabold tracking-widest text-lime-400 uppercase bg-stone-950 px-3 py-0.5 rounded-full border border-stone-800">
-                  Co-Founder
+              {/* Founder 2: Aryan Patel */}
+              <div className="space-y-2 pt-6 md:pt-0 md:px-4">
+                <span className="inline-block text-[9px] font-extrabold tracking-widest text-lime-400 uppercase bg-stone-950 px-3 py-1 rounded-full border border-stone-800">
+                  Co-Founder & Creative Director
                 </span>
                 <h3 className="font-syne font-extrabold text-lg uppercase tracking-wider text-white">
                   ARYAN PATEL
                 </h3>
+                <p className="text-xs text-stone-300 font-light leading-relaxed">
+                  Leads the brand vision, product design, and creative direction behind every ARVIIK collection.
+                </p>
+              </div>
+
+              {/* Founder 3: Keyur Vaghela */}
+              <div className="space-y-2 pt-6 md:pt-0 md:px-4">
+                <span className="inline-block text-[9px] font-extrabold tracking-widest text-lime-400 uppercase bg-stone-950 px-3 py-1 rounded-full border border-stone-800">
+                  Co-Founder & Growth
+                </span>
+                <h3 className="font-syne font-extrabold text-lg uppercase tracking-wider text-white">
+                  KEYUR VAGHELA
+                </h3>
+                <p className="text-xs text-stone-300 font-light leading-relaxed">
+                  Drives marketing, community building, partnerships, and the growth strategy of the brand.
+                </p>
               </div>
 
             </div>
