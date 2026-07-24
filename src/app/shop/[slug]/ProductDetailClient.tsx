@@ -1,11 +1,10 @@
-'use client';
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart, WishlistItem } from '@/context/CartContext';
 import { formatPrice } from '@/lib/utils';
+import RecentlyViewed from '@/components/RecentlyViewed';
 import {
   Heart,
   ShoppingBag,
@@ -23,6 +22,7 @@ import {
   Sparkles,
   Check,
   Zap,
+  Calculator,
 } from 'lucide-react';
 
 interface ProductImage {
@@ -63,6 +63,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [adding, setAdding] = useState(false);
   const [showZoomModal, setShowZoomModal] = useState(false);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
+  const [showSmartCalculator, setShowSmartCalculator] = useState(false);
+  const [userHeight, setUserHeight] = useState('175');
+  const [userWeight, setUserWeight] = useState('70');
+  const [fitPreference, setFitPreference] = useState<'oversized' | 'regular'>('oversized');
+  const [calcResult, setCalcResult] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
 
   // Accordion states
@@ -77,6 +82,44 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const activePrice = product.discount_price && product.discount_price > 0
     ? product.discount_price
     : product.price;
+
+  useEffect(() => {
+    try {
+      const currentItem = {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: activePrice,
+        image: images[0]?.image_url || '/placeholder-tee.jpg',
+      };
+
+      const stored = localStorage.getItem('arviik_recently_viewed');
+      let list = stored ? JSON.parse(stored) : [];
+      list = list.filter((i: any) => i.id !== product.id);
+      list.unshift(currentItem);
+      localStorage.setItem('arviik_recently_viewed', JSON.stringify(list.slice(0, 8)));
+    } catch (e) {
+      console.error('Failed saving to recently viewed:', e);
+    }
+  }, [product.id, activePrice, images]);
+
+  const calculateSize = () => {
+    const w = parseFloat(userWeight) || 68;
+    let recommendedSize: 'S' | 'M' | 'L' | 'XL' | 'XXL' = 'M';
+    if (w < 58) recommendedSize = 'S';
+    else if (w >= 58 && w < 72) recommendedSize = 'M';
+    else if (w >= 72 && w < 84) recommendedSize = 'L';
+    else if (w >= 84 && w < 96) recommendedSize = 'XL';
+    else recommendedSize = 'XXL';
+
+    if (fitPreference === 'regular' && recommendedSize !== 'S') {
+      const map: any = { M: 'S', L: 'M', XL: 'L', XXL: 'XL' };
+      recommendedSize = map[recommendedSize] || recommendedSize;
+    }
+
+    setCalcResult(recommendedSize);
+    setSelectedSize(recommendedSize);
+  };
 
   const isDiscounted = product.discount_price !== undefined && product.discount_price !== null && product.discount_price > 0;
   const isFavorited = isInWishlist(product.id);
@@ -318,14 +361,24 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 <span>Select Size:</span>
                 <span className="text-stone-950 font-extrabold">{selectedSize || 'Choose Size'}</span>
               </label>
-              <button
-                type="button"
-                onClick={() => setShowSizeGuide(true)}
-                className="inline-flex items-center space-x-1 text-xs text-stone-600 hover:text-stone-950 font-bold uppercase tracking-wider underline underline-offset-4"
-              >
-                <Ruler className="h-3.5 w-3.5" />
-                <span>Size Guide</span>
-              </button>
+              <div className="flex items-center space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setShowSmartCalculator(true)}
+                  className="inline-flex items-center space-x-1 text-xs text-lime-700 hover:text-stone-950 font-extrabold uppercase tracking-wider underline underline-offset-4"
+                >
+                  <Calculator className="h-3.5 w-3.5" />
+                  <span>Find My Size</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowSizeGuide(true)}
+                  className="inline-flex items-center space-x-1 text-xs text-stone-600 hover:text-stone-950 font-bold uppercase tracking-wider underline underline-offset-4"
+                >
+                  <Ruler className="h-3.5 w-3.5" />
+                  <span>Size Guide</span>
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-5 gap-2.5">
@@ -613,6 +666,94 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         </div>
       )}
 
+      {/* Smart Size Calculator Modal */}
+      {showSmartCalculator && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/70 backdrop-blur-xs select-none">
+          <div className="bg-white border border-stone-200 w-full max-w-md p-6 rounded-xs shadow-2xl relative space-y-4 animate-fade-in">
+            <div className="flex justify-between items-center border-b border-stone-200 pb-3">
+              <div className="flex items-center space-x-2">
+                <Calculator className="h-5 w-5 text-stone-950" />
+                <h3 className="font-syne font-bold text-sm uppercase tracking-wider text-stone-900">
+                  Smart Size Recommender
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowSmartCalculator(false)}
+                className="text-stone-400 hover:text-stone-950"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-stone-500 font-medium">
+              Enter your weight & height to calculate your ideal ARVIIK streetwear fit.
+            </p>
+
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-extrabold uppercase text-stone-600 block">Height (cm)</label>
+                  <input
+                    type="number"
+                    value={userHeight}
+                    onChange={(e) => setUserHeight(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-200 p-2.5 text-xs text-stone-900 focus:outline-none rounded-xs font-mono font-bold"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-extrabold uppercase text-stone-600 block">Weight (kg)</label>
+                  <input
+                    type="number"
+                    value={userWeight}
+                    onChange={(e) => setUserWeight(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-200 p-2.5 text-xs text-stone-900 focus:outline-none rounded-xs font-mono font-bold"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-extrabold uppercase text-stone-600 block">Fit Preference</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setFitPreference('oversized')}
+                    className={`p-2 text-xs font-bold uppercase rounded-xs border ${
+                      fitPreference === 'oversized' ? 'bg-stone-950 text-white border-stone-950' : 'bg-white text-stone-700 border-stone-200'
+                    }`}
+                  >
+                    Oversized Boxy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFitPreference('regular')}
+                    className={`p-2 text-xs font-bold uppercase rounded-xs border ${
+                      fitPreference === 'regular' ? 'bg-stone-950 text-white border-stone-950' : 'bg-white text-stone-700 border-stone-200'
+                    }`}
+                  >
+                    Standard Regular
+                  </button>
+                </div>
+              </div>
+
+              <button
+                onClick={calculateSize}
+                className="w-full bg-stone-950 hover:bg-stone-900 text-white font-extrabold text-xs uppercase tracking-widest py-3 rounded-xs transition-all"
+              >
+                Calculate My Size
+              </button>
+
+              {calcResult && (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xs text-center space-y-1 animate-fade-in">
+                  <span className="text-[10px] text-emerald-800 font-extrabold uppercase tracking-widest block">Recommended Fit</span>
+                  <span className="text-xl font-syne font-extrabold text-emerald-950">SIZE {calcResult}</span>
+                  <p className="text-[10px] text-emerald-700">Size {calcResult} has been automatically selected for you!</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Sticky Bottom Purchase Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md p-3 border-t border-stone-200/90 shadow-2xl flex items-center justify-between gap-3 select-none">
         <div className="flex flex-col">
@@ -639,6 +780,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             <span>{adding ? 'Adding...' : 'Add to Bag'}</span>
           </button>
         </div>
+      </div>
+
+      {/* Recently Viewed Strip */}
+      <div className="pt-10">
+        <RecentlyViewed />
       </div>
 
     </div>
