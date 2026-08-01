@@ -138,7 +138,7 @@ export default function CheckoutPaymentPage() {
         console.warn('API checkout order creation fallback:', err);
       }
 
-      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_mockkeyid123';
+      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_TKVDXSP0EuD5RL';
 
       const options: any = {
         key: razorpayKey,
