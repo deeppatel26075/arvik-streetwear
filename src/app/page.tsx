@@ -1,8 +1,7 @@
-import { supabase } from '@/lib/supabase';
+import { supabase, withTimeout } from '@/lib/supabase';
 import HomeClientWrapper from './HomeClientWrapper';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 30;
 
 export const MOCK_PRODUCTS = [
   {
@@ -51,14 +50,18 @@ export default async function HomePage() {
   let dbProducts: any[] = [];
 
   try {
-    const { data: prods } = await supabase
-      .from('products')
-      .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
-      .eq('is_hidden', false)
-      .order('created_at', { ascending: false });
+    const res: any = await withTimeout(
+      supabase
+        .from('products')
+        .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
+        .eq('is_hidden', false)
+        .order('created_at', { ascending: false })
+    );
+
+    const prods = res?.data;
     
     if (prods && prods.length > 0) {
-      dbProducts = prods.map((prod, index) => {
+      dbProducts = prods.map((prod: any, index: number) => {
         const fallbacks = [
           '/products/farebi-olive.jpg',
           '/products/polarize-cream.jpg',

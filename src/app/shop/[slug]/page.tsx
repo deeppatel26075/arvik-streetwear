@@ -1,11 +1,10 @@
-import { supabase } from '@/lib/supabase';
+import { supabase, withTimeout } from '@/lib/supabase';
 import { MOCK_PRODUCTS } from '../../page';
 import ProductDetailClient from './ProductDetailClient';
 import ProductDetailFallback from './ProductDetailFallback';
 import { notFound } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 30;
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -16,13 +15,16 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   let dbProduct = null;
 
   try {
-    const { data } = await supabase
-      .from('products')
-      .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
-      .eq('slug', slug)
-      .eq('is_hidden', false)
-      .single();
+    const res: any = await withTimeout(
+      supabase
+        .from('products')
+        .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
+        .eq('slug', slug)
+        .eq('is_hidden', false)
+        .single()
+    );
 
+    const data = res?.data;
     if (data) {
       dbProduct = {
         ...data,

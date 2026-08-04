@@ -1,11 +1,10 @@
-import { supabase } from '@/lib/supabase';
+import { supabase, withTimeout } from '@/lib/supabase';
 import { MOCK_PRODUCTS } from '../../page';
 import ProductCard from '@/components/ProductCard';
 import Link from 'next/link';
 import { SlidersHorizontal, Grid } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 30;
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -17,23 +16,30 @@ export default async function CategoryDetailPage({ params }: CategoryPageProps) 
   let categoryName = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
   try {
-    const { data: categoryData } = await supabase
-      .from('categories')
-      .select('id, name')
-      .eq('slug', slug)
-      .single();
+    const catRes: any = await withTimeout(
+      supabase
+        .from('categories')
+        .select('id, name')
+        .eq('slug', slug)
+        .single()
+    );
+
+    const categoryData = catRes?.data;
 
     if (categoryData) {
       categoryName = categoryData.name;
       
-      const { data: prods } = await supabase
-        .from('products')
-        .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
-        .eq('category_id', categoryData.id)
-        .eq('is_hidden', false);
+      const prodRes: any = await withTimeout(
+        supabase
+          .from('products')
+          .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
+          .eq('category_id', categoryData.id)
+          .eq('is_hidden', false)
+      );
 
+      const prods = prodRes?.data;
       if (prods) {
-        dbProducts = prods.map((p) => ({
+        dbProducts = prods.map((p: any) => ({
           ...p,
           category: p.category ? { name: (p.category as any).name } : undefined,
           product_images: p.product_images || [],

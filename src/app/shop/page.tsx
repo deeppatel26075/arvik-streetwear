@@ -1,11 +1,10 @@
-import { supabase } from '@/lib/supabase';
+import { supabase, withTimeout } from '@/lib/supabase';
 import { MOCK_PRODUCTS } from '../page';
 import ShopClient from './ShopClient';
 import PageLoader from '@/components/PageLoader';
 import { Suspense } from 'react';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 30;
 
 export default async function ShopPage() {
   let dbProducts = [];
@@ -13,19 +12,22 @@ export default async function ShopPage() {
 
   try {
     // 1. Fetch categories
-    const { data: catData } = await supabase
-      .from('categories')
-      .select('*');
-    if (catData) dbCategories = catData;
+    const catRes: any = await withTimeout(
+      supabase.from('categories').select('*')
+    );
+    if (catRes?.data) dbCategories = catRes.data;
 
-    // 2. Fetch products
-    const { data: prodData } = await supabase
-      .from('products')
-      .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
-      .eq('is_hidden', false);
+    // 2. Fetch products with 1s timeout safeguard
+    const prodRes: any = await withTimeout(
+      supabase
+        .from('products')
+        .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
+        .eq('is_hidden', false)
+    );
     
+    const prodData = prodRes?.data;
     if (prodData && prodData.length > 0) {
-      dbProducts = prodData.map(prod => ({
+      dbProducts = prodData.map((prod: any) => ({
         ...prod,
         category: prod.category ? { name: (prod.category as any).name } : undefined,
         product_images: prod.product_images || [],
