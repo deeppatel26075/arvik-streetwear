@@ -6,19 +6,7 @@ export default function IosZoomLock() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // 1. Force strict viewport meta tag into head for iOS Safari
-    let meta = document.querySelector('meta[name="viewport"]');
-    if (!meta) {
-      meta = document.createElement('meta');
-      meta.setAttribute('name', 'viewport');
-      document.head.appendChild(meta);
-    }
-    meta.setAttribute(
-      'content',
-      'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover'
-    );
-
-    // 2. Prevent 2-finger touchstart (pinch start)
+    // 1. Prevent 2-finger touchstart (pinch start)
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches && e.touches.length > 1) {
         e.preventDefault();

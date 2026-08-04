@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from 'next';
+import type { Metadata } from 'next';
 import { Inter, Syne } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
@@ -21,14 +21,6 @@ const syne = Syne({
   weight: ['400', '700', '800'],
   display: 'swap',
 });
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  viewportFit: 'cover',
-};
 
 export const metadata: Metadata = {
   title: 'ARVIIK | Premium Oversized Streetwear',
