@@ -78,15 +78,15 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 py-4">
           <div className="flex items-center justify-between">
             
-            {/* Hamburger Button (Opens Hamburger Menu Drawer) */}
-            <div className="flex items-center">
+            {/* Hamburger Button (Opens Hamburger Menu Drawer - Top Layer zIndex 9999999) */}
+            <div className="flex items-center" style={{ zIndex: 9999999 }}>
               <button
                 onClick={() => setMobileOpen(true)}
-                className="text-stone-900 hover:text-stone-600 focus:outline-none p-1.5 rounded-xs hover:bg-stone-100 transition-colors flex items-center gap-2"
+                className="text-stone-900 hover:text-stone-600 focus:outline-none p-2 rounded-xs hover:bg-stone-100 transition-colors flex items-center gap-2"
                 aria-label="Open Hamburger Menu"
               >
-                <Menu className="h-6 w-6 text-stone-900" />
-                <span className="hidden sm:inline-block text-[11px] font-extrabold uppercase tracking-widest text-stone-900">
+                <Menu className="h-7 w-7 sm:h-8 sm:w-8 text-stone-900 stroke-[2.2]" />
+                <span className="hidden sm:inline-block text-xs sm:text-sm font-black uppercase tracking-widest text-stone-900">
                   MENU
                 </span>
               </button>
@@ -203,309 +203,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* 2. Hamburger Menu Drawer Overlay (Opened by Hamburger Icon ☰ - Top Layer z-[9999]) */}
-        {mobileOpen && (
-          <div className="fixed inset-0 z-[9999] bg-stone-950/80 backdrop-blur-md flex justify-start animate-fade-in">
-            <div className="w-full max-w-md bg-white h-full min-h-screen overflow-y-auto p-6 shadow-2xl flex flex-col justify-between space-y-6 border-r border-stone-200">
-              
-              {/* Drawer Top Header & Close Button */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-stone-200 pb-4">
-                  <div className="flex items-center space-x-2">
-                    <span className="font-syne font-extrabold text-xl tracking-[0.2em] text-stone-950">
-                      ARVIIK
-                    </span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400 bg-stone-100 px-2 py-0.5 rounded-xs">
-                      MENU
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => setMobileOpen(false)}
-                    className="p-1.5 rounded-full bg-stone-100 text-stone-900 hover:bg-stone-200 transition-colors"
-                    aria-label="Close Menu"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {/* SHOP ALL Header Link & Search Bar */}
-                <div className="space-y-3">
-                  <Link
-                    href="/shop"
-                    onClick={() => setMobileOpen(false)}
-                    className="block font-extrabold text-xs tracking-widest uppercase text-stone-950 hover:text-stone-600 transition-colors"
-                  >
-                    SHOP ALL
-                  </Link>
-
-                  <form onSubmit={handleSearchSubmit} className="relative">
-                    <input
-                      type="text"
-                      placeholder="Search products..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-stone-50 border border-stone-200 rounded-sm py-2.5 pl-4 pr-10 text-xs text-stone-900 focus:outline-none focus:border-stone-900"
-                    />
-                    <button
-                      type="submit"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-900"
-                    >
-                      <Search className="w-4 h-4" />
-                    </button>
-                  </form>
-                </div>
-
-                {/* FEATURED COLLECTIONS SECTION */}
-                <div className="space-y-3 pt-2">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-400 border-b border-stone-100 pb-1.5">
-                    FEATURED COLLECTIONS
-                  </h3>
-                  
-                  <div className="space-y-1 divide-y divide-stone-100">
-                    
-                    {/* New Arrivals */}
-                    <Link
-                      href="/shop?filter=new"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-between py-2.5 group"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-[9px]">
-                          NEW
-                        </div>
-                        <div>
-                          <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
-                            NEW ARRIVALS
-                          </h4>
-                          <p className="text-[9px] text-stone-400 tracking-wide">Fresh Drops Every Week</p>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
-                    </Link>
-
-                    {/* Best Sellers */}
-                    <Link
-                      href="/shop?filter=bestseller"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-between py-2.5 group"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">
-                          ⭐
-                        </div>
-                        <div>
-                          <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
-                            BEST SELLERS
-                          </h4>
-                          <p className="text-[9px] text-stone-400 tracking-wide">Our Most Loved Styles</p>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
-                    </Link>
-
-                    {/* Limited Edition */}
-                    <Link
-                      href="/shop?category=Limited+Edition"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-between py-2.5 group"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-7 h-7 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xs">
-                          🔥
-                        </div>
-                        <div>
-                          <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
-                            LIMITED EDITION
-                          </h4>
-                          <p className="text-[9px] text-stone-400 tracking-wide">Exclusive Drops</p>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
-                    </Link>
-
-                    {/* Psychology Edition */}
-                    <Link
-                      href="/shop?category=Psychology+Edition"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-between py-2.5 group"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-7 h-7 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs">
-                          🧠
-                        </div>
-                        <div>
-                          <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
-                            PSYCHOLOGY EDITION
-                          </h4>
-                          <p className="text-[9px] text-stone-400 tracking-wide">Mind & Identity Concepts</p>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
-                    </Link>
-
-                    {/* Anime Edition */}
-                    <Link
-                      href="/shop?category=Anime+Edition"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-between py-2.5 group"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs">
-                          ⚔️
-                        </div>
-                        <div>
-                          <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
-                            ANIME EDITION
-                          </h4>
-                          <p className="text-[9px] text-stone-400 tracking-wide">Otaku & Street Culture</p>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
-                    </Link>
-
-                    {/* All Collection */}
-                    <Link
-                      href="/shop"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-between py-2.5 group"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-7 h-7 rounded-full bg-stone-100 text-stone-700 flex items-center justify-center text-xs">
-                          🛍️
-                        </div>
-                        <div>
-                          <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
-                            ALL COLLECTION
-                          </h4>
-                          <p className="text-[9px] text-stone-400 tracking-wide">Explore All Streetwear Styles</p>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
-                    </Link>
-
-                  </div>
-                </div>
-
-                {/* SHOP BY SECTION */}
-                <div className="space-y-3 pt-2">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-400 border-b border-stone-100 pb-1.5">
-                    SHOP BY
-                  </h3>
-
-                  <div className="space-y-1.5 text-xs font-semibold text-stone-800">
-                    <Link
-                      href="/shop?gender=men"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-between py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <User className="w-4 h-4 text-stone-500" />
-                        <span className="uppercase tracking-wider">Men</span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-stone-300" />
-                    </Link>
-
-                    <Link
-                      href="/shop?gender=unisex"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-between py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <Shirt className="w-4 h-4 text-stone-500" />
-                        <span className="uppercase tracking-wider">Unisex</span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-stone-300" />
-                    </Link>
-                  </div>
-                </div>
-
-                {/* MY ACCOUNT SECTION */}
-                <div className="space-y-3 pt-2">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-400 border-b border-stone-100 pb-1.5">
-                    MY ACCOUNT
-                  </h3>
-
-                  <div className="grid grid-cols-4 gap-2 text-center pt-1">
-                    <Link
-                      href={user ? "/profile" : "/login"}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex flex-col items-center justify-center p-2.5 bg-stone-50 hover:bg-stone-100 border border-stone-200/60 rounded-xs transition-colors group"
-                    >
-                      <User className="w-4 h-4 text-stone-700 mb-1 group-hover:scale-110 transition-transform" />
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-stone-800">
-                        My Account
-                      </span>
-                    </Link>
-
-                    <Link
-                      href="/profile#orders"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex flex-col items-center justify-center p-2.5 bg-stone-50 hover:bg-stone-100 border border-stone-200/60 rounded-xs transition-colors group"
-                    >
-                      <Truck className="w-4 h-4 text-stone-700 mb-1 group-hover:scale-110 transition-transform" />
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-stone-800">
-                        Track Order
-                      </span>
-                    </Link>
-
-                    <Link
-                      href="/contact#returns"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex flex-col items-center justify-center p-2.5 bg-stone-50 hover:bg-stone-100 border border-stone-200/60 rounded-xs transition-colors group"
-                    >
-                      <RefreshCw className="w-4 h-4 text-stone-700 mb-1 group-hover:scale-110 transition-transform" />
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-stone-800">
-                        Return
-                      </span>
-                    </Link>
-
-                    <Link
-                      href="/wishlist"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex flex-col items-center justify-center p-2.5 bg-stone-50 hover:bg-stone-100 border border-stone-200/60 rounded-xs transition-colors group"
-                    >
-                      <Heart className="w-4 h-4 text-stone-700 mb-1 group-hover:scale-110 transition-transform" />
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-stone-800">
-                        Wishlist
-                      </span>
-                    </Link>
-                  </div>
-                </div>
-
-                {/* SUPPORT SECTION */}
-                <div className="space-y-3 pt-2 pb-6">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-400 border-b border-stone-100 pb-1.5">
-                    SUPPORT
-                  </h3>
-
-                  <div className="space-y-2 text-xs font-semibold text-stone-800">
-                    <Link
-                      href="/contact"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center space-x-3 py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
-                    >
-                      <PhoneCall className="w-4 h-4 text-stone-600" />
-                      <span className="uppercase tracking-wider">Contact Us</span>
-                    </Link>
-
-                    <a
-                      href="https://api.whatsapp.com/send?phone=919876543210&text=Hi%20ARVIIK%20Support"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center space-x-3 py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors text-emerald-700"
-                    >
-                      <MessageCircle className="w-4 h-4 text-emerald-600 fill-emerald-100" />
-                      <span className="uppercase tracking-wider">WhatsApp Support</span>
-                    </a>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Desktop Search Modal */}
         {searchOpen && (
           <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-start justify-center pt-24 px-4">
@@ -538,6 +235,309 @@ export default function Navbar() {
           </div>
         )}
       </header>
+
+      {/* Hamburger Menu Drawer Overlay — outside header so z-index is not capped by header's stacking context */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-[99999] bg-stone-950/80 backdrop-blur-md flex justify-start animate-fade-in">
+          <div className="w-full max-w-md bg-white h-full min-h-screen overflow-y-auto p-6 shadow-2xl flex flex-col justify-between space-y-6 border-r border-stone-200">
+            
+            {/* Drawer Top Header & Close Button */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-stone-200 pb-4">
+                <div className="flex items-center space-x-2">
+                  <span className="font-syne font-extrabold text-xl tracking-[0.2em] text-stone-950">
+                    ARVIIK
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400 bg-stone-100 px-2 py-0.5 rounded-xs">
+                    MENU
+                  </span>
+                </div>
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="p-1.5 rounded-full bg-stone-100 text-stone-900 hover:bg-stone-200 transition-colors"
+                  aria-label="Close Menu"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* SHOP ALL Header Link & Search Bar */}
+              <div className="space-y-3">
+                <Link
+                  href="/shop"
+                  onClick={() => setMobileOpen(false)}
+                  className="block font-extrabold text-xs tracking-widest uppercase text-stone-950 hover:text-stone-600 transition-colors"
+                >
+                  SHOP ALL
+                </Link>
+
+                <form onSubmit={handleSearchSubmit} className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-stone-50 border border-stone-200 rounded-sm py-2.5 pl-4 pr-10 text-xs text-stone-900 focus:outline-none focus:border-stone-900"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-900"
+                  >
+                    <Search className="w-4 h-4" />
+                  </button>
+                </form>
+              </div>
+
+              {/* FEATURED COLLECTIONS SECTION */}
+              <div className="space-y-3 pt-2">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-400 border-b border-stone-100 pb-1.5">
+                  FEATURED COLLECTIONS
+                </h3>
+                
+                <div className="space-y-1 divide-y divide-stone-100">
+                  
+                  {/* New Arrivals */}
+                  <Link
+                    href="/shop?filter=new"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2.5 group"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-[9px]">
+                        NEW
+                      </div>
+                      <div>
+                        <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
+                          NEW ARRIVALS
+                        </h4>
+                        <p className="text-[9px] text-stone-400 tracking-wide">Fresh Drops Every Week</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
+                  </Link>
+
+                  {/* Best Sellers */}
+                  <Link
+                    href="/shop?filter=bestseller"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2.5 group"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">
+                        ⭐
+                      </div>
+                      <div>
+                        <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
+                          BEST SELLERS
+                        </h4>
+                        <p className="text-[9px] text-stone-400 tracking-wide">Our Most Loved Styles</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
+                  </Link>
+
+                  {/* Limited Edition */}
+                  <Link
+                    href="/shop?category=Limited+Edition"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2.5 group"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-7 h-7 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xs">
+                        🔥
+                      </div>
+                      <div>
+                        <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
+                          LIMITED EDITION
+                        </h4>
+                        <p className="text-[9px] text-stone-400 tracking-wide">Exclusive Drops</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
+                  </Link>
+
+                  {/* Psychology Edition */}
+                  <Link
+                    href="/shop?category=Psychology+Edition"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2.5 group"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-7 h-7 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs">
+                        🧠
+                      </div>
+                      <div>
+                        <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
+                          PSYCHOLOGY EDITION
+                        </h4>
+                        <p className="text-[9px] text-stone-400 tracking-wide">Mind & Identity Concepts</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
+                  </Link>
+
+                  {/* Anime Edition */}
+                  <Link
+                    href="/shop?category=Anime+Edition"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2.5 group"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs">
+                        ⚔️
+                      </div>
+                      <div>
+                        <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
+                          ANIME EDITION
+                        </h4>
+                        <p className="text-[9px] text-stone-400 tracking-wide">Otaku & Street Culture</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
+                  </Link>
+
+                  {/* All Collection */}
+                  <Link
+                    href="/shop"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2.5 group"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-7 h-7 rounded-full bg-stone-100 text-stone-700 flex items-center justify-center text-xs">
+                        🛍️
+                      </div>
+                      <div>
+                        <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
+                          ALL COLLECTION
+                        </h4>
+                        <p className="text-[9px] text-stone-400 tracking-wide">Explore All Streetwear Styles</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
+                  </Link>
+
+                </div>
+              </div>
+
+              {/* SHOP BY SECTION */}
+              <div className="space-y-3 pt-2">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-400 border-b border-stone-100 pb-1.5">
+                  SHOP BY
+                </h3>
+
+                <div className="space-y-1.5 text-xs font-semibold text-stone-800">
+                  <Link
+                    href="/shop?gender=men"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <User className="w-4 h-4 text-stone-500" />
+                      <span className="uppercase tracking-wider">Men</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300" />
+                  </Link>
+
+                  <Link
+                    href="/shop?gender=unisex"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Shirt className="w-4 h-4 text-stone-500" />
+                      <span className="uppercase tracking-wider">Unisex</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* MY ACCOUNT SECTION */}
+              <div className="space-y-3 pt-2">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-400 border-b border-stone-100 pb-1.5">
+                  MY ACCOUNT
+                </h3>
+
+                <div className="grid grid-cols-4 gap-2 text-center pt-1">
+                  <Link
+                    href={user ? "/profile" : "/login"}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex flex-col items-center justify-center p-2.5 bg-stone-50 hover:bg-stone-100 border border-stone-200/60 rounded-xs transition-colors group"
+                  >
+                    <User className="w-4 h-4 text-stone-700 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-stone-800">
+                      My Account
+                    </span>
+                  </Link>
+
+                  <Link
+                    href="/profile#orders"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex flex-col items-center justify-center p-2.5 bg-stone-50 hover:bg-stone-100 border border-stone-200/60 rounded-xs transition-colors group"
+                  >
+                    <Truck className="w-4 h-4 text-stone-700 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-stone-800">
+                      Track Order
+                    </span>
+                  </Link>
+
+                  <Link
+                    href="/contact#returns"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex flex-col items-center justify-center p-2.5 bg-stone-50 hover:bg-stone-100 border border-stone-200/60 rounded-xs transition-colors group"
+                  >
+                    <RefreshCw className="w-4 h-4 text-stone-700 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-stone-800">
+                      Return
+                    </span>
+                  </Link>
+
+                  <Link
+                    href="/wishlist"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex flex-col items-center justify-center p-2.5 bg-stone-50 hover:bg-stone-100 border border-stone-200/60 rounded-xs transition-colors group"
+                  >
+                    <Heart className="w-4 h-4 text-stone-700 mb-1 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-stone-800">
+                      Wishlist
+                    </span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* SUPPORT SECTION */}
+              <div className="space-y-3 pt-2 pb-6">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-400 border-b border-stone-100 pb-1.5">
+                  SUPPORT
+                </h3>
+
+                <div className="space-y-2 text-xs font-semibold text-stone-800">
+                  <Link
+                    href="/contact"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center space-x-3 py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
+                  >
+                    <PhoneCall className="w-4 h-4 text-stone-600" />
+                    <span className="uppercase tracking-wider">Contact Us</span>
+                  </Link>
+
+                  <a
+                    href="https://api.whatsapp.com/send?phone=919876543210&text=Hi%20ARVIIK%20Support"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center space-x-3 py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors text-emerald-700"
+                  >
+                    <MessageCircle className="w-4 h-4 text-emerald-600 fill-emerald-100" />
+                    <span className="uppercase tracking-wider">WhatsApp Support</span>
+                  </a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Spacer for fixed header */}
       <div className="h-24 sm:h-28 w-full" />
