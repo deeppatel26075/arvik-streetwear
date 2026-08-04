@@ -71,7 +71,7 @@ export default function Navbar() {
 
             {/* Desktop Nav Links */}
             <nav className="hidden lg:flex items-center space-x-7 text-xs font-semibold tracking-widest uppercase">
-              <Link href="/shop" className="text-stone-900 hover:text-stone-500 transition-colors">
+              <Link href="/shop" prefetch={true} className="text-stone-900 hover:text-stone-500 transition-colors">
                 Shop
               </Link>
               
@@ -84,24 +84,28 @@ export default function Navbar() {
                 <div className="absolute top-full left-0 hidden group-hover:block w-52 bg-white border border-stone-200 shadow-lg rounded-sm py-2 z-50 animate-fade-in">
                   <Link
                     href="/shop?category=Limited+Edition"
+                    prefetch={true}
                     className="block px-4 py-2 text-[11px] font-bold text-stone-800 hover:bg-stone-100 hover:text-stone-950 transition-colors uppercase tracking-wider"
                   >
                     🔥 Limited Edition
                   </Link>
                   <Link
                     href="/shop?category=On+Fire"
+                    prefetch={true}
                     className="block px-4 py-2 text-[11px] font-bold text-stone-800 hover:bg-stone-100 hover:text-stone-950 transition-colors uppercase tracking-wider"
                   >
                     ⚡ On Fire
                   </Link>
                   <Link
                     href="/shop?category=Graphic+Tee"
+                    prefetch={true}
                     className="block px-4 py-2 text-[11px] font-bold text-stone-800 hover:bg-stone-100 hover:text-stone-950 transition-colors uppercase tracking-wider"
                   >
                     🎨 Graphic Tee
                   </Link>
                   <Link
                     href="/shop?category=Psychology+Edition"
+                    prefetch={true}
                     className="block px-4 py-2 text-[11px] font-bold text-stone-800 hover:bg-stone-100 hover:text-stone-950 transition-colors uppercase tracking-wider"
                   >
                     🧠 Psychology Edition
@@ -109,10 +113,10 @@ export default function Navbar() {
                 </div>
               </div>
 
-              <Link href="/shop?filter=featured" className="text-stone-900 hover:text-stone-500 transition-colors">
+              <Link href="/shop?filter=featured" prefetch={true} className="text-stone-900 hover:text-stone-500 transition-colors">
                 Featured
               </Link>
-              <Link href="/#founders" className="text-stone-900 hover:text-stone-500 transition-colors">
+              <Link href="/#founders" prefetch={true} className="text-stone-900 hover:text-stone-500 transition-colors">
                 Founders
               </Link>
             </nav>

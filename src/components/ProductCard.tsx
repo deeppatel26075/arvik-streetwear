@@ -98,7 +98,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <>
       <div className="group relative flex flex-col bg-white border border-stone-200/40 rounded-xs overflow-hidden shadow-xs hover:shadow-md transition-shadow duration-300">
-        <Link href={`/shop/${product.slug}`} className="relative block aspect-3/4 bg-stone-100 overflow-hidden">
+        <Link href={`/shop/${product.slug}`} prefetch={true} className="relative block aspect-3/4 bg-stone-100 overflow-hidden">
           {/* Wishlist & QuickView Buttons */}
           <div className="absolute top-3 right-3 z-10 flex flex-col space-y-1.5">
             <button
@@ -167,6 +167,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </span>
           <Link
             href={`/shop/${product.slug}`}
+            prefetch={true}
             className="font-syne font-extrabold text-xs uppercase text-stone-950 tracking-wider hover:text-stone-700 transition-colors line-clamp-1 mb-1"
           >
             {product.name}
