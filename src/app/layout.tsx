@@ -42,6 +42,7 @@ export const metadata: Metadata = {
 };
 
 import ArviikPageAnimation from '@/components/ArviikPageAnimation';
+import IosZoomLock from '@/components/IosZoomLock';
 
 export default function RootLayout({
   children,
@@ -51,6 +52,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${syne.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-white text-stone-900 antialiased">
+        <IosZoomLock />
         <ArviikPageAnimation />
         <ThemeProvider>
           <AuthProvider>
