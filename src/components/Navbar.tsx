@@ -39,7 +39,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full z-40 transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-stone-200/40 select-none">
+      <header className="fixed top-0 left-0 w-full max-w-full overflow-x-hidden z-40 transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-stone-200/40 select-none">
         {/* Top Marquee Announcement Bar */}
         <div className="bg-stone-950 text-lime-400 py-2 overflow-hidden border-b border-stone-900/10 text-[9px] font-bold uppercase tracking-[0.2em] select-none">
           <div className="whitespace-nowrap flex animate-marquee">

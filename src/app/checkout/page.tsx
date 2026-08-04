@@ -146,20 +146,20 @@ export default function CheckoutPage() {
       </div>
 
       {/* Progress Steps Header */}
-      <div className="flex items-center justify-center space-x-6 pb-2">
-        <div className="flex items-center space-x-2 text-xs font-bold text-stone-950">
-          <span className="w-6 h-6 rounded-full bg-stone-950 text-white flex items-center justify-center text-[10px]">1</span>
-          <span className="uppercase tracking-wider text-[10px] font-extrabold">Shipping Details</span>
+      <div className="flex items-center justify-center space-x-2 sm:space-x-6 pb-2 max-w-full overflow-x-hidden select-none">
+        <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs font-bold text-stone-950">
+          <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-stone-950 text-white flex items-center justify-center text-[9px] sm:text-[10px]">1</span>
+          <span className="uppercase tracking-wider text-[9px] sm:text-[10px] font-extrabold">Shipping</span>
         </div>
-        <div className="h-[1px] w-12 bg-stone-200" />
-        <div className="flex items-center space-x-2 text-xs font-bold text-stone-400">
-          <span className="w-6 h-6 rounded-full bg-stone-100 border border-stone-200 text-stone-500 flex items-center justify-center text-[10px]">2</span>
-          <span className="uppercase tracking-wider text-[10px]">Payment</span>
+        <div className="h-[1px] w-5 sm:w-12 bg-stone-200" />
+        <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs font-bold text-stone-400">
+          <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-stone-100 border border-stone-200 text-stone-500 flex items-center justify-center text-[9px] sm:text-[10px]">2</span>
+          <span className="uppercase tracking-wider text-[9px] sm:text-[10px]">Payment</span>
         </div>
-        <div className="h-[1px] w-12 bg-stone-200" />
-        <div className="flex items-center space-x-2 text-xs font-bold text-stone-400">
-          <span className="w-6 h-6 rounded-full bg-stone-100 border border-stone-200 text-stone-500 flex items-center justify-center text-[10px]">3</span>
-          <span className="uppercase tracking-wider text-[10px]">Confirmation</span>
+        <div className="h-[1px] w-5 sm:w-12 bg-stone-200" />
+        <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs font-bold text-stone-400">
+          <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-stone-100 border border-stone-200 text-stone-500 flex items-center justify-center text-[9px] sm:text-[10px]">3</span>
+          <span className="uppercase tracking-wider text-[9px] sm:text-[10px]">Confirmation</span>
         </div>
       </div>
 
