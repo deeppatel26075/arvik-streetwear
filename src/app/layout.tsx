@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
 };
 
-import PageLoader from '@/components/PageLoader';
+import ArviikPageAnimation from '@/components/ArviikPageAnimation';
 
 export default function RootLayout({
   children,
@@ -43,6 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${syne.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-white text-stone-900 antialiased">
+        <ArviikPageAnimation />
         <ThemeProvider>
           <AuthProvider>
             <CartProvider>
