@@ -90,56 +90,54 @@ export default function Navbar() {
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-6 text-[11px] font-bold tracking-widest uppercase">
-              <Link
-                href="/shop?filter=new"
-                prefetch={true}
-                className="text-stone-900 hover:text-stone-500 transition-colors flex items-center gap-1"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-lime-600" />
-                <span>New Arrivals</span>
+            <nav className="hidden lg:flex items-center space-x-7 text-xs font-semibold tracking-widest uppercase">
+              <Link href="/shop" prefetch={true} className="text-stone-900 hover:text-stone-500 transition-colors">
+                Shop All
               </Link>
 
-              <Link
-                href="/shop?filter=bestseller"
-                prefetch={true}
-                className="text-stone-900 hover:text-stone-500 transition-colors flex items-center gap-1"
-              >
-                <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                <span>Best Seller</span>
-              </Link>
+              {/* Categories Dropdown */}
+              <div className="relative group py-2">
+                <button className="text-stone-900 hover:text-stone-500 transition-colors flex items-center gap-1 uppercase tracking-widest font-semibold focus:outline-none">
+                  <span>Categories</span>
+                  <span className="text-[10px]">▼</span>
+                </button>
+                <div className="absolute top-full left-0 hidden group-hover:block w-56 bg-white border border-stone-200 shadow-lg rounded-sm py-2 z-50 animate-fade-in">
+                  <Link
+                    href="/shop?category=Limited+Edition"
+                    prefetch={true}
+                    className="block px-4 py-2 text-[11px] font-bold text-stone-800 hover:bg-stone-100 hover:text-stone-950 transition-colors uppercase tracking-wider"
+                  >
+                    🔥 Limited Edition
+                  </Link>
+                  <Link
+                    href="/shop?filter=bestseller"
+                    prefetch={true}
+                    className="block px-4 py-2 text-[11px] font-bold text-stone-800 hover:bg-stone-100 hover:text-stone-950 transition-colors uppercase tracking-wider"
+                  >
+                    ⭐ Best Sellers
+                  </Link>
+                  <Link
+                    href="/shop?category=Psychology+Edition"
+                    prefetch={true}
+                    className="block px-4 py-2 text-[11px] font-bold text-stone-800 hover:bg-stone-100 hover:text-stone-950 transition-colors uppercase tracking-wider"
+                  >
+                    🧠 Psychology Edition
+                  </Link>
+                  <Link
+                    href="/shop?category=Anime+Edition"
+                    prefetch={true}
+                    className="block px-4 py-2 text-[11px] font-bold text-stone-800 hover:bg-stone-100 hover:text-stone-950 transition-colors uppercase tracking-wider"
+                  >
+                    ⚔️ Anime Edition
+                  </Link>
+                </div>
+              </div>
 
-              <Link
-                href="/shop?category=Limited+Edition"
-                prefetch={true}
-                className="text-stone-900 hover:text-stone-500 transition-colors flex items-center gap-1"
-              >
-                <Flame className="w-3.5 h-3.5 text-rose-500" />
-                <span>Limited Edition</span>
+              <Link href="/editions" prefetch={true} className="text-stone-900 hover:text-stone-500 transition-colors">
+                Editions
               </Link>
-
-              <Link
-                href="/shop?category=Psychology+Edition"
-                prefetch={true}
-                className="text-stone-900 hover:text-stone-500 transition-colors"
-              >
-                <span>Psychology Edition</span>
-              </Link>
-
-              <Link
-                href="/shop?category=Anime+Edition"
-                prefetch={true}
-                className="text-stone-900 hover:text-stone-500 transition-colors"
-              >
-                <span>Anime Edition</span>
-              </Link>
-
-              <Link
-                href="/shop"
-                prefetch={true}
-                className="text-stone-900 hover:text-stone-500 transition-colors font-extrabold text-stone-950 border-b-2 border-stone-950 pb-0.5"
-              >
-                <span>All Collection</span>
+              <Link href="/contact" prefetch={true} className="text-stone-900 hover:text-stone-500 transition-colors">
+                Contact
               </Link>
             </nav>
 
