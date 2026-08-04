@@ -54,6 +54,14 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
   const [priceSort, setPriceSort] = useState<string>('');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
+  // Sync state when URL search parameters change via Navbar links
+  useEffect(() => {
+    const cat = searchParams?.get('category') || '';
+    const query = searchParams?.get('query') || searchParams?.get('search') || '';
+    setSelectedCategory(cat);
+    setSearchQuery(query);
+  }, [searchParams]);
+
   useEffect(() => {
     try {
       const stored = localStorage.getItem('arviik_custom_products');
@@ -81,6 +89,8 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
 
   useEffect(() => {
     let filtered = [...localProducts];
+    const filterParam = searchParams?.get('filter') || '';
+    const priceParam = searchParams?.get('price') || '';
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
@@ -91,8 +101,14 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
       );
     }
 
-    if (initialFilter === 'featured') {
+    if (filterParam === 'featured') {
       filtered = filtered.filter((p) => p.is_featured);
+    } else if (filterParam === 'bestseller') {
+      filtered = filtered.filter((p) => p.is_featured || (p.discount_price && p.discount_price < 1300));
+    }
+
+    if (priceParam === 'under999') {
+      filtered = filtered.filter((p) => (p.discount_price || p.price) <= 999);
     }
 
     if (selectedCategory) {
