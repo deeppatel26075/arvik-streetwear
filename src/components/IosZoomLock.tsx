@@ -6,24 +6,49 @@ export default function IosZoomLock() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // 1. Block multi-touch pinch zooming (2+ fingers)
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length > 1) {
+    // 1. Force strict viewport meta tag into head for iOS Safari
+    let meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'viewport');
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute(
+      'content',
+      'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover'
+    );
+
+    // 2. Prevent 2-finger touchstart (pinch start)
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches && e.touches.length > 1) {
         e.preventDefault();
       }
     };
 
-    // 2. Block WebKit gesture zoom (pinch/rotate on iOS Safari)
+    // 3. Prevent 2-finger touchmove (pinch moving)
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches && e.touches.length > 1) {
+        e.preventDefault();
+      }
+    };
+
+    // 4. Prevent WebKit gestures (iOS native pinch/zoom)
     const handleGesture = (e: Event) => {
       e.preventDefault();
     };
 
-    // 3. Block double-tap zooming
+    // 5. Prevent Ctrl + Wheel zoom (trackpad pinch)
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+      }
+    };
+
+    // 6. Prevent double-tap zoom
     let lastTouchEnd = 0;
     const handleTouchEnd = (e: TouchEvent) => {
       const now = Date.now();
       if (now - lastTouchEnd <= 300) {
-        // Prevent default zoom action on double tap unless clicking interactive elements
         const target = e.target as HTMLElement;
         const isInteractive = target && (
           target.tagName === 'BUTTON' ||
@@ -42,19 +67,27 @@ export default function IosZoomLock() {
       lastTouchEnd = now;
     };
 
-    // Attach non-passive event listeners to intercept iOS Safari touch gestures
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('gesturestart', handleGesture, { passive: false });
-    document.addEventListener('gesturechange', handleGesture, { passive: false });
-    document.addEventListener('gestureend', handleGesture, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd, { passive: false });
+    // Register on both window and document with non-passive listeners
+    const options = { passive: false };
+
+    window.addEventListener('touchstart', handleTouchStart, options);
+    window.addEventListener('touchmove', handleTouchMove, options);
+    window.addEventListener('touchend', handleTouchEnd, options);
+    window.addEventListener('wheel', handleWheel, options);
+
+    document.addEventListener('gesturestart', handleGesture, options);
+    document.addEventListener('gesturechange', handleGesture, options);
+    document.addEventListener('gestureend', handleGesture, options);
 
     return () => {
-      document.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('wheel', handleWheel);
+
       document.removeEventListener('gesturestart', handleGesture);
       document.removeEventListener('gesturechange', handleGesture);
       document.removeEventListener('gestureend', handleGesture);
-      document.removeEventListener('touchend', handleTouchEnd);
     };
   }, []);
 
