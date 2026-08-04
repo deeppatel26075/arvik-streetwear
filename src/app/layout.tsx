@@ -43,7 +43,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${syne.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-white text-stone-900 antialiased">
-        <PageLoader fullScreen={true} />
         <ThemeProvider>
           <AuthProvider>
             <CartProvider>
