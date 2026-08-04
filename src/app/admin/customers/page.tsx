@@ -13,38 +13,56 @@ export default function AdminCustomers() {
     try {
       setLoading(true);
       
-      // Fetch user profile stats
-      const { data: profiles, error } = await supabase
+      // 1. Fetch user profile stats
+      const { data: profiles } = await supabase
         .from('profiles')
+        .select('*');
+
+      // 2. Fetch all orders to aggregate customer stats
+      const { data: orders } = await supabase
+        .from('orders')
         .select('*')
-        .eq('role', 'customer');
+        .order('created_at', { ascending: false });
 
-      if (error) console.error(error);
+      const customerMap = new Map();
 
+      // Add registered profiles
       if (profiles && profiles.length > 0) {
-        const list = [];
-        for (const prof of profiles) {
-          // Fetch order counts
-          const { data: orders } = await supabase
-            .from('orders')
-            .select('total_amount')
-            .eq('user_id', prof.id);
-
-          const totalSpent = orders?.reduce((sum, o) => sum + parseFloat(o.total_amount), 0) || 0;
-
-          list.push({
-            id: prof.id,
-            name: prof.full_name || 'Guest User',
-            phone: prof.phone || 'N/A',
-            address: prof.shipping_address ? `${prof.shipping_address}, ${prof.shipping_city}` : 'N/A',
-            orderCount: orders?.length || 0,
-            totalSpent,
-          });
-        }
-        setCustomers(list);
-      } else {
-        setCustomers([]);
+        profiles.forEach((p) => {
+          if (p.role !== 'admin') {
+            customerMap.set(p.id || p.full_name, {
+              id: p.id,
+              name: p.full_name || 'Registered Customer',
+              phone: p.phone || 'N/A',
+              address: p.shipping_address ? `${p.shipping_address}, ${p.shipping_city || ''}` : 'N/A',
+              orderCount: 0,
+              totalSpent: 0,
+            });
+          }
+        });
       }
+
+      // Aggregate orders into customer list
+      if (orders && orders.length > 0) {
+        orders.forEach((o) => {
+          const key = o.user_id || o.shipping_email || o.shipping_phone || o.shipping_name;
+          const current = customerMap.get(key) || {
+            id: key,
+            name: o.shipping_name || 'Customer',
+            phone: o.shipping_phone || o.shipping_email || 'N/A',
+            address: o.shipping_address ? `${o.shipping_address}, ${o.shipping_city}` : 'N/A',
+            orderCount: 0,
+            totalSpent: 0,
+          };
+
+          current.orderCount += 1;
+          current.totalSpent += parseFloat(o.total_amount || '0');
+          customerMap.set(key, current);
+        });
+      }
+
+      const list = Array.from(customerMap.values());
+      setCustomers(list);
     } catch (e) {
       console.error(e);
     } finally {
