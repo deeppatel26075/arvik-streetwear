@@ -4,6 +4,9 @@ import ShopClient from './ShopClient';
 import PageLoader from '@/components/PageLoader';
 import { Suspense } from 'react';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function ShopPage() {
   let dbProducts = [];
   let dbCategories = [];

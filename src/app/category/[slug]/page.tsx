@@ -4,6 +4,9 @@ import ProductCard from '@/components/ProductCard';
 import Link from 'next/link';
 import { SlidersHorizontal, Grid } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
 }

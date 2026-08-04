@@ -4,6 +4,9 @@ import ProductDetailClient from './ProductDetailClient';
 import ProductDetailFallback from './ProductDetailFallback';
 import { notFound } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
 }
