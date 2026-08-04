@@ -203,10 +203,10 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* 2. Hamburger Menu Drawer Overlay (Opened by Hamburger Icon ☰) */}
+        {/* 2. Hamburger Menu Drawer Overlay (Opened by Hamburger Icon ☰ - Top Layer z-[9999]) */}
         {mobileOpen && (
-          <div className="fixed inset-0 z-[100] bg-stone-950/70 backdrop-blur-xs flex justify-start animate-fade-in">
-            <div className="w-full max-w-md bg-white h-full overflow-y-auto p-6 shadow-2xl flex flex-col justify-between space-y-6">
+          <div className="fixed inset-0 z-[9999] bg-stone-950/80 backdrop-blur-md flex justify-start animate-fade-in">
+            <div className="w-full max-w-md bg-white h-full min-h-screen overflow-y-auto p-6 shadow-2xl flex flex-col justify-between space-y-6 border-r border-stone-200">
               
               {/* Drawer Top Header & Close Button */}
               <div className="space-y-4">
