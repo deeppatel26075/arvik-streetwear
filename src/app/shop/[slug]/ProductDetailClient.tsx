@@ -482,11 +482,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               </button>
               {openAccordion === 'description' && (
                 <div className="p-4 bg-stone-50/50 border-t border-stone-100 text-xs text-stone-600 leading-relaxed">
-                  {product.description || (
                     <p>
-                      Crafted for true streetwear purists, this piece represents ARVIIK’s relentless dedication to heavyweight cotton engineering, signature oversized silhouettes, and high-impact graphics. Designed by founders Rishi Patel, Keyur Vagela, and Aryan Patel.
+                      Crafted for true streetwear purists, this piece represents ARVIIK’s relentless dedication to heavyweight cotton engineering, signature oversized silhouettes, and high-impact graphics.
                     </p>
-                  )}
                 </div>
               )}
             </div>

@@ -116,9 +116,6 @@ export default function Navbar() {
               <Link href="/shop?filter=featured" prefetch={true} className="text-stone-900 hover:text-stone-500 transition-colors">
                 Featured
               </Link>
-              <Link href="/#founders" prefetch={true} className="text-stone-900 hover:text-stone-500 transition-colors">
-                Founders
-              </Link>
             </nav>
 
             {/* Logo */}
@@ -230,13 +227,6 @@ export default function Navbar() {
                 className="block text-sm font-bold uppercase tracking-widest text-stone-900"
               >
                 Featured
-              </Link>
-              <Link
-                href="/#founders"
-                onClick={() => setMobileOpen(false)}
-                className="block text-sm font-bold uppercase tracking-widest text-stone-900"
-              >
-                Founders
               </Link>
             </div>
           </div>
