@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
 import { ArrowRight, Star } from 'lucide-react';
 
@@ -59,10 +60,13 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
       {/* 1. HERO SECTION */}
       <section className="relative h-[60vh] sm:h-[68vh] min-h-[420px] w-full flex items-center justify-center bg-stone-900 overflow-hidden select-none">
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="/products/mard-paisa-maroon.jpg"
             alt="ARVIIK Streetwear Hero"
-            className="object-cover w-full h-full opacity-40 scale-105 animate-pulse-slow"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-40 scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-stone-950/50 via-stone-950/30 to-stone-950/70" />
         </div>
@@ -109,10 +113,14 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
             className="group relative h-52 sm:h-60 bg-stone-950 rounded-xs overflow-hidden p-5 flex flex-col justify-between border border-stone-800 transition-all hover:scale-[1.02] duration-300 shadow-md"
           >
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/50 to-transparent z-10" />
-            <img
+            <Image
               src="/products/farebi-olive.jpg"
               alt="Limited Edition"
-              className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-75 transition-opacity duration-300"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              loading="lazy"
+              decoding="async"
+              className="object-cover opacity-50 group-hover:opacity-75 transition-opacity duration-300"
             />
             <div className="relative z-20 flex justify-between items-start">
               <span className="bg-amber-400 text-stone-950 text-[9px] font-extrabold uppercase px-2.5 py-1 tracking-widest rounded-full shadow-xs">
@@ -135,10 +143,14 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
             className="group relative h-52 sm:h-60 bg-stone-950 rounded-xs overflow-hidden p-5 flex flex-col justify-between border border-stone-800 transition-all hover:scale-[1.02] duration-300 shadow-md"
           >
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/50 to-transparent z-10" />
-            <img
+            <Image
               src="/products/polarize-cream.jpg"
               alt="On Fire"
-              className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-75 transition-opacity duration-300"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              loading="lazy"
+              decoding="async"
+              className="object-cover opacity-50 group-hover:opacity-75 transition-opacity duration-300"
             />
             <div className="relative z-20 flex justify-between items-start">
               <span className="bg-orange-500 text-white text-[9px] font-extrabold uppercase px-2.5 py-1 tracking-widest rounded-full shadow-xs">
@@ -161,10 +173,14 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
             className="group relative h-52 sm:h-60 bg-stone-950 rounded-xs overflow-hidden p-5 flex flex-col justify-between border border-stone-800 transition-all hover:scale-[1.02] duration-300 shadow-md"
           >
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/50 to-transparent z-10" />
-            <img
+            <Image
               src="/products/polarize-navy.jpg"
               alt="Graphic Tee"
-              className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-75 transition-opacity duration-300"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              loading="lazy"
+              decoding="async"
+              className="object-cover opacity-50 group-hover:opacity-75 transition-opacity duration-300"
             />
             <div className="relative z-20 flex justify-between items-start">
               <span className="bg-indigo-500 text-white text-[9px] font-extrabold uppercase px-2.5 py-1 tracking-widest rounded-full shadow-xs">
@@ -187,10 +203,14 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
             className="group relative h-52 sm:h-60 bg-stone-950 rounded-xs overflow-hidden p-5 flex flex-col justify-between border border-stone-800 transition-all hover:scale-[1.02] duration-300 shadow-md"
           >
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/50 to-transparent z-10" />
-            <img
+            <Image
               src="/products/mard-paisa-maroon.jpg"
               alt="Psychology Edition"
-              className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-75 transition-opacity duration-300"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              loading="lazy"
+              decoding="async"
+              className="object-cover opacity-50 group-hover:opacity-75 transition-opacity duration-300"
             />
             <div className="relative z-20 flex justify-between items-start">
               <span className="bg-emerald-500 text-white text-[9px] font-extrabold uppercase px-2.5 py-1 tracking-widest rounded-full shadow-xs">

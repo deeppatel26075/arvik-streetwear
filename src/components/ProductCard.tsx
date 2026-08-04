@@ -2,9 +2,14 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { useCart, WishlistItem } from '@/context/CartContext';
 import { Heart, ShoppingBag, Eye } from 'lucide-react';
-import QuickViewModal from '@/components/QuickViewModal';
+
+const QuickViewModal = dynamic(() => import('@/components/QuickViewModal'), {
+  ssr: false,
+});
 
 interface ProductImage {
   image_url: string;
@@ -125,10 +130,14 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Image */}
           <div className="w-full h-full relative">
-            <img
+            <Image
               src={mainImage}
               alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              loading="lazy"
+              decoding="async"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-103"
             />
           </div>
 

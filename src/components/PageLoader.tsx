@@ -15,25 +15,33 @@ export default function PageLoader({ fullScreen = true }: PageLoaderProps) {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
+    // Skip loader on repeat session visits for lightning fast navigation
+    if (typeof window !== 'undefined' && sessionStorage.getItem('arviik_loader_seen')) {
+      setVisible(false);
+      return;
+    }
+
     let index = 1;
-    // Step 1: Type out "A" -> "ARVIIK" letter-by-letter
     const interval = setInterval(() => {
       index++;
       if (index <= fullText.length) {
         setDisplayedText(fullText.slice(0, index));
       } else {
         clearInterval(interval);
-        // Step 2: Reveal glowing underline line & tagline
         setShowUnderline(true);
-        setTimeout(() => setShowSubtext(true), 150);
+        setShowSubtext(true);
 
-        // Step 3: Smooth fade-out transition after brief hold
         setTimeout(() => {
           setFadeOut(true);
-          setTimeout(() => setVisible(false), 500);
-        }, 700);
+          setTimeout(() => {
+            setVisible(false);
+            try {
+              sessionStorage.setItem('arviik_loader_seen', 'true');
+            } catch (e) {}
+          }, 300);
+        }, 200);
       }
-    }, 110);
+    }, 45);
 
     return () => clearInterval(interval);
   }, []);
