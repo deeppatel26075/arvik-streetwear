@@ -13,6 +13,10 @@ import {
   Heart,
   User,
   ChevronRight,
+  Sparkles,
+  Star,
+  Flame,
+  Tag,
   MessageCircle,
   PhoneCall,
   RefreshCw,
@@ -232,6 +236,87 @@ export default function Navbar() {
               </div>
 
 
+
+              {/* FEATURED COLLECTIONS SECTION */}
+              <div className="space-y-3 pt-2">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-400 border-b border-stone-100 pb-1.5">
+                  FEATURED COLLECTIONS
+                </h3>
+
+                <div className="space-y-1.5 text-xs font-semibold text-stone-800">
+                  <Link
+                    href="/shop?filter=new"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Sparkles className="w-4 h-4 text-stone-500" />
+                      <span className="uppercase tracking-wider">New Arrivals</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300" />
+                  </Link>
+
+                  <Link
+                    href="/shop?filter=bestseller"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Star className="w-4 h-4 text-stone-500" />
+                      <span className="uppercase tracking-wider">Best Sellers</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300" />
+                  </Link>
+
+                  <Link
+                    href="/shop?category=Limited+Edition"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Flame className="w-4 h-4 text-stone-500" />
+                      <span className="uppercase tracking-wider">Limited Edition</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300" />
+                  </Link>
+
+                  <Link
+                    href="/shop?category=Psychology+Edition"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Tag className="w-4 h-4 text-stone-500" />
+                      <span className="uppercase tracking-wider">Psychology Edition</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300" />
+                  </Link>
+
+                  <Link
+                    href="/shop?category=Anime+Edition"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Tag className="w-4 h-4 text-stone-500" />
+                      <span className="uppercase tracking-wider">Anime Edition</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300" />
+                  </Link>
+
+                  <Link
+                    href="/shop"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <ShoppingBag className="w-4 h-4 text-stone-500" />
+                      <span className="uppercase tracking-wider">All Collection</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300" />
+                  </Link>
+                </div>
+              </div>
 
               {/* SHOP BY SECTION */}
               <div className="space-y-3 pt-2">
