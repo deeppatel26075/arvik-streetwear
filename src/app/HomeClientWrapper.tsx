@@ -34,11 +34,14 @@ const REVIEWS = [
 
 export default function HomeClientWrapper({ products }: HomeClientWrapperProps) {
   const [currentReview, setCurrentReview] = React.useState(0);
+  const [touchStart, setTouchStart] = React.useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = React.useState<number | null>(null);
 
+  // Auto-swipe every 4.5 seconds
   React.useEffect(() => {
     const timer = setInterval(() => {
       setCurrentReview((prev) => (prev + 1) % REVIEWS.length);
-    }, 5000);
+    }, 4500);
     return () => clearInterval(timer);
   }, []);
 
@@ -48,6 +51,30 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
 
   const handleNextReview = () => {
     setCurrentReview((prev) => (prev + 1) % REVIEWS.length);
+  };
+
+  // Touch Swipe handlers for mobile
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe) {
+      handleNextReview();
+    } else if (isRightSwipe) {
+      handlePrevReview();
+    }
   };
 
   const displayProducts = products && products.length > 0 ? products : [
@@ -282,12 +309,17 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
             </h2>
           </div>
 
-          {/* Single Box Review Card */}
-          <div className="relative bg-white p-6 sm:p-8 rounded-xl border border-stone-200/80 shadow-md flex flex-col items-center text-center space-y-4">
+          {/* Single Box Review Card with Touch Swipe Support */}
+          <div
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+            className="relative bg-white p-6 sm:p-8 rounded-xl border border-stone-200/80 shadow-md flex flex-col items-center text-center space-y-4 select-none touch-pan-y"
+          >
             {/* Left Chevron Button */}
             <button
               onClick={handlePrevReview}
-              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-stone-100 hover:bg-stone-950 hover:text-white text-stone-700 transition-colors shadow-xs"
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-stone-100 hover:bg-stone-950 hover:text-white text-stone-700 transition-colors shadow-xs z-10"
               aria-label="Previous Review"
             >
               <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -296,29 +328,32 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
             {/* Right Chevron Button */}
             <button
               onClick={handleNextReview}
-              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-stone-100 hover:bg-stone-950 hover:text-white text-stone-700 transition-colors shadow-xs"
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-stone-100 hover:bg-stone-950 hover:text-white text-stone-700 transition-colors shadow-xs z-10"
               aria-label="Next Review"
             >
               <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
-            {/* Stars */}
-            <div className="flex items-center text-amber-500 space-x-1">
-              {[...Array(REVIEWS[currentReview].rating)].map((_, i) => (
-                <Star key={i} className="h-4 w-4 fill-current" />
-              ))}
-            </div>
+            {/* Animated Content Wrapper */}
+            <div key={currentReview} className="animate-fade-in flex flex-col items-center space-y-4 w-full">
+              {/* Stars */}
+              <div className="flex items-center text-amber-500 space-x-1">
+                {[...Array(REVIEWS[currentReview].rating)].map((_, i) => (
+                  <Star key={i} className="h-4 w-4 fill-current" />
+                ))}
+              </div>
 
-            {/* Review Content */}
-            <p className="text-xs sm:text-sm text-stone-700 leading-relaxed italic max-w-xl px-6 sm:px-8">
-              {REVIEWS[currentReview].quote}
-            </p>
+              {/* Review Content */}
+              <p className="text-xs sm:text-sm text-stone-700 leading-relaxed italic max-w-xl px-6 sm:px-8">
+                {REVIEWS[currentReview].quote}
+              </p>
 
-            {/* Author Info */}
-            <div className="pt-2 border-t border-stone-100 w-full flex justify-center items-center space-x-3 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-stone-400">
-              <span className="text-stone-950">{REVIEWS[currentReview].author}</span>
-              <span>•</span>
-              <span className="text-stone-500">{REVIEWS[currentReview].location}</span>
+              {/* Author Info */}
+              <div className="pt-2 border-t border-stone-100 w-full flex justify-center items-center space-x-3 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-stone-400">
+                <span className="text-stone-950">{REVIEWS[currentReview].author}</span>
+                <span>•</span>
+                <span className="text-stone-500">{REVIEWS[currentReview].location}</span>
+              </div>
             </div>
 
             {/* Indicator Dots */}
