@@ -497,6 +497,70 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         </div>
       </div>
 
+      {/* Product Story Section (Placed above Customer Reviews) */}
+      <div className="pt-12 border-t border-stone-200 space-y-6">
+        <div className="text-center space-y-2 max-w-2xl mx-auto">
+          <span className="text-[10px] text-stone-400 font-extrabold tracking-[0.3em] uppercase block">
+            The Craft & Concept
+          </span>
+          <h3 className="font-syne font-extrabold text-xl sm:text-2xl uppercase tracking-wider text-stone-900">
+            Product Story
+          </h3>
+          <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-medium pt-1">
+            {product.description ||
+              `Every piece in the ARVIIK collection is born from a desire to merge luxury street aesthetics with raw, uncompromised quality. Engineered with heavy 240 GSM combed cotton, custom boxy cuts, and bold concept artwork, this shirt is designed to be worn as a statement of identity.`}
+          </p>
+        </div>
+
+        {/* 3 Story Images Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+          <div className="relative aspect-4/5 rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80 shadow-xs group">
+            <Image
+              src={imageList[0] || '/products/farebi-olive.jpg'}
+              alt="Product Detail 1"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-stone-950/70 via-transparent to-transparent" />
+            <div className="absolute bottom-3 left-3 right-3 text-white text-center">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest block text-stone-200">
+                Heavyweight 240 GSM Cotton
+              </span>
+            </div>
+          </div>
+
+          <div className="relative aspect-4/5 rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80 shadow-xs group">
+            <Image
+              src={imageList[1] || '/products/polarize-cream.jpg'}
+              alt="Product Detail 2"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-stone-950/70 via-transparent to-transparent" />
+            <div className="absolute bottom-3 left-3 right-3 text-white text-center">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest block text-stone-200">
+                Signature Boxy Oversized Fit
+              </span>
+            </div>
+          </div>
+
+          <div className="relative aspect-4/5 rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80 shadow-xs group">
+            <Image
+              src={imageList[2] || '/products/polarize-navy.jpg'}
+              alt="Product Detail 3"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-stone-950/70 via-transparent to-transparent" />
+            <div className="absolute bottom-3 left-3 right-3 text-white text-center">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest block text-stone-200">
+                High-Density Graphic Craft
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Customer Reviews & Ratings Section */}
       <div className="pt-12 border-t border-stone-200 space-y-6">
         <div className="flex justify-between items-end border-b border-stone-200 pb-4">
