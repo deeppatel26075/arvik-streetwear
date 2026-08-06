@@ -100,13 +100,13 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="group relative flex flex-col bg-white border border-stone-200/40 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-shadow duration-300">
         <Link href={`/shop/${product.slug}`} prefetch={true} className="relative block aspect-3/4 bg-stone-100 overflow-hidden">
           {/* Wishlist & QuickView Buttons */}
-          <div className="absolute top-3 right-3 z-10 flex flex-col space-y-1.5">
+          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 flex flex-col space-y-1 sm:space-y-1.5">
             <button
               onClick={handleWishlistClick}
-              className="p-2 rounded-full bg-white/90 backdrop-blur-xs text-stone-900 shadow-sm hover:bg-white transition-colors"
+              className="p-1.5 sm:p-2 rounded-full bg-white/90 backdrop-blur-xs text-stone-900 shadow-sm hover:bg-white transition-colors"
               aria-label="Add to Wishlist"
             >
-              <Heart className={`h-4 w-4 transition-colors ${isFavorited ? 'fill-stone-900 text-stone-900' : 'text-stone-700'}`} />
+              <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 transition-colors ${isFavorited ? 'fill-stone-900 text-stone-900' : 'text-stone-700'}`} />
             </button>
             <button
               onClick={(e) => {
@@ -114,16 +114,16 @@ export default function ProductCard({ product }: ProductCardProps) {
                 e.stopPropagation();
                 setShowQuickView(true);
               }}
-              className="p-2 rounded-full bg-white/90 backdrop-blur-xs text-stone-900 shadow-sm hover:bg-white transition-colors"
+              className="p-1.5 sm:p-2 rounded-full bg-white/90 backdrop-blur-xs text-stone-900 shadow-sm hover:bg-white transition-colors"
               title="Quick View"
             >
-              <Eye className="h-4 w-4 text-stone-700" />
+              <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-stone-700" />
             </button>
           </div>
 
           {/* Discount Badge */}
           {discountPercent > 0 && (
-            <span className="absolute top-3 left-3 z-10 bg-amber-400 text-stone-950 text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-md shadow-md">
+            <span className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 bg-amber-400 text-stone-950 text-[9px] sm:text-[10px] font-black tracking-wider uppercase px-1.5 py-0.5 sm:px-2 rounded-md shadow-md">
               {discountPercent}% OFF
             </span>
           )}
@@ -161,29 +161,29 @@ export default function ProductCard({ product }: ProductCardProps) {
         </Link>
 
         {/* Info Container */}
-        <div className="p-3 sm:p-3.5 flex flex-col flex-grow bg-white border-t border-stone-100">
-          <span className="text-[9px] text-stone-400 font-extrabold uppercase tracking-widest mb-0.5">
+        <div className="p-2.5 sm:p-3.5 flex flex-col flex-grow bg-white border-t border-stone-100">
+          <span className="text-[8px] sm:text-[9px] text-stone-400 font-extrabold uppercase tracking-widest mb-0.5">
             {categoryName}
           </span>
           <Link
             href={`/shop/${product.slug}`}
             prefetch={true}
-            className="font-syne font-extrabold text-xs uppercase text-stone-950 tracking-wider hover:text-stone-700 transition-colors line-clamp-1 mb-1"
+            className="font-syne font-extrabold text-[11px] sm:text-xs uppercase text-stone-950 tracking-wider hover:text-stone-700 transition-colors line-clamp-1 mb-1"
           >
             {product.name}
           </Link>
-          <div className="flex items-center space-x-2 mb-2.5">
-            <span className="text-xs font-mono font-extrabold text-stone-950">₹{price.toLocaleString('en-IN')}</span>
+          <div className="flex items-center space-x-1.5 sm:space-x-2 mb-2">
+            <span className="text-[11px] sm:text-xs font-mono font-extrabold text-stone-950">₹{price.toLocaleString('en-IN')}</span>
             {mrp > price && (
-              <span className="text-[10px] font-mono text-stone-400 line-through">₹{mrp.toLocaleString('en-IN')}</span>
+              <span className="text-[9px] sm:text-[10px] font-mono text-stone-400 line-through">₹{mrp.toLocaleString('en-IN')}</span>
             )}
           </div>
-          <div className="mt-auto pt-2 border-t border-stone-100/70">
+          <div className="mt-auto pt-1.5 sm:pt-2 border-t border-stone-100/70">
             <button
               onClick={(e) => handleQuickAdd('M', e)}
-              className="w-full border border-stone-200 text-stone-900 bg-white hover:bg-stone-950 hover:text-white text-[10px] font-extrabold uppercase tracking-widest py-2 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs"
+              className="w-full border border-stone-200 text-stone-900 bg-white hover:bg-stone-950 hover:text-white text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest py-1.5 sm:py-2 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-1 sm:space-x-1.5 cursor-pointer shadow-2xs"
             >
-              <ShoppingBag className="h-3.5 w-3.5" />
+              <ShoppingBag className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               <span>Add to Cart</span>
             </button>
           </div>

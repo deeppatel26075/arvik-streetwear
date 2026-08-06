@@ -60,7 +60,7 @@ export default async function ShopPage() {
   const finalCategories = combinedCategories.length > 0 ? combinedCategories : defaultCategories;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-10 overflow-x-hidden">
       <Suspense fallback={<PageLoader fullScreen={false} />}>
         <ShopClient initialProducts={finalProducts as any} categories={finalCategories as any} />
       </Suspense>
