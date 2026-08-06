@@ -310,7 +310,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
 
       {/* Mobile Filters Drawer */}
       {mobileFiltersOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
+        <div className="fixed inset-0 z-[99999] lg:hidden flex">
           {/* Backdrop */}
           <div
             onClick={() => setMobileFiltersOpen(false)}
