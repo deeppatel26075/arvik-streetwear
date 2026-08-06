@@ -7,11 +7,13 @@ import { useRouter } from 'next/navigation';
 import { useCart, WishlistItem } from '@/context/CartContext';
 import { formatPrice } from '@/lib/utils';
 import RecentlyViewed from '@/components/RecentlyViewed';
+import ProductCard from '@/components/ProductCard';
 import {
   Heart,
   ShoppingBag,
   Star,
   ArrowLeft,
+  ArrowRight,
   Truck,
   RotateCcw,
   ShieldCheck,
@@ -635,6 +637,73 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               </span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* 4. Recommended Products Section */}
+      <div className="pt-12 border-t border-stone-200 space-y-6">
+        <div className="flex items-end justify-between border-b border-stone-200 pb-4">
+          <div>
+            <span className="text-[10px] text-stone-400 font-extrabold tracking-[0.3em] uppercase block">
+              Complete Your Fit
+            </span>
+            <h3 className="font-syne font-extrabold text-xl uppercase tracking-wider text-stone-900 mt-0.5">
+              Recommended Products
+            </h3>
+          </div>
+          <Link
+            href="/shop"
+            className="inline-flex items-center space-x-1.5 text-xs font-extrabold uppercase tracking-widest text-stone-900 hover:opacity-75 transition-opacity"
+          >
+            <span>Explore All</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6">
+          {[
+            {
+              id: 'rec-001',
+              name: 'Eternal Vision Tee',
+              slug: 'eternal-vision-black-tee',
+              price: 1299,
+              mrp: 1299,
+              category: 'Oversized Tees',
+              product_images: [{ image_url: '/products/farebi-olive.jpg' }]
+            },
+            {
+              id: 'rec-002',
+              name: 'Chaos Bloom Tee',
+              slug: 'chaos-bloom-ivory-tee',
+              price: 1199,
+              mrp: 1199,
+              category: 'Oversized Tees',
+              product_images: [{ image_url: '/products/polarize-cream.jpg' }]
+            },
+            {
+              id: 'rec-003',
+              name: 'Midnight Tales Tee',
+              slug: 'midnight-tales-black-tee',
+              price: 1299,
+              mrp: 1299,
+              category: 'Graphic Prints',
+              product_images: [{ image_url: '/products/polarize-navy.jpg' }]
+            },
+            {
+              id: 'rec-004',
+              name: 'Lost Paradise Tee',
+              slug: 'lost-paradise-black-tee',
+              price: 1299,
+              mrp: 1299,
+              category: 'Graphic Prints',
+              product_images: [{ image_url: '/products/mard-paisa-maroon.jpg' }]
+            }
+          ]
+            .filter((item) => item.slug !== product.slug)
+            .slice(0, 4)
+            .map((item) => (
+              <ProductCard key={item.id} product={item as any} />
+            ))}
         </div>
       </div>
 
