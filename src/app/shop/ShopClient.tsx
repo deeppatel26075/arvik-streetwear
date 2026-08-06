@@ -171,21 +171,21 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
       </div>
 
       {/* 2. Controls / Search bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#ECECEC] pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#ECECEC] pb-4">
         {/* Search */}
-        <div className="relative w-full md:max-w-sm">
+        <div className="relative w-full sm:max-w-xs">
           <input
             type="text"
             placeholder="Search items..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="apple-input w-full pl-10 text-xs"
+            className="apple-input w-full pl-9 pr-8 text-xs py-2"
           />
-          <Search className="absolute left-3.5 top-3.5 h-3.5 w-3.5 text-[#666666]" />
+          <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#666666]" />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3.5 top-3.5 text-[#666666] hover:text-[#111111]"
+              className="absolute right-3 top-2.5 text-[#666666] hover:text-[#111111]"
             >
               <X className="h-3 w-3" />
             </button>
@@ -193,21 +193,21 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
         </div>
 
         {/* Desktop Sorting & Filter buttons */}
-        <div className="flex items-center space-x-4 justify-between md:justify-end">
+        <div className="flex items-center space-x-2.5 justify-between sm:justify-end w-full sm:w-auto">
           <button
             onClick={() => setMobileFiltersOpen(true)}
-            className="lg:hidden inline-flex items-center space-x-1.5 border border-[#ECECEC] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-[#111111] hover:bg-[#F7F7F7] rounded-[10px]"
+            className="lg:hidden flex-1 sm:flex-initial inline-flex items-center justify-center space-x-1.5 border border-[#ECECEC] px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-[#111111] hover:bg-[#F7F7F7] rounded-lg"
           >
-            <SlidersHorizontal className="h-4 w-4" />
+            <SlidersHorizontal className="h-3.5 w-3.5" />
             <span>Filters</span>
           </button>
 
-          <div className="flex items-center space-x-2">
-            <ArrowUpDown className="h-4 w-4 text-[#666666]" />
+          <div className="flex-1 sm:flex-initial flex items-center space-x-1.5 border border-[#ECECEC] bg-[#F7F7F7] px-2.5 py-1.5 rounded-lg">
+            <ArrowUpDown className="h-3.5 w-3.5 text-[#666666] flex-shrink-0" />
             <select
               value={priceSort}
               onChange={(e) => setPriceSort(e.target.value)}
-              className="bg-[#F7F7F7] border border-[#ECECEC] text-xs font-bold px-3 py-2.5 focus:outline-none focus:border-[#111111] rounded-[10px]"
+              className="bg-transparent text-xs font-bold text-[#111111] focus:outline-none w-full"
             >
               <option value="">Sort Price</option>
               <option value="low-high">Low to High</option>
@@ -299,7 +299,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-6">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

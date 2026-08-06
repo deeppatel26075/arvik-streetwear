@@ -43,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${syne.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans bg-white text-stone-900 antialiased">
+      <body className="min-h-full flex flex-col font-sans bg-white text-stone-900 antialiased overflow-x-hidden max-w-full">
         <IosZoomLock />
         <ArviikPageAnimation />
         <ThemeProvider>
@@ -51,7 +51,7 @@ export default function RootLayout({
             <CartProvider>
               <Navbar />
               <CartDrawer />
-              <main className="flex-grow flex flex-col">{children}</main>
+              <main className="flex-grow flex flex-col overflow-x-hidden max-w-full">{children}</main>
               <Footer />
             </CartProvider>
           </AuthProvider>
