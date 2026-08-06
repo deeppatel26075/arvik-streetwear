@@ -497,7 +497,84 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         </div>
       </div>
 
-      {/* Product Story Section (Placed above Customer Reviews) */}
+      {/* 4 Feature Highlights Section (Placed above Product Story) */}
+      <div className="pt-12 border-t border-stone-200 space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* Element 1 */}
+          <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
+            <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
+              <Image
+                src={images[0]?.image_url || '/products/farebi-olive.jpg'}
+                alt="240 GSM Heavyweight Cotton"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-900 text-center">
+              240 GSM Heavyweight Cotton
+            </h4>
+            <p className="text-[11px] text-stone-600 leading-relaxed text-center font-medium">
+              Engineered with 100% premium French Terry cotton for maximum structure, comfort, and long-lasting durability.
+            </p>
+          </div>
+
+          {/* Element 2 */}
+          <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
+            <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
+              <Image
+                src={images[1]?.image_url || images[0]?.image_url || '/products/polarize-cream.jpg'}
+                alt="Signature Boxy Oversized Fit"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-900 text-center">
+              Signature Boxy Oversized Fit
+            </h4>
+            <p className="text-[11px] text-stone-600 leading-relaxed text-center font-medium">
+              Designed with dropped shoulders and relaxed boxy proportions for an authentic modern streetwear fit.
+            </p>
+          </div>
+
+          {/* Element 3 */}
+          <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
+            <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
+              <Image
+                src={images[2]?.image_url || images[0]?.image_url || '/products/polarize-navy.jpg'}
+                alt="High-Density Screen Prints"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-900 text-center">
+              High-Density Screen Prints
+            </h4>
+            <p className="text-[11px] text-stone-600 leading-relaxed text-center font-medium">
+              High-definition graphic artwork printed using premium fade-resistant inks built to withstand intense wear.
+            </p>
+          </div>
+
+          {/* Element 4 */}
+          <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
+            <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
+              <Image
+                src={images[3]?.image_url || images[0]?.image_url || '/products/mard-paisa-maroon.jpg'}
+                alt="Pan-India Express Delivery"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-900 text-center">
+              Pan-India Express Delivery
+            </h4>
+            <p className="text-[11px] text-stone-600 leading-relaxed text-center font-medium">
+              Fast shipping dispatched within 24 hours with express delivery and easy 7-day exchanges across India.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Product Story Section */}
       <div className="pt-12 border-t border-stone-200 space-y-6">
         <div className="text-center space-y-2 max-w-2xl mx-auto">
           <span className="text-[10px] text-stone-400 font-extrabold tracking-[0.3em] uppercase block">
@@ -577,81 +654,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 <Star key={i} className="h-4 w-4 fill-current" />
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* 4 Feature Highlights Section (Image on Top + Title + Description) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 pt-2">
-          {/* Element 1 */}
-          <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
-            <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
-              <Image
-                src={images[0]?.image_url || '/products/farebi-olive.jpg'}
-                alt="240 GSM Heavyweight Cotton"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-900 text-center">
-              240 GSM Heavyweight Cotton
-            </h4>
-            <p className="text-[11px] text-stone-600 leading-relaxed text-center font-medium">
-              Engineered with 100% premium French Terry cotton for maximum structure, comfort, and long-lasting durability.
-            </p>
-          </div>
-
-          {/* Element 2 */}
-          <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
-            <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
-              <Image
-                src={images[1]?.image_url || images[0]?.image_url || '/products/polarize-cream.jpg'}
-                alt="Signature Boxy Oversized Fit"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-900 text-center">
-              Signature Boxy Oversized Fit
-            </h4>
-            <p className="text-[11px] text-stone-600 leading-relaxed text-center font-medium">
-              Designed with dropped shoulders and relaxed boxy proportions for an authentic modern streetwear fit.
-            </p>
-          </div>
-
-          {/* Element 3 */}
-          <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
-            <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
-              <Image
-                src={images[2]?.image_url || images[0]?.image_url || '/products/polarize-navy.jpg'}
-                alt="High-Density Screen Prints"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-900 text-center">
-              High-Density Screen Prints
-            </h4>
-            <p className="text-[11px] text-stone-600 leading-relaxed text-center font-medium">
-              High-definition graphic artwork printed using premium fade-resistant inks built to withstand intense wear.
-            </p>
-          </div>
-
-          {/* Element 4 */}
-          <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
-            <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
-              <Image
-                src={images[3]?.image_url || images[0]?.image_url || '/products/mard-paisa-maroon.jpg'}
-                alt="Pan-India Express Delivery"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-900 text-center">
-              Pan-India Express Delivery
-            </h4>
-            <p className="text-[11px] text-stone-600 leading-relaxed text-center font-medium">
-              Fast shipping dispatched within 24 hours with express delivery and easy 7-day exchanges across India.
-            </p>
           </div>
         </div>
       </div>
