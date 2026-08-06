@@ -1,7 +1,8 @@
 import { supabase, withTimeout } from '@/lib/supabase';
 import HomeClientWrapper from './HomeClientWrapper';
 
-export const revalidate = 30;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const MOCK_PRODUCTS = [
   {
