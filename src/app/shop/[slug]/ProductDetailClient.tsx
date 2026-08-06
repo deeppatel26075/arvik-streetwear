@@ -498,11 +498,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         </div>
       </div>
 
-      {/* 4 Feature Highlights Section (Horizontally Swipable on Mobile) */}
+      {/* 4 Feature Highlights Section */}
       <div className="pt-12 border-t border-stone-200 space-y-6">
-        <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:overflow-visible sm:pb-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {/* Element 1 */}
-          <div className="flex-shrink-0 w-[240px] sm:w-auto bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
+          <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
             <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
               <Image
                 src={images[0]?.image_url || '/products/farebi-olive.jpg'}
@@ -520,7 +520,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           </div>
 
           {/* Element 2 */}
-          <div className="flex-shrink-0 w-[240px] sm:w-auto bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
+          <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
             <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
               <Image
                 src={images[1]?.image_url || images[0]?.image_url || '/products/polarize-cream.jpg'}
@@ -538,7 +538,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           </div>
 
           {/* Element 3 */}
-          <div className="flex-shrink-0 w-[240px] sm:w-auto bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
+          <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
             <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
               <Image
                 src={images[2]?.image_url || images[0]?.image_url || '/products/polarize-navy.jpg'}
@@ -556,7 +556,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           </div>
 
           {/* Element 4 */}
-          <div className="flex-shrink-0 w-[240px] sm:w-auto bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
+          <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
             <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
               <Image
                 src={images[3]?.image_url || images[0]?.image_url || '/products/mard-paisa-maroon.jpg'}
