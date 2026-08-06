@@ -132,17 +132,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                 </div>
               </div>
 
-              {/* Fabric Specs Badges */}
-              <div className="grid grid-cols-2 gap-2 text-[10px] font-extrabold uppercase tracking-wider text-stone-600">
-                <div className="bg-stone-50 p-2 border border-stone-200/60 rounded-xs">
-                  <span className="text-stone-400 block text-[8px]">Fabric</span>
-                  <span>100% Cotton</span>
-                </div>
-                <div className="bg-stone-50 p-2 border border-stone-200/60 rounded-xs">
-                  <span className="text-stone-400 block text-[8px]">Weight</span>
-                  <span>240 GSM Heavy</span>
-                </div>
-              </div>
+
 
               {/* Size Selector */}
               <div className="space-y-1.5 pt-1">
