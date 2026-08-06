@@ -336,25 +336,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             </span>
           </div>
 
-          {/* Key Product Attribute Badges */}
-          <div className="grid grid-cols-2 gap-2.5 text-xs">
-            <div className="p-3 bg-white border border-stone-200 rounded-xs space-y-0.5">
-              <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest block">Fabric Blend</span>
-              <span className="font-bold text-stone-900 uppercase tracking-wide">{product.fabric || '100% Premium Cotton'}</span>
-            </div>
-            <div className="p-3 bg-white border border-stone-200 rounded-xs space-y-0.5">
-              <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest block">Fabric Weight</span>
-              <span className="font-bold text-stone-900 uppercase tracking-wide">{product.gsm || '240 GSM Heavyweight'}</span>
-            </div>
-            <div className="p-3 bg-white border border-stone-200 rounded-xs space-y-0.5">
-              <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest block">Silhouette Fit</span>
-              <span className="font-bold text-stone-900 uppercase tracking-wide">{product.fit_type || 'Oversized Boxy Fit'}</span>
-            </div>
-            <div className="p-3 bg-white border border-stone-200 rounded-xs space-y-0.5">
-              <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest block">Print Craft</span>
-              <span className="font-bold text-stone-900 uppercase tracking-wide">High-Density Screen Print</span>
-            </div>
-          </div>
+
 
           {/* Size Selector Grid */}
           <div className="space-y-3 pt-2">
