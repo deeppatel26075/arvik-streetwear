@@ -218,13 +218,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         </div>
       </div>
 
-      {/* Main Product Layout (2-Column Grid) */}
+      {/* Main Product Layout (Comet-Inspired 2-Column Showcase) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-14 items-start">
         
-        {/* Left Column: Image Gallery Sticky Showcase */}
+        {/* Left Column: Image Gallery Showcase (Comet Style) */}
         <div className="lg:col-span-7 space-y-3 sm:space-y-4 lg:sticky lg:top-24">
           {/* Main Display Image */}
-          <div className="relative aspect-4/5 sm:aspect-3/4 bg-stone-100 rounded-lg overflow-hidden border border-stone-200 group shadow-xs">
+          <div className="relative aspect-4/5 sm:aspect-3/4 bg-stone-100 rounded-2xl overflow-hidden border border-stone-200/80 group shadow-sm">
             <Image
               src={primaryImage}
               alt={product.name}
@@ -234,53 +234,51 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               priority
             />
 
-            {/* Badges */}
-            <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 flex flex-col gap-1.5">
+            {/* Badges & Image Pill Counter */}
+            <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 flex items-center gap-2">
               {isDiscounted && (
-                <span className="bg-red-600 text-white text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-xs shadow-xs">
-                  {Math.round(((product.price - activePrice) / product.price) * 100)}% OFF
+                <span className="bg-stone-950 text-white text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full shadow-md">
+                  SAVE ₹{product.price - activePrice}
                 </span>
               )}
-              {product.category?.name && (
-                <span className="bg-stone-950/90 backdrop-blur-xs text-white text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-xs shadow-xs">
-                  {product.category.name}
-                </span>
-              )}
+              <span className="bg-white/90 backdrop-blur-md text-stone-900 text-[10px] font-mono font-extrabold px-2.5 py-0.5 rounded-full border border-stone-200/80 shadow-xs">
+                {activeImageIdx + 1} / {images.length}
+              </span>
             </div>
 
             {/* Actions over main image */}
-            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 flex flex-col space-y-1.5 sm:space-y-2">
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 flex flex-col space-y-2">
               <button
                 onClick={handleWishlistClick}
-                className="p-2 sm:p-3 rounded-full bg-white/90 backdrop-blur-xs text-stone-900 shadow-md hover:bg-white transition-all border border-stone-200"
+                className="p-2.5 rounded-full bg-white/95 backdrop-blur-md text-stone-900 shadow-md hover:bg-white transition-all border border-stone-200"
                 title="Save to Wishlist"
               >
                 <Heart
-                  className={`h-4 w-4 sm:h-4.5 sm:w-4.5 transition-colors ${
+                  className={`h-4 w-4 transition-colors ${
                     isFavorited ? 'fill-red-600 text-red-600' : 'text-stone-700'
                   }`}
                 />
               </button>
               <button
                 onClick={() => setShowZoomModal(true)}
-                className="p-2 sm:p-3 rounded-full bg-white/90 backdrop-blur-xs text-stone-900 shadow-md hover:bg-white transition-all border border-stone-200"
+                className="p-2.5 rounded-full bg-white/95 backdrop-blur-md text-stone-900 shadow-md hover:bg-white transition-all border border-stone-200"
                 title="Zoom Photo"
               >
-                <ZoomIn className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-stone-700" />
+                <ZoomIn className="h-4 w-4 text-stone-700" />
               </button>
             </div>
           </div>
 
-          {/* Horizontal / Grid Thumbnails Strip */}
+          {/* Horizontal Thumbnails Strip (Comet Style) */}
           {images.length > 1 && (
-            <div className="grid grid-cols-5 gap-2 sm:gap-3">
+            <div className="grid grid-cols-5 gap-2.5">
               {images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveImageIdx(i)}
-                  className={`relative aspect-4/5 sm:aspect-3/4 bg-stone-100 border rounded-md overflow-hidden transition-all ${
+                  className={`relative aspect-4/5 sm:aspect-3/4 bg-stone-100 rounded-xl overflow-hidden transition-all border ${
                     activeImageIdx === i
-                      ? 'border-stone-950 ring-2 ring-stone-950 shadow-sm'
+                      ? 'border-stone-950 ring-2 ring-stone-950 shadow-sm opacity-100'
                       : 'border-stone-200 opacity-60 hover:opacity-100'
                   }`}
                 >
@@ -297,62 +295,70 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           )}
         </div>
 
-        {/* Right Column: Product Info & Purchase Controls */}
-        {/* Right Column: Product Info & Purchase Controls */}
+        {/* Right Column: Product Info & Purchase Controls (Comet Inspired) */}
         <div className="lg:col-span-5 space-y-5">
           
           {/* Header & Title */}
-          <div className="space-y-1.5">
-            <span className="text-[9px] font-extrabold uppercase tracking-widest text-stone-400 block">
-              ARVIIK STREETWEAR • {product.category?.name || 'LIMITED EDITION'}
-            </span>
-            <h1 className="font-syne font-extrabold text-xl sm:text-2xl lg:text-3xl uppercase tracking-wider text-stone-950 leading-tight">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest bg-stone-100 text-stone-700 px-2.5 py-0.5 rounded-full border border-stone-200/80">
+                {product.category?.name || 'Oversized Streetwear'}
+              </span>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                In Stock
+              </span>
+            </div>
+            
+            <h1 className="font-syne font-extrabold text-2xl sm:text-3xl uppercase tracking-wider text-stone-950 leading-tight">
               {product.name}
             </h1>
 
-            {/* Rating Stars */}
+            {/* Rating Stars Pill */}
             <div className="flex items-center space-x-2 pt-0.5">
-              <div className="flex text-amber-500">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-3.5 w-3.5 fill-current" />
-                ))}
+              <div className="flex items-center space-x-1 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded-full text-amber-900">
+                <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                <span className="text-xs font-bold font-mono">4.9</span>
               </div>
-              <span className="text-xs font-bold text-stone-900">4.9</span>
-              <span className="text-[11px] text-stone-400">• 148 Verified Buyer Reviews</span>
+              <span className="text-[11px] text-stone-500 font-medium">• 148 Verified Street Culture Reviews</span>
             </div>
           </div>
 
-          {/* Price Block */}
-          <div className="p-3 sm:p-4 bg-stone-50 border border-stone-200/80 rounded-lg flex items-center justify-between">
-            <div>
-              <span className="text-xl sm:text-2xl font-extrabold text-stone-950 font-mono">
+          {/* Price Block (Comet Style) */}
+          <div className="p-4 bg-stone-50/80 border border-stone-200/80 rounded-xl space-y-1">
+            <div className="flex items-baseline space-x-3">
+              <span className="text-2xl sm:text-3xl font-extrabold text-stone-950 font-mono">
                 {formatPrice(activePrice)}
               </span>
               {isDiscounted && (
-                <span className="text-xs sm:text-sm text-stone-400 line-through font-mono ml-2.5">
+                <span className="text-sm text-stone-400 line-through font-mono">
                   {formatPrice(product.price)}
                 </span>
               )}
+              {isDiscounted && (
+                <span className="text-[10px] font-extrabold text-emerald-700 uppercase bg-emerald-100 px-2 py-0.5 rounded-md">
+                  {Math.round(((product.price - activePrice) / product.price) * 100)}% OFF
+                </span>
+              )}
             </div>
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-xs border border-emerald-200">
-              In Stock & Ready
-            </span>
+            <p className="text-[10px] text-stone-500 font-medium">
+              Inclusive of all taxes. Free shipping on all prepaid orders.
+            </p>
           </div>
 
-          {/* Size Selector Grid */}
-          <div className="space-y-2.5 pt-1">
+          {/* Size Selector Grid (Comet Style) */}
+          <div className="space-y-3 pt-1">
             <div className="flex justify-between items-center">
-              <label className="text-xs font-bold text-stone-900 uppercase tracking-wider flex items-center gap-1">
-                <span>Size:</span>
-                <span className="text-stone-950 font-extrabold">{selectedSize || 'Choose'}</span>
-              </label>
-              <div className="flex items-center space-x-2.5">
+              <div className="flex items-center space-x-1.5">
+                <span className="text-xs font-extrabold text-stone-900 uppercase tracking-wider">Select Size:</span>
+                <span className="text-xs text-stone-950 font-extrabold uppercase bg-stone-100 px-2 py-0.5 rounded-md">{selectedSize || 'Choose'}</span>
+              </div>
+              <div className="flex items-center space-x-3">
                 <button
                   type="button"
                   onClick={() => setShowSmartCalculator(true)}
-                  className="inline-flex items-center space-x-1 text-[11px] text-lime-700 hover:text-stone-950 font-extrabold uppercase tracking-wider underline underline-offset-4"
+                  className="inline-flex items-center space-x-1 text-[11px] text-stone-900 hover:text-stone-600 font-extrabold uppercase tracking-wider underline underline-offset-4"
                 >
-                  <Calculator className="h-3 w-3" />
+                  <Calculator className="h-3.5 w-3.5 text-lime-700" />
                   <span>Find Size</span>
                 </button>
                 <button
@@ -360,13 +366,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   onClick={() => setShowSizeGuide(true)}
                   className="inline-flex items-center space-x-1 text-[11px] text-stone-600 hover:text-stone-950 font-bold uppercase tracking-wider underline underline-offset-4"
                 >
-                  <Ruler className="h-3 w-3" />
-                  <span>Guide</span>
+                  <Ruler className="h-3.5 w-3.5" />
+                  <span>Size Guide</span>
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5">
+            <div className="grid grid-cols-5 gap-2">
               {sizes.map((sz) => {
                 const stock = getStock(sz);
                 const isAvailable = stock > 0;
@@ -378,17 +384,17 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       setSelectedSize(sz);
                       setSizeWarning(false);
                     }}
-                    className={`h-10 sm:h-12 font-bold text-xs rounded-md flex flex-col items-center justify-center transition-all uppercase border ${
+                    className={`h-11 sm:h-12 font-bold text-xs rounded-xl flex flex-col items-center justify-center transition-all uppercase border ${
                       selectedSize === sz
                         ? 'bg-stone-950 text-white border-stone-950 shadow-md ring-2 ring-stone-950'
                         : !isAvailable
-                        ? 'border-stone-150 text-stone-300 bg-stone-50 cursor-not-allowed line-through'
+                        ? 'border-stone-200 text-stone-300 bg-stone-50 cursor-not-allowed line-through'
                         : 'border-stone-200 text-stone-900 hover:border-stone-950 hover:bg-stone-50'
                     }`}
                   >
                     <span>{sz}</span>
                     {isAvailable && stock <= 3 && (
-                      <span className={`text-[7px] sm:text-[8px] tracking-tighter uppercase font-bold ${selectedSize === sz ? 'text-amber-300' : 'text-amber-600'}`}>
+                      <span className={`text-[7px] sm:text-[8px] tracking-tighter uppercase font-extrabold ${selectedSize === sz ? 'text-amber-300' : 'text-amber-600'}`}>
                         {stock} Left
                       </span>
                     )}
@@ -399,75 +405,68 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
             {sizeWarning && (
               <p className="text-xs font-bold text-red-600 uppercase tracking-wider animate-bounce">
-                ⚠️ Please select a size before adding to cart.
-              </p>
-            )}
-
-            {selectedSize && selectedStock <= 3 && selectedStock > 0 && (
-              <p className="text-[10px] sm:text-[11px] font-bold text-amber-800 bg-amber-50 p-2 rounded-xs border border-amber-200 flex items-center gap-1.5 uppercase tracking-wider">
-                <Zap className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
-                <span>Hurry! Only {selectedStock} item(s) left in Size {selectedSize}.</span>
+                ⚠️ Please select a size before adding to bag.
               </p>
             )}
           </div>
 
-          {/* Action CTA Buttons */}
-          <div className="space-y-2 pt-1">
+          {/* Action CTA Buttons (Comet Style) */}
+          <div className="space-y-2.5 pt-2">
             <button
               onClick={() => handleAddToCart(false)}
               disabled={adding}
-              className="w-full bg-stone-950 hover:bg-stone-900 text-white text-xs font-extrabold uppercase tracking-widest py-3.5 sm:py-4 rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer"
+              className="w-full bg-stone-950 hover:bg-stone-900 text-white text-xs sm:text-sm font-extrabold uppercase tracking-widest py-4 rounded-xl shadow-lg transition-all flex items-center justify-between px-6 cursor-pointer group"
             >
-              <ShoppingBag className="h-4 w-4" />
-              <span>{adding ? 'Adding To Bag...' : 'ADD TO CART'}</span>
+              <div className="flex items-center space-x-2">
+                <ShoppingBag className="h-4 w-4" />
+                <span>{adding ? 'Adding To Bag...' : 'ADD TO BAG'}</span>
+              </div>
+              <span className="font-mono text-stone-200 font-bold">{formatPrice(activePrice)}</span>
             </button>
 
             <button
               onClick={() => handleAddToCart(true)}
               disabled={adding}
-              className="w-full bg-white border-2 border-stone-950 text-stone-950 hover:bg-stone-950 hover:text-white text-xs font-extrabold uppercase tracking-widest py-3 sm:py-3.5 rounded-lg transition-all flex items-center justify-center space-x-2 shadow-xs cursor-pointer"
+              className="w-full bg-white border-2 border-stone-950 text-stone-950 hover:bg-stone-950 hover:text-white text-xs font-extrabold uppercase tracking-widest py-3.5 rounded-xl transition-all flex items-center justify-center space-x-2 shadow-xs cursor-pointer"
             >
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>EXPRESS CHECKOUT</span>
+              <Sparkles className="h-4 w-4" />
+              <span>BUY IT NOW (EXPRESS CHECKOUT)</span>
             </button>
           </div>
 
-          {/* Delivery & Assurance Perks Banner */}
-          <div className="grid grid-cols-3 gap-1.5 p-3 bg-stone-50 border border-stone-200/80 rounded-lg text-center">
-            <div className="space-y-0.5">
-              <Truck className="h-3.5 w-3.5 text-stone-800 mx-auto" />
-              <span className="text-[9px] sm:text-[10px] font-bold text-stone-900 uppercase tracking-wider block">Free Shipping</span>
-              <span className="text-[8px] sm:text-[9px] text-stone-500 block">Pan-India</span>
+          {/* Delivery & Assurance Perks Banner (Comet Minimal Badges) */}
+          <div className="grid grid-cols-3 gap-2 p-3.5 bg-stone-50/80 border border-stone-200/80 rounded-xl text-center">
+            <div className="space-y-1">
+              <Truck className="h-4 w-4 text-stone-800 mx-auto" />
+              <span className="text-[10px] font-extrabold text-stone-900 uppercase tracking-wider block">Express Shipping</span>
+              <span className="text-[9px] text-stone-500 block">Dispatch in 24 hrs</span>
             </div>
-            <div className="space-y-0.5 border-x border-stone-200 px-1">
-              <RotateCcw className="h-3.5 w-3.5 text-stone-800 mx-auto" />
-              <span className="text-[9px] sm:text-[10px] font-bold text-stone-900 uppercase tracking-wider block">Easy Returns</span>
-              <span className="text-[8px] sm:text-[9px] text-stone-500 block">7-Day Exchange</span>
+            <div className="space-y-1 border-x border-stone-200 px-1">
+              <RotateCcw className="h-4 w-4 text-stone-800 mx-auto" />
+              <span className="text-[10px] font-extrabold text-stone-900 uppercase tracking-wider block">7-Day Exchange</span>
+              <span className="text-[9px] text-stone-500 block">Hassle-Free Pickup</span>
             </div>
-            <div className="space-y-0.5">
-              <ShieldCheck className="h-3.5 w-3.5 text-stone-800 mx-auto" />
-              <span className="text-[9px] sm:text-[10px] font-bold text-stone-900 uppercase tracking-wider block">100% Authentic</span>
-              <span className="text-[8px] sm:text-[9px] text-stone-500 block">Verified</span>
+            <div className="space-y-1">
+              <ShieldCheck className="h-4 w-4 text-stone-800 mx-auto" />
+              <span className="text-[10px] font-extrabold text-stone-900 uppercase tracking-wider block">100% Authentic</span>
+              <span className="text-[9px] text-stone-500 block">240 GSM French Terry</span>
             </div>
           </div>
 
           {/* Product Details Accordion Tabs */}
-          <div className="border-t border-stone-200 pt-4 space-y-2">
-            
-
-
+          <div className="border-t border-stone-200 pt-4 space-y-2.5">
             {/* Specs Tab */}
-            <div className="border border-stone-200 rounded-xs overflow-hidden">
+            <div className="border border-stone-200/80 rounded-xl overflow-hidden">
               <button
                 onClick={() => toggleTab('specs')}
-                className="w-full p-3.5 bg-white hover:bg-stone-50 flex justify-between items-center text-xs font-bold text-stone-900 uppercase tracking-wider"
+                className="w-full p-4 bg-white hover:bg-stone-50 flex justify-between items-center text-xs font-bold text-stone-900 uppercase tracking-wider"
               >
                 <span>Fabric & Fit Specifications</span>
-                {openAccordion === 'specs' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                {openAccordion === 'specs' ? <ChevronUp className="h-4 w-4 text-stone-600" /> : <ChevronDown className="h-4 w-4 text-stone-600" />}
               </button>
               {openAccordion === 'specs' && (
-                <div className="p-4 bg-stone-50/50 border-t border-stone-100 text-xs space-y-2 text-stone-700">
-                  <p><strong className="font-semibold text-stone-900">Material:</strong> {product.fabric || '100% Premium French Terry Cotton'}</p>
+                <div className="p-4 bg-stone-50/50 border-t border-stone-100 text-xs space-y-2 text-stone-700 font-medium">
+                  <p><strong className="font-semibold text-stone-900">Material:</strong> {product.fabric || '100% Premium Combed Cotton'}</p>
                   <p><strong className="font-semibold text-stone-900">Fabric Weight:</strong> {product.gsm || '240 GSM Heavyweight'}</p>
                   <p><strong className="font-semibold text-stone-900">Fit Silhouette:</strong> {product.fit_type || 'Signature Oversized Drop-Shoulder Fit'}</p>
                   <p><strong className="font-semibold text-stone-900">Finish:</strong> Bio-washed, Pre-shrunk & Softened</p>
@@ -476,23 +475,22 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             </div>
 
             {/* Wash Care Tab */}
-            <div className="border border-stone-200 rounded-xs overflow-hidden">
+            <div className="border border-stone-200/80 rounded-xl overflow-hidden">
               <button
                 onClick={() => toggleTab('wash')}
-                className="w-full p-3.5 bg-white hover:bg-stone-50 flex justify-between items-center text-xs font-bold text-stone-900 uppercase tracking-wider"
+                className="w-full p-4 bg-white hover:bg-stone-50 flex justify-between items-center text-xs font-bold text-stone-900 uppercase tracking-wider"
               >
                 <span>Wash & Care Instructions</span>
-                {openAccordion === 'wash' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                {openAccordion === 'wash' ? <ChevronUp className="h-4 w-4 text-stone-600" /> : <ChevronDown className="h-4 w-4 text-stone-600" />}
               </button>
               {openAccordion === 'wash' && (
-                <div className="p-4 bg-stone-50/50 border-t border-stone-100 text-xs space-y-1.5 text-stone-700">
+                <div className="p-4 bg-stone-50/50 border-t border-stone-100 text-xs space-y-1.5 text-stone-700 font-medium">
                   <p>• {product.wash_instructions || 'Machine wash cold inside out with like colors.'}</p>
                   <p>• Do not iron directly on screen-printed graphic art.</p>
                   <p>• Do not tumble dry high; hang dry in shade to maintain fabric longevity.</p>
                 </div>
               )}
             </div>
-
           </div>
 
         </div>
