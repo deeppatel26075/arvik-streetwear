@@ -516,7 +516,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
           <div className="relative aspect-4/5 rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80 shadow-xs group">
             <Image
-              src={imageList[0] || '/products/farebi-olive.jpg'}
+              src={images[0]?.image_url || '/products/farebi-olive.jpg'}
               alt="Product Detail 1"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -531,7 +531,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
           <div className="relative aspect-4/5 rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80 shadow-xs group">
             <Image
-              src={imageList[1] || '/products/polarize-cream.jpg'}
+              src={images[1]?.image_url || images[0]?.image_url || '/products/polarize-cream.jpg'}
               alt="Product Detail 2"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -546,7 +546,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
           <div className="relative aspect-4/5 rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80 shadow-xs group">
             <Image
-              src={imageList[2] || '/products/polarize-navy.jpg'}
+              src={images[2]?.image_url || images[0]?.image_url || '/products/polarize-navy.jpg'}
               alt="Product Detail 3"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -586,7 +586,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
             <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
               <Image
-                src={imageList[0] || '/products/farebi-olive.jpg'}
+                src={images[0]?.image_url || '/products/farebi-olive.jpg'}
                 alt="240 GSM Heavyweight Cotton"
                 fill
                 className="object-cover"
@@ -604,7 +604,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
             <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
               <Image
-                src={imageList[1] || '/products/polarize-cream.jpg'}
+                src={images[1]?.image_url || images[0]?.image_url || '/products/polarize-cream.jpg'}
                 alt="Signature Boxy Oversized Fit"
                 fill
                 className="object-cover"
@@ -622,7 +622,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
             <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
               <Image
-                src={imageList[2] || '/products/polarize-navy.jpg'}
+                src={images[2]?.image_url || images[0]?.image_url || '/products/polarize-navy.jpg'}
                 alt="High-Density Screen Prints"
                 fill
                 className="object-cover"
@@ -640,7 +640,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <div className="bg-white border border-stone-200/80 rounded-xl overflow-hidden p-4 shadow-xs flex flex-col space-y-3 transition-all hover:shadow-md">
             <div className="relative w-full aspect-4/3 rounded-lg overflow-hidden bg-stone-100">
               <Image
-                src={imageList[3] || '/products/mard-paisa-maroon.jpg'}
+                src={images[3]?.image_url || images[0]?.image_url || '/products/mard-paisa-maroon.jpg'}
                 alt="Pan-India Express Delivery"
                 fill
                 className="object-cover"
