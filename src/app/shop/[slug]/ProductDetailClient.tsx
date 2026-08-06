@@ -415,13 +415,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             <button
               onClick={() => handleAddToCart(false)}
               disabled={adding}
-              className="w-full bg-stone-950 hover:bg-stone-900 text-white text-xs sm:text-sm font-extrabold uppercase tracking-widest py-4 rounded-xl shadow-lg transition-all flex items-center justify-between px-6 cursor-pointer group"
+              className="w-full bg-stone-950 hover:bg-stone-900 text-white text-xs sm:text-sm font-extrabold uppercase tracking-widest py-4 rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer group"
             >
-              <div className="flex items-center space-x-2">
-                <ShoppingBag className="h-4 w-4" />
-                <span>{adding ? 'Adding To Bag...' : 'ADD TO BAG'}</span>
-              </div>
-              <span className="font-mono text-stone-200 font-bold">{formatPrice(activePrice)}</span>
+              <ShoppingBag className="h-4 w-4" />
+              <span>{adding ? 'Adding To Bag...' : 'ADD TO BAG'}</span>
             </button>
 
             <button
