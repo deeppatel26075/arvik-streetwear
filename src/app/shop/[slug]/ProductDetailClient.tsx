@@ -471,23 +471,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           {/* Product Details Accordion Tabs */}
           <div className="border-t border-stone-200 pt-4 space-y-2">
             
-            {/* Description Tab */}
-            <div className="border border-stone-200 rounded-xs overflow-hidden">
-              <button
-                onClick={() => toggleTab('description')}
-                className="w-full p-3.5 bg-white hover:bg-stone-50 flex justify-between items-center text-xs font-bold text-stone-900 uppercase tracking-wider"
-              >
-                <span>Design & Story</span>
-                {openAccordion === 'description' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </button>
-              {openAccordion === 'description' && (
-                <div className="p-4 bg-stone-50/50 border-t border-stone-100 text-xs text-stone-600 leading-relaxed">
-                    <p>
-                      Crafted for true streetwear purists, this piece represents ARVIIK’s relentless dedication to heavyweight cotton engineering, signature oversized silhouettes, and high-impact graphics.
-                    </p>
-                </div>
-              )}
-            </div>
+
 
             {/* Specs Tab */}
             <div className="border border-stone-200 rounded-xs overflow-hidden">
