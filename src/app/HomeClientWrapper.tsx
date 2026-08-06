@@ -37,11 +37,11 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
   const [touchStart, setTouchStart] = React.useState<number | null>(null);
   const [touchEnd, setTouchEnd] = React.useState<number | null>(null);
 
-  // Auto-swipe every 4.5 seconds
+  // Auto-swipe every 2.5 seconds for faster transition
   React.useEffect(() => {
     const timer = setInterval(() => {
       setCurrentReview((prev) => (prev + 1) % REVIEWS.length);
-    }, 4500);
+    }, 2500);
     return () => clearInterval(timer);
   }, []);
 
@@ -54,7 +54,7 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
   };
 
   // Touch Swipe handlers for mobile
-  const minSwipeDistance = 50;
+  const minSwipeDistance = 30;
 
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null);
