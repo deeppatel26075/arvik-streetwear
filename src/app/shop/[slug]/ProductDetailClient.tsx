@@ -196,35 +196,35 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   };
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-6 sm:space-y-12">
       {/* Breadcrumb & Navigation */}
-      <div className="flex justify-between items-center pb-4 border-b border-stone-200">
+      <div className="flex justify-between items-center pb-3 border-b border-stone-200">
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center space-x-2 text-xs font-bold text-stone-600 hover:text-stone-950 uppercase tracking-widest transition-colors"
+          className="inline-flex items-center space-x-1.5 text-[11px] sm:text-xs font-bold text-stone-600 hover:text-stone-950 uppercase tracking-wider transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           <span>Back to Shop</span>
         </button>
 
         <div className="flex items-center space-x-3">
           <button
             onClick={handleShare}
-            className="inline-flex items-center space-x-1.5 text-xs text-stone-500 hover:text-stone-950 font-bold uppercase tracking-wider transition-colors"
+            className="inline-flex items-center space-x-1 text-[11px] sm:text-xs text-stone-500 hover:text-stone-950 font-bold uppercase tracking-wider transition-colors"
           >
-            <Share2 className="h-4 w-4" />
-            <span>{copiedLink ? 'Copied Link!' : 'Share'}</span>
+            <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span>{copiedLink ? 'Copied!' : 'Share'}</span>
           </button>
         </div>
       </div>
 
       {/* Main Product Layout (2-Column Grid) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-14 items-start">
         
         {/* Left Column: Image Gallery Sticky Showcase */}
-        <div className="lg:col-span-7 space-y-4 lg:sticky lg:top-24">
+        <div className="lg:col-span-7 space-y-3 sm:space-y-4 lg:sticky lg:top-24">
           {/* Main Display Image */}
-          <div className="relative aspect-3/4 bg-stone-100 rounded-sm overflow-hidden border border-stone-200 group shadow-xs">
+          <div className="relative aspect-4/5 sm:aspect-3/4 bg-stone-100 rounded-lg overflow-hidden border border-stone-200 group shadow-xs">
             <Image
               src={primaryImage}
               alt={product.name}
@@ -235,50 +235,50 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             />
 
             {/* Badges */}
-            <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+            <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 flex flex-col gap-1.5">
               {isDiscounted && (
-                <span className="bg-red-600 text-white text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-xs shadow-xs">
+                <span className="bg-red-600 text-white text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-xs shadow-xs">
                   {Math.round(((product.price - activePrice) / product.price) * 100)}% OFF
                 </span>
               )}
               {product.category?.name && (
-                <span className="bg-stone-950/90 backdrop-blur-xs text-white text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-xs shadow-xs">
+                <span className="bg-stone-950/90 backdrop-blur-xs text-white text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-xs shadow-xs">
                   {product.category.name}
                 </span>
               )}
             </div>
 
             {/* Actions over main image */}
-            <div className="absolute top-4 right-4 z-10 flex flex-col space-y-2">
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 flex flex-col space-y-1.5 sm:space-y-2">
               <button
                 onClick={handleWishlistClick}
-                className="p-3 rounded-full bg-white/90 backdrop-blur-xs text-stone-900 shadow-md hover:bg-white transition-all border border-stone-200"
+                className="p-2 sm:p-3 rounded-full bg-white/90 backdrop-blur-xs text-stone-900 shadow-md hover:bg-white transition-all border border-stone-200"
                 title="Save to Wishlist"
               >
                 <Heart
-                  className={`h-4.5 w-4.5 transition-colors ${
+                  className={`h-4 w-4 sm:h-4.5 sm:w-4.5 transition-colors ${
                     isFavorited ? 'fill-red-600 text-red-600' : 'text-stone-700'
                   }`}
                 />
               </button>
               <button
                 onClick={() => setShowZoomModal(true)}
-                className="p-3 rounded-full bg-white/90 backdrop-blur-xs text-stone-900 shadow-md hover:bg-white transition-all border border-stone-200"
+                className="p-2 sm:p-3 rounded-full bg-white/90 backdrop-blur-xs text-stone-900 shadow-md hover:bg-white transition-all border border-stone-200"
                 title="Zoom Photo"
               >
-                <ZoomIn className="h-4.5 w-4.5 text-stone-700" />
+                <ZoomIn className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-stone-700" />
               </button>
             </div>
           </div>
 
           {/* Horizontal / Grid Thumbnails Strip */}
           {images.length > 1 && (
-            <div className="grid grid-cols-5 gap-3">
+            <div className="grid grid-cols-5 gap-2 sm:gap-3">
               {images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveImageIdx(i)}
-                  className={`relative aspect-3/4 bg-stone-100 border rounded-xs overflow-hidden transition-all ${
+                  className={`relative aspect-4/5 sm:aspect-3/4 bg-stone-100 border rounded-md overflow-hidden transition-all ${
                     activeImageIdx === i
                       ? 'border-stone-950 ring-2 ring-stone-950 shadow-sm'
                       : 'border-stone-200 opacity-60 hover:opacity-100'
@@ -298,76 +298,75 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         </div>
 
         {/* Right Column: Product Info & Purchase Controls */}
-        <div className="lg:col-span-5 space-y-6">
+        {/* Right Column: Product Info & Purchase Controls */}
+        <div className="lg:col-span-5 space-y-5">
           
           {/* Header & Title */}
-          <div className="space-y-2">
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-stone-400 block">
+          <div className="space-y-1.5">
+            <span className="text-[9px] font-extrabold uppercase tracking-widest text-stone-400 block">
               ARVIIK STREETWEAR • {product.category?.name || 'LIMITED EDITION'}
             </span>
-            <h1 className="font-syne font-extrabold text-2xl lg:text-3xl uppercase tracking-wider text-stone-950 leading-tight">
+            <h1 className="font-syne font-extrabold text-xl sm:text-2xl lg:text-3xl uppercase tracking-wider text-stone-950 leading-tight">
               {product.name}
             </h1>
 
             {/* Rating Stars */}
-            <div className="flex items-center space-x-2 pt-1">
+            <div className="flex items-center space-x-2 pt-0.5">
               <div className="flex text-amber-500">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-current" />
+                  <Star key={i} className="h-3.5 w-3.5 fill-current" />
                 ))}
               </div>
               <span className="text-xs font-bold text-stone-900">4.9</span>
-              <span className="text-xs text-stone-400">• 148 Verified Buyer Reviews</span>
+              <span className="text-[11px] text-stone-400">• 148 Verified Buyer Reviews</span>
             </div>
           </div>
 
           {/* Price Block */}
-          <div className="p-4 bg-stone-50 border border-stone-200/80 rounded-xs flex items-center justify-between">
+          <div className="p-3 sm:p-4 bg-stone-50 border border-stone-200/80 rounded-lg flex items-center justify-between">
             <div>
-              <span className="text-2xl font-extrabold text-stone-950 font-mono">
+              <span className="text-xl sm:text-2xl font-extrabold text-stone-950 font-mono">
                 {formatPrice(activePrice)}
               </span>
               {isDiscounted && (
-                <span className="text-sm text-stone-400 line-through font-mono ml-3">
+                <span className="text-xs sm:text-sm text-stone-400 line-through font-mono ml-2.5">
                   {formatPrice(product.price)}
                 </span>
               )}
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-xs border border-emerald-200">
-              In Stock & Ready to Ship
+            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-xs border border-emerald-200">
+              In Stock & Ready
             </span>
           </div>
 
-
-
           {/* Size Selector Grid */}
-          <div className="space-y-3 pt-2">
+          <div className="space-y-2.5 pt-1">
             <div className="flex justify-between items-center">
-              <label className="text-xs font-bold text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
-                <span>Select Size:</span>
-                <span className="text-stone-950 font-extrabold">{selectedSize || 'Choose Size'}</span>
+              <label className="text-xs font-bold text-stone-900 uppercase tracking-wider flex items-center gap-1">
+                <span>Size:</span>
+                <span className="text-stone-950 font-extrabold">{selectedSize || 'Choose'}</span>
               </label>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2.5">
                 <button
                   type="button"
                   onClick={() => setShowSmartCalculator(true)}
-                  className="inline-flex items-center space-x-1 text-xs text-lime-700 hover:text-stone-950 font-extrabold uppercase tracking-wider underline underline-offset-4"
+                  className="inline-flex items-center space-x-1 text-[11px] text-lime-700 hover:text-stone-950 font-extrabold uppercase tracking-wider underline underline-offset-4"
                 >
-                  <Calculator className="h-3.5 w-3.5" />
-                  <span>Find My Size</span>
+                  <Calculator className="h-3 w-3" />
+                  <span>Find Size</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowSizeGuide(true)}
-                  className="inline-flex items-center space-x-1 text-xs text-stone-600 hover:text-stone-950 font-bold uppercase tracking-wider underline underline-offset-4"
+                  className="inline-flex items-center space-x-1 text-[11px] text-stone-600 hover:text-stone-950 font-bold uppercase tracking-wider underline underline-offset-4"
                 >
-                  <Ruler className="h-3.5 w-3.5" />
-                  <span>Size Guide</span>
+                  <Ruler className="h-3 w-3" />
+                  <span>Guide</span>
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-5 gap-2.5">
+            <div className="grid grid-cols-5 gap-1.5 sm:gap-2.5">
               {sizes.map((sz) => {
                 const stock = getStock(sz);
                 const isAvailable = stock > 0;
@@ -379,7 +378,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       setSelectedSize(sz);
                       setSizeWarning(false);
                     }}
-                    className={`h-12 font-bold text-xs rounded-xs flex flex-col items-center justify-center transition-all uppercase border ${
+                    className={`h-10 sm:h-12 font-bold text-xs rounded-md flex flex-col items-center justify-center transition-all uppercase border ${
                       selectedSize === sz
                         ? 'bg-stone-950 text-white border-stone-950 shadow-md ring-2 ring-stone-950'
                         : !isAvailable
@@ -389,7 +388,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   >
                     <span>{sz}</span>
                     {isAvailable && stock <= 3 && (
-                      <span className={`text-[8px] tracking-tighter uppercase font-bold ${selectedSize === sz ? 'text-amber-300' : 'text-amber-600'}`}>
+                      <span className={`text-[7px] sm:text-[8px] tracking-tighter uppercase font-bold ${selectedSize === sz ? 'text-amber-300' : 'text-amber-600'}`}>
                         {stock} Left
                       </span>
                     )}
@@ -405,7 +404,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             )}
 
             {selectedSize && selectedStock <= 3 && selectedStock > 0 && (
-              <p className="text-[11px] font-bold text-amber-800 bg-amber-50 p-2.5 rounded-xs border border-amber-200 flex items-center gap-1.5 uppercase tracking-wider">
+              <p className="text-[10px] sm:text-[11px] font-bold text-amber-800 bg-amber-50 p-2 rounded-xs border border-amber-200 flex items-center gap-1.5 uppercase tracking-wider">
                 <Zap className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
                 <span>Hurry! Only {selectedStock} item(s) left in Size {selectedSize}.</span>
               </p>
@@ -413,42 +412,42 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           </div>
 
           {/* Action CTA Buttons */}
-          <div className="space-y-3 pt-2">
+          <div className="space-y-2 pt-1">
             <button
               onClick={() => handleAddToCart(false)}
               disabled={adding}
-              className="w-full bg-stone-950 hover:bg-stone-900 text-white text-xs font-extrabold uppercase tracking-widest py-4 rounded-xs shadow-md transition-all flex items-center justify-center space-x-2"
+              className="w-full bg-stone-950 hover:bg-stone-900 text-white text-xs font-extrabold uppercase tracking-widest py-3.5 sm:py-4 rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer"
             >
-              <ShoppingBag className="h-4.5 w-4.5" />
+              <ShoppingBag className="h-4 w-4" />
               <span>{adding ? 'Adding To Bag...' : 'ADD TO CART'}</span>
             </button>
 
             <button
               onClick={() => handleAddToCart(true)}
               disabled={adding}
-              className="w-full bg-white border-2 border-stone-950 text-stone-950 hover:bg-stone-950 hover:text-white text-xs font-extrabold uppercase tracking-widest py-3.5 rounded-xs transition-all flex items-center justify-center space-x-2 shadow-xs"
+              className="w-full bg-white border-2 border-stone-950 text-stone-950 hover:bg-stone-950 hover:text-white text-xs font-extrabold uppercase tracking-widest py-3 sm:py-3.5 rounded-lg transition-all flex items-center justify-center space-x-2 shadow-xs cursor-pointer"
             >
-              <Sparkles className="h-4 w-4" />
-              <span>BUY IT NOW (EXPRESS CHECKOUT)</span>
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>EXPRESS CHECKOUT</span>
             </button>
           </div>
 
           {/* Delivery & Assurance Perks Banner */}
-          <div className="grid grid-cols-3 gap-3 p-4 bg-stone-50 border border-stone-200/80 rounded-xs text-center">
-            <div className="space-y-1">
-              <Truck className="h-4 w-4 text-stone-800 mx-auto" />
-              <span className="text-[10px] font-bold text-stone-900 uppercase tracking-wider block">Free Shipping</span>
-              <span className="text-[9px] text-stone-500 block">Pan-India Orders</span>
+          <div className="grid grid-cols-3 gap-1.5 p-3 bg-stone-50 border border-stone-200/80 rounded-lg text-center">
+            <div className="space-y-0.5">
+              <Truck className="h-3.5 w-3.5 text-stone-800 mx-auto" />
+              <span className="text-[9px] sm:text-[10px] font-bold text-stone-900 uppercase tracking-wider block">Free Shipping</span>
+              <span className="text-[8px] sm:text-[9px] text-stone-500 block">Pan-India</span>
             </div>
-            <div className="space-y-1 border-x border-stone-200 px-1">
-              <RotateCcw className="h-4 w-4 text-stone-800 mx-auto" />
-              <span className="text-[10px] font-bold text-stone-900 uppercase tracking-wider block">Easy Returns</span>
-              <span className="text-[9px] text-stone-500 block">7-Day Exchange</span>
+            <div className="space-y-0.5 border-x border-stone-200 px-1">
+              <RotateCcw className="h-3.5 w-3.5 text-stone-800 mx-auto" />
+              <span className="text-[9px] sm:text-[10px] font-bold text-stone-900 uppercase tracking-wider block">Easy Returns</span>
+              <span className="text-[8px] sm:text-[9px] text-stone-500 block">7-Day Exchange</span>
             </div>
-            <div className="space-y-1">
-              <ShieldCheck className="h-4 w-4 text-stone-800 mx-auto" />
-              <span className="text-[10px] font-bold text-stone-900 uppercase tracking-wider block">100% Authentic</span>
-              <span className="text-[9px] text-stone-500 block">Razorpay Verified</span>
+            <div className="space-y-0.5">
+              <ShieldCheck className="h-3.5 w-3.5 text-stone-800 mx-auto" />
+              <span className="text-[9px] sm:text-[10px] font-bold text-stone-900 uppercase tracking-wider block">100% Authentic</span>
+              <span className="text-[8px] sm:text-[9px] text-stone-500 block">Verified</span>
             </div>
           </div>
 
