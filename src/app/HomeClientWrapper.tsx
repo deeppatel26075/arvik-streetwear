@@ -4,14 +4,52 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
-import { ArrowRight, Star, Flame } from 'lucide-react';
+import { ArrowRight, Star, Flame, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface HomeClientWrapperProps {
   products: any[];
   settings?: any;
 }
 
+const REVIEWS = [
+  {
+    quote: '"The print quality is unmatched. Most oversized tees lose shape around the neck after three washes, but ARVIIK feels as heavy and boxy as day one."',
+    author: 'Karan Malhotra',
+    location: 'Mumbai',
+    rating: 5,
+  },
+  {
+    quote: '"Bought the Archive-01 tee. Absolutely in love with the French Terry fabric weight. Shipping was fast, and the size chart is completely accurate."',
+    author: 'Elena Rostova',
+    location: 'Delhi',
+    rating: 5,
+  },
+  {
+    quote: '"Super premium packaging and customer service helped me switch size from XL to L because the fit is extremely boxy. Highly recommended!"',
+    author: 'Rohan Sharma',
+    location: 'Bengaluru',
+    rating: 5,
+  },
+];
+
 export default function HomeClientWrapper({ products }: HomeClientWrapperProps) {
+  const [currentReview, setCurrentReview] = React.useState(0);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentReview((prev) => (prev + 1) % REVIEWS.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handlePrevReview = () => {
+    setCurrentReview((prev) => (prev - 1 + REVIEWS.length) % REVIEWS.length);
+  };
+
+  const handleNextReview = () => {
+    setCurrentReview((prev) => (prev + 1) % REVIEWS.length);
+  };
+
   const displayProducts = products && products.length > 0 ? products : [
     {
       id: '00000000-0000-0000-0000-000000000001',
@@ -232,9 +270,9 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
         </div>
       </section>
 
-      {/* 5. COMMUNITY REVIEWS SECTION */}
+      {/* 5. COMMUNITY REVIEWS SECTION - SINGLE CARD CAROUSEL */}
       <section className="bg-stone-50 py-12 sm:py-16 border-b border-stone-200/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-6">
           <div className="text-center space-y-1">
             <span className="text-[10px] text-stone-400 font-extrabold tracking-[0.3em] uppercase block">
               Verifiable Feedback
@@ -243,50 +281,60 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
               Community Reviews
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-5 rounded-xs border border-stone-200/60 shadow-xs flex flex-col space-y-3.5">
-              <div className="flex items-center text-amber-500 space-x-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-3.5 w-3.5 fill-current" />
-                ))}
-              </div>
-              <p className="text-xs text-stone-600 leading-relaxed italic">
-                "The print quality is unmatched. Most oversized tees lose shape around the neck after three washes, but ARVIIK feels as heavy and boxy as day one."
-              </p>
-              <div className="pt-2 border-t border-stone-100 flex justify-between items-center text-[10px] font-bold text-stone-400 uppercase tracking-widest">
-                <span className="text-stone-900">Karan Malhotra</span>
-                <span>Mumbai</span>
-              </div>
+
+          {/* Single Box Review Card */}
+          <div className="relative bg-white p-6 sm:p-8 rounded-xl border border-stone-200/80 shadow-md flex flex-col items-center text-center space-y-4">
+            {/* Left Chevron Button */}
+            <button
+              onClick={handlePrevReview}
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-stone-100 hover:bg-stone-950 hover:text-white text-stone-700 transition-colors shadow-xs"
+              aria-label="Previous Review"
+            >
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+
+            {/* Right Chevron Button */}
+            <button
+              onClick={handleNextReview}
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-stone-100 hover:bg-stone-950 hover:text-white text-stone-700 transition-colors shadow-xs"
+              aria-label="Next Review"
+            >
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+
+            {/* Stars */}
+            <div className="flex items-center text-amber-500 space-x-1">
+              {[...Array(REVIEWS[currentReview].rating)].map((_, i) => (
+                <Star key={i} className="h-4 w-4 fill-current" />
+              ))}
             </div>
 
-            <div className="bg-white p-5 rounded-xs border border-stone-200/60 shadow-xs flex flex-col space-y-3.5">
-              <div className="flex items-center text-amber-500 space-x-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-3.5 w-3.5 fill-current" />
-                ))}
-              </div>
-              <p className="text-xs text-stone-600 leading-relaxed italic">
-                "Bought the Archive-01 tee. Absolutely in love with the French Terry fabric weight. Shipping was fast, and the size chart is completely accurate."
-              </p>
-              <div className="pt-2 border-t border-stone-100 flex justify-between items-center text-[10px] font-bold text-stone-400 uppercase tracking-widest">
-                <span className="text-stone-900">Elena Rostova</span>
-                <span>Delhi</span>
-              </div>
+            {/* Review Content */}
+            <p className="text-xs sm:text-sm text-stone-700 leading-relaxed italic max-w-xl px-6 sm:px-8">
+              {REVIEWS[currentReview].quote}
+            </p>
+
+            {/* Author Info */}
+            <div className="pt-2 border-t border-stone-100 w-full flex justify-center items-center space-x-3 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-stone-400">
+              <span className="text-stone-950">{REVIEWS[currentReview].author}</span>
+              <span>•</span>
+              <span className="text-stone-500">{REVIEWS[currentReview].location}</span>
             </div>
 
-            <div className="bg-white p-5 rounded-xs border border-stone-200/60 shadow-xs flex flex-col space-y-3.5">
-              <div className="flex items-center text-amber-500 space-x-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-3.5 w-3.5 fill-current" />
-                ))}
-              </div>
-              <p className="text-xs text-stone-600 leading-relaxed italic">
-                "Super premium packaging and customer service helped me switch size from XL to L because the fit is extremely boxy. Highly recommended!"
-              </p>
-              <div className="pt-2 border-t border-stone-100 flex justify-between items-center text-[10px] font-bold text-stone-400 uppercase tracking-widest">
-                <span className="text-stone-900">Rohan Sharma</span>
-                <span>Bengaluru</span>
-              </div>
+            {/* Indicator Dots */}
+            <div className="flex items-center justify-center space-x-2 pt-2">
+              {REVIEWS.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentReview(index)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    index === currentReview
+                      ? 'w-6 bg-stone-950'
+                      : 'w-2 bg-stone-300 hover:bg-stone-500'
+                  }`}
+                  aria-label={`Go to review ${index + 1}`}
+                />
+              ))}
             </div>
           </div>
         </div>
