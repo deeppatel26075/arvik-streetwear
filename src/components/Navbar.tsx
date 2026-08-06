@@ -13,16 +13,11 @@ import {
   Heart,
   User,
   ChevronRight,
-  Flame,
-  Sparkles,
-  Star,
-  Tag,
   MessageCircle,
   PhoneCall,
   RefreshCw,
   Truck,
-  Shirt,
-  ArrowRight
+  Shirt
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -92,59 +87,7 @@ export default function Navbar() {
               </button>
             </div>
 
-            {/* 1. Main Top Navigation Bar (Requested exact items) */}
-            <nav className="hidden lg:flex items-center space-x-6 text-[11px] font-bold tracking-widest uppercase">
-              <Link
-                href="/shop?filter=new"
-                prefetch={true}
-                className="text-stone-900 hover:text-stone-500 transition-colors flex items-center gap-1"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-lime-600" />
-                <span>New Arrivals</span>
-              </Link>
 
-              <Link
-                href="/shop?filter=bestseller"
-                prefetch={true}
-                className="text-stone-900 hover:text-stone-500 transition-colors flex items-center gap-1"
-              >
-                <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                <span>Best Seller</span>
-              </Link>
-
-              <Link
-                href="/shop?category=Limited+Edition"
-                prefetch={true}
-                className="text-stone-900 hover:text-stone-500 transition-colors flex items-center gap-1"
-              >
-                <Flame className="w-3.5 h-3.5 text-rose-500" />
-                <span>Limited Edition</span>
-              </Link>
-
-              <Link
-                href="/shop?category=Psychology+Edition"
-                prefetch={true}
-                className="text-stone-900 hover:text-stone-500 transition-colors"
-              >
-                <span>Psychology Edition</span>
-              </Link>
-
-              <Link
-                href="/shop?category=Anime+Edition"
-                prefetch={true}
-                className="text-stone-900 hover:text-stone-500 transition-colors"
-              >
-                <span>Anime Edition</span>
-              </Link>
-
-              <Link
-                href="/shop"
-                prefetch={true}
-                className="text-stone-900 hover:text-stone-500 transition-colors font-extrabold text-stone-950 border-b-2 border-stone-950 pb-0.5"
-              >
-                <span>All Collection</span>
-              </Link>
-            </nav>
 
             {/* Brand Logo */}
             <div className="flex-shrink-0">
@@ -288,136 +231,7 @@ export default function Navbar() {
                 </form>
               </div>
 
-              {/* FEATURED COLLECTIONS SECTION */}
-              <div className="space-y-3 pt-2">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-400 border-b border-stone-100 pb-1.5">
-                  FEATURED COLLECTIONS
-                </h3>
-                
-                <div className="space-y-1 divide-y divide-stone-100">
-                  
-                  {/* New Arrivals */}
-                  <Link
-                    href="/shop?filter=new"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-between py-2.5 group"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-[9px]">
-                        NEW
-                      </div>
-                      <div>
-                        <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
-                          NEW ARRIVALS
-                        </h4>
-                        <p className="text-[9px] text-stone-400 tracking-wide">Fresh Drops Every Week</p>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
-                  </Link>
 
-                  {/* Best Sellers */}
-                  <Link
-                    href="/shop?filter=bestseller"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-between py-2.5 group"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">
-                        ⭐
-                      </div>
-                      <div>
-                        <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
-                          BEST SELLERS
-                        </h4>
-                        <p className="text-[9px] text-stone-400 tracking-wide">Our Most Loved Styles</p>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
-                  </Link>
-
-                  {/* Limited Edition */}
-                  <Link
-                    href="/shop?category=Limited+Edition"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-between py-2.5 group"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-7 h-7 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xs">
-                        🔥
-                      </div>
-                      <div>
-                        <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
-                          LIMITED EDITION
-                        </h4>
-                        <p className="text-[9px] text-stone-400 tracking-wide">Exclusive Drops</p>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
-                  </Link>
-
-                  {/* Psychology Edition */}
-                  <Link
-                    href="/shop?category=Psychology+Edition"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-between py-2.5 group"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-7 h-7 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs">
-                        🧠
-                      </div>
-                      <div>
-                        <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
-                          PSYCHOLOGY EDITION
-                        </h4>
-                        <p className="text-[9px] text-stone-400 tracking-wide">Mind & Identity Concepts</p>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
-                  </Link>
-
-                  {/* Anime Edition */}
-                  <Link
-                    href="/shop?category=Anime+Edition"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-between py-2.5 group"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs">
-                        ⚔️
-                      </div>
-                      <div>
-                        <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
-                          ANIME EDITION
-                        </h4>
-                        <p className="text-[9px] text-stone-400 tracking-wide">Otaku & Street Culture</p>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
-                  </Link>
-
-                  {/* All Collection */}
-                  <Link
-                    href="/shop"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-between py-2.5 group"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-7 h-7 rounded-full bg-stone-100 text-stone-700 flex items-center justify-center text-xs">
-                        🛍️
-                      </div>
-                      <div>
-                        <h4 className="font-syne font-extrabold text-xs uppercase tracking-wider text-stone-950 group-hover:text-stone-600 transition-colors">
-                          ALL COLLECTION
-                        </h4>
-                        <p className="text-[9px] text-stone-400 tracking-wide">Explore All Streetwear Styles</p>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-900 transition-colors" />
-                  </Link>
-
-                </div>
-              </div>
 
               {/* SHOP BY SECTION */}
               <div className="space-y-3 pt-2">
