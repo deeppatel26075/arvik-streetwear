@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { formatPrice } from '@/lib/utils';
 import { MOCK_PRODUCTS } from '@/app/page';
-import { Plus, Edit2, Trash2, Check, Eye, EyeOff, Star, X, RefreshCw } from 'lucide-react';
+import { Plus, Edit2, Trash2, Check, Eye, EyeOff, Star, X, RefreshCw, Upload, Loader2 } from 'lucide-react';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<any[]>([]);
@@ -25,6 +25,7 @@ export default function AdminProducts() {
   const [fitType, setFitType] = useState('Oversized Fit');
   const [washInstructions, setWashInstructions] = useState('Cold wash inside out');
   const [productImages, setProductImages] = useState<string[]>(['', '', '', '', '']);
+  const [uploadingSlots, setUploadingSlots] = useState<boolean[]>([false, false, false, false, false]);
 
   // Stock sizes
   const [stockS, setStockS] = useState('10');
@@ -33,18 +34,47 @@ export default function AdminProducts() {
   const [stockXL, setStockXL] = useState('10');
   const [stockXXL, setStockXXL] = useState('5');
 
-  const handleSingleImageUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSingleImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result as string;
+    // Mark slot as uploading
+    setUploadingSlots((prev) => { const s = [...prev]; s[index] = true; return s; });
+
+    try {
+      // Generate unique file path: products/{timestamp}_{filename}
+      const ext = file.name.split('.').pop();
+      const filePath = `products/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, file, { upsert: true, contentType: file.type });
+
+      if (uploadError) throw uploadError;
+
+      // Get the public URL
+      const { data: urlData } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
+
+      const publicUrl = urlData.publicUrl;
       const next = [...productImages];
-      next[index] = base64String;
+      next[index] = publicUrl;
       setProductImages(next);
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('Supabase Storage upload failed, falling back to base64:', err);
+      // Fallback: read as base64 if storage fails
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        const next = [...productImages];
+        next[index] = base64String;
+        setProductImages(next);
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setUploadingSlots((prev) => { const s = [...prev]; s[index] = false; return s; });
+    }
   };
 
   const handleImageUrlChange = (index: number, value: string) => {
@@ -168,6 +198,7 @@ export default function AdminProducts() {
     setFitType('Oversized Fit');
     setWashInstructions('Cold machine wash inside out. Do not iron print.');
     setProductImages(['', '', '', '', '']);
+    setUploadingSlots([false, false, false, false, false]);
     setStockS('10');
     setStockM('15');
     setStockL('20');
@@ -196,6 +227,7 @@ export default function AdminProducts() {
       existingImgs[3] || '',
       existingImgs[4] || '',
     ]);
+    setUploadingSlots([false, false, false, false, false]);
 
     // Set stock values from sizes array
     const getQty = (sz: string) => {
@@ -600,19 +632,25 @@ export default function AdminProducts() {
                   <div key={idx} className="space-y-1.5 p-2.5 bg-white border border-stone-200 rounded-sm">
                     <label className="text-[9px] text-stone-700 font-bold uppercase tracking-wider block">{label}</label>
                     <div className="flex items-center space-x-3">
-                      {productImages[idx] ? (
+                      {/* Image preview / upload state slot */}
+                      {uploadingSlots[idx] ? (
+                        <div className="w-14 h-16 bg-stone-100 border border-stone-200 rounded-sm flex items-center justify-center flex-shrink-0">
+                          <Loader2 className="h-5 w-5 text-stone-500 animate-spin" />
+                        </div>
+                      ) : productImages[idx] ? (
                         <div className="relative w-14 h-16 bg-stone-100 border border-stone-200 rounded-sm overflow-hidden flex-shrink-0 shadow-xs">
                           <img src={productImages[idx]} alt={`Photo ${idx + 1}`} className="object-cover w-full h-full" />
                           <button
                             type="button"
                             onClick={() => handleRemoveImage(idx)}
-                            className="absolute top-0.5 right-0.5 bg-red-650 text-white rounded-full p-0.5 shadow-sm hover:opacity-90 transition-opacity"
+                            className="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full p-0.5 shadow-sm hover:opacity-90 transition-opacity"
                           >
                             <X className="h-3 w-3" />
                           </button>
                         </div>
                       ) : (
-                        <div className="w-14 h-16 border border-dashed border-stone-300 rounded-sm flex flex-col items-center justify-center text-stone-400 flex-shrink-0 text-[9px] font-bold">
+                        <div className="w-14 h-16 border border-dashed border-stone-300 rounded-sm flex flex-col items-center justify-center text-stone-400 flex-shrink-0 text-[9px] font-bold gap-1">
+                          <Upload className="h-3.5 w-3.5" />
                           <span>Slot {idx + 1}</span>
                         </div>
                       )}
@@ -620,8 +658,9 @@ export default function AdminProducts() {
                         <input
                           type="file"
                           accept="image/*"
+                          disabled={uploadingSlots[idx]}
                           onChange={(e) => handleSingleImageUpload(idx, e)}
-                          className="w-full text-[11px] text-stone-500 file:mr-2 file:py-0.5 file:px-2 file:rounded-sm file:border-0 file:text-[9px] file:font-bold file:uppercase file:bg-stone-950 file:text-white hover:file:opacity-90"
+                          className="w-full text-[11px] text-stone-500 file:mr-2 file:py-0.5 file:px-2 file:rounded-sm file:border-0 file:text-[9px] file:font-bold file:uppercase file:bg-stone-950 file:text-white hover:file:opacity-90 disabled:opacity-50"
                         />
                         <input
                           type="text"
