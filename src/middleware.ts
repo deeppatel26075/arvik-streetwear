@@ -3,20 +3,21 @@ import { NextResponse, type NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  // Define protected path matches
   const isAdminPath = path.startsWith('/admin');
   const isProfilePath = path.startsWith('/profile');
 
-  // Retrieve Supabase token from cookies
-  const hasSession = request.cookies.has('sb-access-token') || 
-                      request.cookies.has('supabase-auth-token') ||
-                      request.cookies.getAll().some(c => c.name.includes('auth-token'));
+  // Check for any Supabase auth cookie (chunked or legacy format)
+  const hasSession =
+    request.cookies.has('sb-access-token') ||
+    request.cookies.has('supabase-auth-token') ||
+    request.cookies.getAll().some((c) => c.name.includes('auth-token')) ||
+    request.cookies.getAll().some((c) => c.name.startsWith('sb-') && c.name.endsWith('-auth-token'));
 
-  // If trying to access profile/admin without any token, redirect to login
-  if ((isProfilePath || isAdminPath) && !hasSession) {
-    // We let the client-side context handle deeper verification,
-    // but redirect immediately if there are no auth cookies at all.
-    return NextResponse.next();
+  // Redirect unauthenticated users away from protected routes
+  if ((isAdminPath || isProfilePath) && !hasSession) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('redirect', path);
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
