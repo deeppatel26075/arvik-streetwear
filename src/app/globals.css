@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FFFFFF;
+  --foreground: #111111;
+}
+
+html {
+  scroll-behavior: smooth;
+  max-width: 100vw;
+  overflow-x: hidden;
+  touch-action: pan-x pan-y !important;
+  overscroll-behavior-x: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow-x: hidden !important;
+  max-width: 100vw;
+  width: 100%;
+  position: relative;
+  touch-action: pan-x pan-y !important;
+  overscroll-behavior-x: none;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent iOS Safari auto-zooming on form input focus */
+@media screen and (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+img {
+  content-visibility: auto;
+}
+
+.font-syne {
+  font-family: var(--font-syne), 'Syne', sans-serif;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Animations with hardware acceleration */
+@keyframes marquee {
+  0% { transform: translate3d(0%, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marquee 25s linear infinite;
+  backface-visibility: hidden;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
