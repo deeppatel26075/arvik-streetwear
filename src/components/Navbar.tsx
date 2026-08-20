@@ -127,7 +127,7 @@ export default function Navbar() {
               </Link>
 
               <Link
-                href={user ? "/profile" : "/login"}
+                href={user ? "/account" : "/login"}
                 className="text-stone-900 hover:opacity-70 transition-opacity p-1"
                 aria-label="Account"
               >

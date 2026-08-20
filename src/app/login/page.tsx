@@ -26,11 +26,11 @@ export default function LoginPage() {
 
   // Redirect if already logged in — role determined by DB, not email
   useEffect(() => {
-    if (!loading && user) {
-      if (profile?.role === 'admin') {
+    if (!loading && user && profile) {
+      if (profile.role === 'admin') {
         router.push('/admin');
       } else {
-        router.push('/profile');
+        router.push('/account');
       }
     }
   }, [user, profile, loading, router]);
@@ -45,29 +45,40 @@ export default function LoginPage() {
 
     try {
       if (isRegister) {
+        if (!fullName.trim()) {
+          setErrorMsg('Please enter your full name.');
+          setAuthLoading(false);
+          return;
+        }
+
         // Real user registration via Supabase Auth
         const { data, error } = await supabase.auth.signUp({
           email: cleanEmail,
           password,
           options: {
             data: {
-              full_name: fullName,
-              phone: phone,
+              full_name: fullName.trim(),
+              phone: phone.trim(),
             },
           },
         });
 
         if (error) throw error;
 
-        // Profile is created automatically by handle_new_user() trigger.
-        // All new users receive 'customer' role — no exceptions.
-        if (data.user) {
-          setSuccessMsg('Account registered! Please check your email to confirm, then sign in.');
+        if (data.session) {
+          // User is automatically logged in (auto-confirm enabled)
+          setSuccessMsg('Account registered successfully! Redirecting...');
+          setTimeout(() => {
+            router.push('/account');
+          }, 800);
+        } else if (data.user) {
+          // Email confirmation is required
+          setSuccessMsg('Account registered! Please check your email to confirm your account, then sign in.');
+          setIsRegister(false);
+          setPassword('');
         }
-        setIsRegister(false);
-        setPassword('');
       } else {
-        // Real sign in via Supabase Auth only — no fallback, no mock
+        // Real sign in via Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
           email: cleanEmail,
           password,
@@ -75,9 +86,20 @@ export default function LoginPage() {
 
         if (authError) throw authError;
 
-        // Role-based redirect: read from DB profile (set by AuthContext via onAuthStateChange)
-        // The redirect happens via the useEffect above once profile loads.
-        // No need to manually redirect here — AuthContext handles it.
+        if (authData.user) {
+          // Fetch role directly for immediate deterministic redirect
+          const { data: prof } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', authData.user.id)
+            .maybeSingle();
+
+          if (prof?.role === 'admin') {
+            router.push('/admin');
+          } else {
+            router.push('/account');
+          }
+        }
       }
     } catch (err: any) {
       console.error('Auth error:', err);
@@ -205,11 +227,6 @@ export default function LoginPage() {
               <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">
                 Password
               </label>
-              {!isRegister && (
-                <a href="#" className="text-[10px] text-stone-400 hover:text-stone-900 underline font-semibold uppercase tracking-wider">
-                  Forgot Password?
-                </a>
-              )}
             </div>
             <div className="relative">
               <input

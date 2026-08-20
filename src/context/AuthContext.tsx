@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { User } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 
 export interface UserProfile {
   id: string;
@@ -32,18 +32,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, retries = 2) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (data && !error) {
         setProfile(data as UserProfile);
+      } else if (retries > 0) {
+        // Retry shortly in case DB trigger is still inserting profile
+        setTimeout(() => fetchProfile(userId, retries - 1), 300);
       } else {
-        // Profile not yet created (e.g. trigger delay) — set minimal profile
         setProfile(null);
       }
     } catch (err) {
@@ -59,42 +61,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    const getInitialSession = async () => {
+    let isMounted = true;
+
+    const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
+        if (session?.user && isMounted) {
           setUser(session.user);
           await fetchProfile(session.user.id);
-        } else {
+        } else if (isMounted) {
           setUser(null);
           setProfile(null);
         }
       } catch (err) {
         console.error('Error getting initial session:', err);
-        setUser(null);
-        setProfile(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getInitialSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setLoading(true);
-        if (session?.user) {
-          setUser(session.user);
-          await fetchProfile(session.user.id);
-        } else {
+        if (isMounted) {
           setUser(null);
           setProfile(null);
         }
-        setLoading(false);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    initializeAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session: Session | null) => {
+        if (session?.user && isMounted) {
+          setUser(session.user);
+          await fetchProfile(session.user.id);
+        } else if (isMounted) {
+          setUser(null);
+          setProfile(null);
+        }
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     );
 
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -112,8 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // isAdmin is derived EXCLUSIVELY from the authoritative database role.
-  // No email-based checks. No localStorage sessions.
+  // isAdmin is derived EXCLUSIVELY from the authoritative database role in profiles table.
   const isAdmin = profile?.role === 'admin';
 
   return (
