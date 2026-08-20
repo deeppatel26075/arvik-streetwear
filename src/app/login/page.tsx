@@ -8,7 +8,7 @@ import { ArrowRight, Lock, Mail, User, Phone } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, profile, loading, signInMock } = useAuth();
+  const { user, profile, loading } = useAuth();
 
   // Tab state
   const [isRegister, setIsRegister] = useState(false);
@@ -24,7 +24,7 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // Redirect if already logged in
+  // Redirect if already logged in — role determined by DB, not email
   useEffect(() => {
     if (!loading && user) {
       if (profile?.role === 'admin') {
@@ -42,11 +42,10 @@ export default function LoginPage() {
     setAuthLoading(true);
 
     const cleanEmail = email.toLowerCase().trim();
-    const isAdminAccount = cleanEmail === 'rishipatel1610@gmail.com';
 
     try {
       if (isRegister) {
-        // Real user registration
+        // Real user registration via Supabase Auth
         const { data, error } = await supabase.auth.signUp({
           email: cleanEmail,
           password,
@@ -60,66 +59,25 @@ export default function LoginPage() {
 
         if (error) throw error;
 
-        // Automatically create or update profile
+        // Profile is created automatically by handle_new_user() trigger.
+        // All new users receive 'customer' role — no exceptions.
         if (data.user) {
-          await supabase.from('profiles').upsert({
-            id: data.user.id,
-            full_name: fullName || (isAdminAccount ? 'Rishi Patel' : 'Customer'),
-            phone: phone || '',
-            role: isAdminAccount ? 'admin' : 'customer',
-          });
+          setSuccessMsg('Account registered! Please check your email to confirm, then sign in.');
         }
-        
-        setSuccessMsg('Account registered successfully! You can now sign in with your credentials.');
         setIsRegister(false);
         setPassword('');
       } else {
-        // Real user sign in
-        let authUser = null;
-        let authError = null;
+        // Real sign in via Supabase Auth only — no fallback, no mock
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password,
+        });
 
-        try {
-          const { data: authData, error: sbError } = await supabase.auth.signInWithPassword({
-            email: cleanEmail,
-            password,
-          });
-          if (sbError) {
-            authError = sbError;
-          } else {
-            authUser = authData.user;
-          }
-        } catch (sbErr: any) {
-          authError = sbErr;
-        }
+        if (authError) throw authError;
 
-        // If Supabase auth error occurs but credentials match designated admin (Rishi Patel)
-        if (!authUser && isAdminAccount && password === 'Rishi1610') {
-          signInMock('rishipatel1610@gmail.com');
-          router.push('/admin');
-          return;
-        }
-
-        if (authError && !authUser) {
-          throw authError;
-        }
-
-        // Fetch user profile role
-        let role = isAdminAccount ? 'admin' : 'customer';
-        if (authUser) {
-          const { data: prof } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', authUser.id)
-            .single();
-
-          if (prof?.role) role = prof.role;
-        }
-
-        if (role === 'admin' || isAdminAccount) {
-          router.push('/admin');
-        } else {
-          router.push('/profile');
-        }
+        // Role-based redirect: read from DB profile (set by AuthContext via onAuthStateChange)
+        // The redirect happens via the useEffect above once profile loads.
+        // No need to manually redirect here — AuthContext handles it.
       }
     } catch (err: any) {
       console.error('Auth error:', err);
@@ -194,7 +152,7 @@ export default function LoginPage() {
                   <input
                     type="text"
                     required
-                    placeholder="Karan Malhotra"
+                    placeholder="Your Full Name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full bg-stone-50 border border-stone-200 px-4 py-3 pl-10 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
@@ -232,7 +190,7 @@ export default function LoginPage() {
               <input
                 type="email"
                 required
-                placeholder="customer@arviik.com"
+                placeholder="customer@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-stone-50 border border-stone-200 px-4 py-3 pl-10 text-xs focus:outline-none focus:border-stone-900 rounded-sm"

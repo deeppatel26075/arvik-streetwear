@@ -13,43 +13,15 @@ export default function AdminOrders() {
   const loadOrders = async () => {
     try {
       setLoading(true);
-      
-      // Load local orders for offline/local prototype mode
-      let localOrdersList: any[] = [];
-      try {
-        const stored = localStorage.getItem('arviik_custom_orders');
-        if (stored) {
-          localOrdersList = JSON.parse(stored);
-        }
-      } catch (e) {
-        console.error('Failed to load local orders:', e);
-      }
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*, order_items(*, products(name))')
+        .order('created_at', { ascending: false });
 
-      let dbOrders: any[] = [];
-      try {
-        const { data, error } = await supabase
-          .from('orders')
-          .select('*, order_items(*, products(name))')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error(error);
-        } else if (data) {
-          dbOrders = data;
-        }
-      } catch (dbErr) {
-        console.warn('Supabase orders fetch skipped/failed, using local/mock orders:', dbErr);
-      }
-
-      // Combine both lists (local first, then DB)
-      const combined = [...localOrdersList, ...dbOrders];
-
-      // Set loaded orders list
-      setOrders(combined);
-      // Clean stale mock orders from localStorage if any exist
-      if (localOrdersList.some(o => o.id === 'ORD-89472' || o.id === 'ORD-89469' || o.id === 'ORD-89468')) {
-        const cleaned = localOrdersList.filter(o => o.id !== 'ORD-89472' && o.id !== 'ORD-89469' && o.id !== 'ORD-89468');
-        localStorage.setItem('arviik_custom_orders', JSON.stringify(cleaned));
+      if (error) {
+        console.error('Failed to load orders:', error);
+      } else {
+        setOrders(data || []);
       }
     } catch (e) {
       console.error(e);
@@ -63,33 +35,19 @@ export default function AdminOrders() {
   }, []);
 
   const updateStatus = async (orderId: string, newStatus: string) => {
-    try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: newStatus })
-        .eq('id', orderId);
+    const { error } = await supabase
+      .from('orders')
+      .update({ status: newStatus })
+      .eq('id', orderId);
 
-      if (error) throw error;
-    } catch (e) {
-      console.warn('Supabase status update skipped/failed, applying locally:', e);
+    if (error) {
+      alert('Failed to update order status: ' + error.message);
+      return;
     }
 
-    // Update state
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
     if (selectedOrder && selectedOrder.id === orderId) {
       setSelectedOrder((prev: any) => ({ ...prev, status: newStatus }));
-    }
-
-    // Sync with local storage
-    try {
-      const stored = localStorage.getItem('arviik_custom_orders');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        const updated = parsed.map((o: any) => o.id === orderId ? { ...o, status: newStatus } : o);
-        localStorage.setItem('arviik_custom_orders', JSON.stringify(updated));
-      }
-    } catch (err) {
-      console.error('Failed to update local order cache status:', err);
     }
   };
 

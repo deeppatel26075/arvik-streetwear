@@ -3,18 +3,31 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { ChevronRight, LogOut, LayoutDashboard, ShoppingBag, Heart, MapPin, User } from 'lucide-react';
 
 export default function AccountPage() {
   const router = useRouter();
   const { user, profile, loading, signOut } = useAuth();
+  const [orders, setOrders] = React.useState<any[]>([]);
 
   // Redirect to login if unauthenticated
   React.useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
+    } else if (user) {
+      fetchOrders();
     }
   }, [user, loading, router]);
+
+  async function fetchOrders() {
+    const { data } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('user_id', user?.id)
+      .order('created_at', { ascending: false });
+    if (data) setOrders(data);
+  }
 
   if (loading) {
     return (
@@ -30,10 +43,10 @@ export default function AccountPage() {
 
   const menuItems = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/account' },
-    { label: 'Orders', icon: ShoppingBag, path: '/account' },
+    { label: 'Orders', icon: ShoppingBag, path: '/account/orders' },
     { label: 'Wishlist', icon: Heart, path: '/wishlist' },
-    { label: 'Addresses', icon: MapPin, path: '/account' },
-    { label: 'Account Details', icon: User, path: '/account' },
+    { label: 'Addresses', icon: MapPin, path: '/account/addresses' },
+    { label: 'Account Details', icon: User, path: '/account/details' },
   ];
 
   const displayName = profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Customer';
@@ -94,6 +107,22 @@ export default function AccountPage() {
           <ChevronRight className="h-4 w-4 text-[#666666]" />
         </button>
       </div>
+
+      {orders.length > 0 && (
+        <div className="pt-6">
+          <h2 className="font-bold text-[10px] uppercase tracking-widest text-[#666666] mb-4">
+            RECENT ORDERS
+          </h2>
+          <div className="space-y-2">
+            {orders.slice(0, 3).map((order) => (
+              <div key={order.id} className="p-4 border border-[#ECECEC] rounded-[10px] text-xs flex justify-between items-center">
+                <span className="font-medium text-[#111111]">#{order.id.slice(0, 8)}</span>
+                <span className="text-[#666666]">{new Date(order.created_at).toLocaleDateString()}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

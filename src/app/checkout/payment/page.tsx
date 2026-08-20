@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { formatPrice } from '@/lib/utils';
-import { ArrowLeft, Check, Lock, CreditCard, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowLeft, Check, Lock, CreditCard, ShieldCheck, Zap, ShoppingBag } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface ShippingDetails {
@@ -60,97 +61,135 @@ export default function CheckoutPaymentPage() {
   };
 
   if (cart.length === 0) {
-    return null;
+    return (
+      <div className="max-w-md mx-auto px-4 py-24 text-center space-y-5">
+        <div className="w-16 h-16 bg-stone-100 border border-stone-200 rounded-full flex items-center justify-center mx-auto text-stone-400">
+          <ShoppingBag className="h-8 w-8" />
+        </div>
+        <h1 className="font-syne font-extrabold text-xl uppercase tracking-wider text-stone-900">Your Cart is Empty</h1>
+        <Link href="/shop" className="inline-block bg-stone-950 text-white text-xs font-bold uppercase tracking-widest px-8 py-3.5 rounded-xs shadow-md hover:bg-stone-900 transition-all">
+          Explore Collection
+        </Link>
+      </div>
+    );
   }
+
+  /**
+   * Gets the current user's Supabase JWT for server-side API calls.
+   * Returns null if user is not authenticated.
+   */
+  const getUserJwt = async (): Promise<string | null> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token ?? null;
+  };
 
   const handlePlaceOrder = async () => {
     if (!shipping) return;
     setErrorMsg(null);
     setLoading(true);
 
-    const totalAmount = getCartTotal();
-
     try {
-      // 1. CASH ON DELIVERY (COD) FLOW
-      if (paymentMethod === 'cod') {
-        const orderId = `ARVIIK${Math.floor(100000 + Math.random() * 900000)}`;
-
-        const localOrder = {
-          id: orderId,
-          created_at: new Date().toISOString(),
-          shipping_name: shipping.name,
-          shipping_email: shipping.email,
-          shipping_phone: shipping.phone,
-          shipping_address: shipping.address,
-          shipping_city: shipping.city,
-          shipping_state: shipping.state,
-          shipping_pincode: shipping.pincode,
-          total_amount: totalAmount,
-          status: 'pending',
-          payment_method: 'COD',
-          order_items: cart.map(item => ({
-            size: item.size,
-            quantity: item.quantity,
-            price: item.discountPrice || item.price,
-            products: { name: item.name }
-          }))
-        };
-
-        const existingOrders = JSON.parse(localStorage.getItem('arviik_custom_orders') || '[]');
-        localStorage.setItem('arviik_custom_orders', JSON.stringify([localOrder, ...existingOrders]));
-
-        clearCart();
-        localStorage.removeItem('arviik_shipping');
-
-        confetti({
-          particleCount: 150,
-          spread: 80,
-          origin: { y: 0.6 },
-        });
-
-        router.push(`/checkout/success?orderId=${orderId}&email=${shipping.email}&total=${totalAmount}`);
+      // Require authentication for all order types
+      const jwt = await getUserJwt();
+      if (!jwt) {
+        setErrorMsg('You must be logged in to place an order. Please sign in and try again.');
+        setLoading(false);
         return;
       }
 
-      // 2. RAZORPAY ONLINE PAYMENT FLOW
+      // Build items array — only include safe fields (no client-side price)
+      const orderItems = cart.map(item => ({
+        productId: item.productId,
+        size:      item.size,
+        quantity:  item.quantity,
+        // price is intentionally omitted — server fetches authoritative price
+      }));
+
+      const shippingDetails = {
+        name:     shipping.name,
+        email:    shipping.email,
+        phone:    shipping.phone,
+        address:  `${shipping.address}${shipping.apartment ? ', ' + shipping.apartment : ''}`,
+        city:     shipping.city,
+        state:    shipping.state,
+        pincode:  shipping.pincode,
+      };
+
+      // ── COD FLOW ────────────────────────────────────────────────────────────
+      if (paymentMethod === 'cod') {
+        const res = await fetch('/api/place-cod-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwt}`,
+          },
+          body: JSON.stringify({
+            shipping: shippingDetails,
+            items:    orderItems,
+            couponCode: coupon?.code || null,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.orderId) {
+          setErrorMsg(data.error || 'Failed to place your COD order. Please try again.');
+          setLoading(false);
+          return;
+        }
+
+        // Real order created in database — proceed to success
+        clearCart();
+        localStorage.removeItem('arviik_shipping');
+        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+        router.push(`/checkout/success?orderId=${data.orderId}&email=${encodeURIComponent(shipping.email)}&total=${data.total}`);
+        return;
+      }
+
+      // ── RAZORPAY FLOW ────────────────────────────────────────────────────────
       const isScriptLoaded = await loadRazorpayScript();
       if (!isScriptLoaded) {
         throw new Error('Razorpay SDK failed to load. Please check your internet connection.');
       }
 
-      // Call backend route to generate Razorpay Order ID
-      let razorpayOrderId = null;
-      try {
-        const res = await fetch('/api/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: totalAmount,
-            currency: 'INR',
-          }),
-        });
+      // Call backend to generate Razorpay Order ID
+      const checkoutRes = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount:   getCartTotal(),
+          currency: 'INR',
+        }),
+      });
 
-        const data = await res.json();
-        if (data.id) {
-          razorpayOrderId = data.id;
-        }
-      } catch (err) {
-        console.warn('API checkout order creation fallback:', err);
+      if (!checkoutRes.ok) {
+        const errData = await checkoutRes.json();
+        throw new Error(errData.error || 'Failed to create Razorpay order.');
       }
 
-      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_TKVDXSP0EuD5RL';
+      const checkoutData = await checkoutRes.json();
+      const razorpayOrderId = checkoutData.id;
+
+      if (!razorpayOrderId) {
+        throw new Error('Invalid response from payment gateway.');
+      }
+
+      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      if (!razorpayKey) {
+        throw new Error('Payment gateway is not configured.');
+      }
 
       const options: any = {
-        key: razorpayKey,
-        amount: Math.round(totalAmount * 100), // in paise
-        currency: 'INR',
-        name: 'ARVIIK STREETWEAR',
+        key:         razorpayKey,
+        amount:      Math.round(getCartTotal() * 100),
+        currency:    'INR',
+        name:        'ARVIIK STREETWEAR',
         description: 'Payment for Streetwear Order',
-        image: '/arviik-logo.png',
-        order_id: razorpayOrderId || undefined,
+        image:       '/arviik-logo.png',
+        order_id:    razorpayOrderId,
         prefill: {
-          name: shipping.name,
-          email: shipping.email,
+          name:    shipping.name,
+          email:   shipping.email,
           contact: shipping.phone,
         },
         theme: {
@@ -159,64 +198,42 @@ export default function CheckoutPaymentPage() {
         handler: async function (response: any) {
           setLoading(true);
           try {
-            // Verify signature backend call
+            // Verify signature on server — signature must be real and verified
+            if (!response.razorpay_payment_id || !response.razorpay_order_id || !response.razorpay_signature) {
+              throw new Error('Incomplete payment response received.');
+            }
+
             const verifyRes = await fetch('/api/verify', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${jwt}`,
+              },
               body: JSON.stringify({
-                razorpay_payment_id: response.razorpay_payment_id || `pay_mock_${Date.now()}`,
-                razorpay_order_id: response.razorpay_order_id || razorpayOrderId || `order_mock_${Date.now()}`,
-                razorpay_signature: response.razorpay_signature || 'mock_signature',
-                shipping,
-                items: cart,
-                total: totalAmount,
-                couponId: coupon?.code,
-                userId: user?.id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id:   response.razorpay_order_id,
+                razorpay_signature:  response.razorpay_signature,
+                shipping: shippingDetails,
+                items:    orderItems,
+                couponCode: coupon?.code || null,
+                // total intentionally omitted — server calculates from DB prices
               }),
             });
 
             const verifyData = await verifyRes.json();
-            const finalOrderId = verifyData.orderId || `ARVIIK${Math.floor(100000 + Math.random() * 900000)}`;
 
-            // Save order locally for immediate dashboard display
-            const localOrder = {
-              id: finalOrderId,
-              created_at: new Date().toISOString(),
-              shipping_name: shipping.name,
-              shipping_email: shipping.email,
-              shipping_phone: shipping.phone,
-              shipping_address: shipping.address,
-              shipping_city: shipping.city,
-              shipping_state: shipping.state,
-              shipping_pincode: shipping.pincode,
-              total_amount: totalAmount,
-              status: 'pending',
-              payment_method: 'Razorpay Online',
-              razorpay_payment_id: response.razorpay_payment_id,
-              order_items: cart.map(item => ({
-                size: item.size,
-                quantity: item.quantity,
-                price: item.discountPrice || item.price,
-                products: { name: item.name }
-              }))
-            };
+            if (!verifyRes.ok || !verifyData.orderId) {
+              throw new Error(verifyData.error || 'Payment verification failed.');
+            }
 
-            const existingOrders = JSON.parse(localStorage.getItem('arviik_custom_orders') || '[]');
-            localStorage.setItem('arviik_custom_orders', JSON.stringify([localOrder, ...existingOrders]));
-
+            // Real order confirmed in database
             clearCart();
             localStorage.removeItem('arviik_shipping');
-
-            confetti({
-              particleCount: 150,
-              spread: 80,
-              origin: { y: 0.6 },
-            });
-
-            router.push(`/checkout/success?orderId=${finalOrderId}&email=${shipping.email}&total=${totalAmount}`);
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+            router.push(`/checkout/success?orderId=${verifyData.orderId}&email=${shipping.email}&total=${verifyData.total}`);
           } catch (verifyError: any) {
             console.error('Verification error:', verifyError);
-            setErrorMsg(verifyError.message || 'Payment verification failed.');
+            setErrorMsg(verifyError.message || 'Payment verification failed. Please contact support.');
           } finally {
             setLoading(false);
           }
@@ -231,7 +248,7 @@ export default function CheckoutPaymentPage() {
       const razorpayInstance = new (window as any).Razorpay(options);
       razorpayInstance.on('payment.failed', function (response: any) {
         console.error('Razorpay Payment Failed:', response.error);
-        setErrorMsg(`Payment failed: ${response.error.description || 'Transaction cancelled.'}`);
+        setErrorMsg(`Payment failed: ${response.error.description || 'Transaction declined.'}`);
         setLoading(false);
       });
 
@@ -377,6 +394,13 @@ export default function CheckoutPaymentPage() {
               </label>
             </div>
 
+            {!user && (
+              <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xs text-[11px] text-amber-800 font-bold uppercase tracking-wider">
+                ⚠️ You must be signed in to place an order.{' '}
+                <Link href="/login" className="underline">Sign in here</Link>.
+              </div>
+            )}
+
             {errorMsg && (
               <div className="p-3.5 bg-red-50 border border-red-200 rounded-xs text-[11px] text-red-800 font-bold uppercase tracking-wider">
                 ⚠️ {errorMsg}
@@ -385,15 +409,15 @@ export default function CheckoutPaymentPage() {
 
             <button
               onClick={handlePlaceOrder}
-              disabled={loading}
+              disabled={loading || !user}
               className="w-full bg-stone-950 hover:bg-stone-900 text-white font-extrabold text-xs tracking-widest uppercase py-4 rounded-xs shadow-md transition-all flex items-center justify-center space-x-2 disabled:opacity-50 mt-4"
             >
               <span>
                 {loading
                   ? 'Processing Order...'
                   : paymentMethod === 'razorpay'
-                  ? `PAY ${formatPrice(getCartTotal())} VIA RAZORPAY`
-                  : `PLACE COD ORDER (${formatPrice(getCartTotal())})`}
+                  ? `PAY VIA RAZORPAY`
+                  : `PLACE COD ORDER`}
               </span>
             </button>
           </div>
@@ -454,9 +478,12 @@ export default function CheckoutPaymentPage() {
                 <span className="text-emerald-700 font-bold uppercase tracking-wider">FREE</span>
               </div>
               <div className="flex justify-between text-base font-extrabold text-stone-950 pt-1">
-                <span>Total Amount</span>
+                <span>Estimated Total</span>
                 <span className="font-mono">{formatPrice(getCartTotal())}</span>
               </div>
+              <p className="text-[9px] text-stone-400 font-medium">
+                * Final amount is calculated server-side from verified prices.
+              </p>
             </div>
           </div>
         </div>

@@ -1,160 +1,165 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 
+/**
+ * POST /api/verify
+ *
+ * Verifies a Razorpay payment HMAC signature, then creates the order
+ * atomically in the database via place_order() SECURITY DEFINER function.
+ *
+ * Security guarantees:
+ * - Signature MUST pass HMAC-SHA256 verification. No bypass conditions.
+ * - Prices are calculated server-side by place_order(). Client total is ignored.
+ * - Order is only created on real signature verification success.
+ * - User must be authenticated (JWT passed in Authorization header from client).
+ */
 export async function POST(request: Request) {
   try {
+    const body = await request.json();
+
     const {
       razorpay_payment_id,
       razorpay_order_id,
       razorpay_signature,
       shipping,
       items,
-      total,
-      couponId,
-      userId,
-    } = await request.json();
+      couponCode,
+    } = body;
 
-    // 1. Signature Verification
-    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'JfoiYCtlva3SX1q1lcGOHY3Q';
-    
-    // Create text combination
+    // ── 1. Validate required fields ──────────────────────────────────────────
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      return NextResponse.json(
+        { error: 'Missing Razorpay payment fields.' },
+        { status: 400 }
+      );
+    }
+
+    if (!shipping || !items || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json(
+        { error: 'Missing order data.' },
+        { status: 400 }
+      );
+    }
+
+    // ── 2. Verify Razorpay HMAC Signature ────────────────────────────────────
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!key_secret) {
+      console.error('RAZORPAY_KEY_SECRET environment variable is not set.');
+      return NextResponse.json(
+        { error: 'Payment gateway is not configured.' },
+        { status: 503 }
+      );
+    }
+
     const text = `${razorpay_order_id}|${razorpay_payment_id}`;
-    
-    // Generate HMAC hex digest
     const generated_signature = crypto
       .createHmac('sha256', key_secret)
       .update(text)
       .digest('hex');
 
-    const isVerified = generated_signature === razorpay_signature;
+    // Strict constant-time comparison — NO bypass conditions whatsoever
+    const isVerified =
+      generated_signature.length === razorpay_signature.length &&
+      crypto.timingSafeEqual(
+        Buffer.from(generated_signature, 'hex'),
+        Buffer.from(razorpay_signature, 'hex')
+      );
 
-    // Check if it's test mode or mock key signature (for seamless customer checkout)
-    const isMock = key_secret === 'mockkeysecret456' || razorpay_signature === 'mock_signature' || key_secret === 'JfoiYCtlva3SX1q1lcGOHY3Q';
-
-    if (!isVerified && !isMock) {
-      console.warn('Signature verification mismatch, accepting test transaction safely.');
+    if (!isVerified) {
+      console.warn('Razorpay signature verification FAILED for order:', razorpay_order_id);
+      return NextResponse.json(
+        { error: 'Payment signature verification failed. This payment cannot be accepted.' },
+        { status: 400 }
+      );
     }
 
-    // 2. Insert into Database
-    let coupon_db_id = null;
-
-    // If coupon was used, verify and log it
-    if (couponId) {
-      const { data: couponData } = await supabase
-        .from('coupons')
-        .select('id, times_used')
-        .eq('code', couponId.toUpperCase())
-        .single();
-      
-      if (couponData) {
-        coupon_db_id = couponData.id;
-        // Increment coupon count
-        await supabase
-          .from('coupons')
-          .update({ times_used: couponData.times_used + 1 })
-          .eq('id', couponData.id);
-      }
+    // ── 3. Get user's auth token from request header ──────────────────────────
+    // The client must send its Supabase session JWT in Authorization header
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Authentication required to place an order.' },
+        { status: 401 }
+      );
     }
 
-    // Insert order entry
-    const { data: orderData, error: orderError } = await supabase
-      .from('orders')
-      .insert({
-        user_id: userId || null,
-        status: 'pending',
-        total_amount: total,
-        coupon_id: coupon_db_id,
-        shipping_name: shipping.name,
-        shipping_email: shipping.email,
-        shipping_phone: shipping.phone,
-        shipping_address: shipping.address,
-        shipping_city: shipping.city,
-        shipping_state: shipping.state,
-        shipping_pincode: shipping.pincode,
-      })
-      .select('id')
-      .single();
+    const userJwt = authHeader.replace('Bearer ', '');
 
-    if (orderError || !orderData) {
-      console.error('Error recording order in database:', orderError);
-      // Even if database logs error, we might be in demo mode. Let's return mock order ID in demo mode.
-      if (isMock) {
-        const mockOrderId = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
-        return NextResponse.json({
-          message: 'Mock payment verified & order recorded (demo mode)',
-          orderId: mockOrderId,
-        });
-      }
-      return NextResponse.json({ error: 'Failed to create order record' }, { status: 500 });
+    // ── 4. Create Supabase client with user's JWT ─────────────────────────────
+    // This ensures place_order() runs with auth.uid() = the real user
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error('Supabase environment variables are not configured.');
+      return NextResponse.json(
+        { error: 'Database is not configured.' },
+        { status: 503 }
+      );
     }
 
-    const orderId = orderData.id;
-
-    // Insert order items & decrement inventory
-    for (const item of items) {
-      // 1. Insert order item
-      await supabase.from('order_items').insert({
-        order_id: orderId,
-        product_id: item.productId,
-        size: item.size,
-        quantity: item.quantity,
-        price: item.discountPrice || item.price,
-      });
-
-      // 2. Decrement inventory stock
-      // Retrieve current quantity
-      const { data: invData } = await supabase
-        .from('inventory')
-        .select('quantity')
-        .eq('product_id', item.productId)
-        .eq('size', item.size)
-        .single();
-      
-      if (invData) {
-        const newQty = Math.max(0, invData.quantity - item.quantity);
-        await supabase
-          .from('inventory')
-          .update({ quantity: newQty })
-          .eq('product_id', item.productId)
-          .eq('size', item.size);
-      }
-    }
-
-    // Insert payment record
-    await supabase.from('payments').insert({
-      order_id: orderId,
-      provider: 'razorpay',
-      transaction_id: razorpay_payment_id,
-      signature: razorpay_signature,
-      amount: total,
-      status: 'success',
+    const supabaseUser = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${userJwt}` } },
     });
 
-    // Mock send confirmation email
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: shipping.email,
-          name: shipping.name,
-          orderId,
-          total,
-        }),
-      });
-    } catch (e) {
-      console.error('Error calling mock email handler:', e);
+    // Verify the JWT is valid and get user
+    const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: 'Invalid or expired session. Please log in again.' },
+        { status: 401 }
+      );
     }
 
+    // ── 5. Call place_order() — ALL prices calculated server-side ────────────
+    // The client items array only contains: { product_id, size, quantity }
+    // Prices are fetched from the database inside place_order().
+    const orderItems = items.map((item: any) => ({
+      product_id: item.productId,
+      size:       item.size,
+      quantity:   item.quantity,
+      // Note: price is intentionally NOT passed — place_order() fetches it from DB
+    }));
+
+    const { data: orderResult, error: orderError } = await supabaseUser.rpc('place_order', {
+      p_items:              orderItems,
+      p_shipping_name:      shipping.name,
+      p_shipping_email:     shipping.email,
+      p_shipping_phone:     shipping.phone,
+      p_shipping_address:   shipping.address,
+      p_shipping_city:      shipping.city,
+      p_shipping_state:     shipping.state,
+      p_shipping_pincode:   shipping.pincode,
+      p_coupon_code:        couponCode || null,
+      p_payment_method:     'razorpay',
+      p_razorpay_payment_id: razorpay_payment_id,
+      p_razorpay_order_id:   razorpay_order_id,
+      p_razorpay_signature:  razorpay_signature,
+    });
+
+    if (orderError || !orderResult?.order_id) {
+      console.error('place_order() error:', orderError);
+      return NextResponse.json(
+        { error: orderError?.message || 'Failed to create order. Please contact support.' },
+        { status: 500 }
+      );
+    }
+
+    // ── 6. Return real database order ID ─────────────────────────────────────
     return NextResponse.json({
-      message: 'Payment verified & order recorded successfully',
-      orderId,
+      message:  'Payment verified and order created successfully.',
+      orderId:  orderResult.order_id,
+      total:    orderResult.total,
+      subtotal: orderResult.subtotal,
+      discount: orderResult.discount,
     });
+
   } catch (error: any) {
     console.error('Payment verification error:', error);
     return NextResponse.json(
-      { error: error.message || 'Signature verification failed' },
+      { error: error.message || 'An unexpected error occurred.' },
       { status: 500 }
     );
   }

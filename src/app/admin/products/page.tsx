@@ -1,15 +1,16 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { formatPrice } from '@/lib/utils';
-import { MOCK_PRODUCTS } from '@/app/page';
-import { Plus, Edit2, Trash2, Check, Eye, EyeOff, Star, X, RefreshCw, Upload, Loader2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, EyeOff, Star, X, RefreshCw, Upload, Loader2, AlertCircle } from 'lucide-react';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Form states
   const [formOpen, setFormOpen] = useState(false);
@@ -23,7 +24,7 @@ export default function AdminProducts() {
   const [fabric, setFabric] = useState('100% Premium Cotton');
   const [gsm, setGsm] = useState('240 GSM');
   const [fitType, setFitType] = useState('Oversized Fit');
-  const [washInstructions, setWashInstructions] = useState('Cold wash inside out');
+  const [washInstructions, setWashInstructions] = useState('Cold machine wash inside out. Do not iron directly on print.');
   const [productImages, setProductImages] = useState<string[]>(['', '', '', '', '']);
   const [uploadingSlots, setUploadingSlots] = useState<boolean[]>([false, false, false, false, false]);
 
@@ -38,11 +39,9 @@ export default function AdminProducts() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Mark slot as uploading
     setUploadingSlots((prev) => { const s = [...prev]; s[index] = true; return s; });
 
     try {
-      // Generate unique file path: products/{timestamp}_{filename}
       const ext = file.name.split('.').pop();
       const filePath = `products/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
 
@@ -52,26 +51,13 @@ export default function AdminProducts() {
 
       if (uploadError) throw uploadError;
 
-      // Get the public URL
-      const { data: urlData } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-      const publicUrl = urlData.publicUrl;
+      const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(filePath);
       const next = [...productImages];
-      next[index] = publicUrl;
+      next[index] = urlData.publicUrl;
       setProductImages(next);
     } catch (err) {
-      console.error('Supabase Storage upload failed, falling back to base64:', err);
-      // Fallback: read as base64 if storage fails
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        const next = [...productImages];
-        next[index] = base64String;
-        setProductImages(next);
-      };
-      reader.readAsDataURL(file);
+      console.error('Image upload failed:', err);
+      setSaveError('Image upload failed. Please try again.');
     } finally {
       setUploadingSlots((prev) => { const s = [...prev]; s[index] = false; return s; });
     }
@@ -89,114 +75,52 @@ export default function AdminProducts() {
     setProductImages(next);
   };
 
-  // Load products & categories
-  const loadData = async () => {
+  // Always load fresh from Supabase — no localStorage
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
 
-      // Check categories
-      let loadedCats: any[] = [];
-      const defaultCategories = [
-        { id: 'cat-limited-edition', name: 'Limited Edition', slug: 'limited-edition' },
-        { id: 'cat-on-fire', name: 'On Fire', slug: 'on-fire' },
-        { id: 'cat-graphic-tee', name: 'Graphic Tee', slug: 'graphic-tee' },
-        { id: 'cat-psychology-edition', name: 'Psychology Edition', slug: 'psychology-edition' }
-      ];
+      const [{ data: cats }, { data: prods }] = await Promise.all([
+        supabase.from('categories').select('*').order('name'),
+        supabase
+          .from('products')
+          .select('*, category:categories(name), product_images(image_url, display_order), inventory(size, quantity)')
+          .order('created_at', { ascending: false }),
+      ]);
 
-      const storedCats = localStorage.getItem('arviik_custom_categories');
-      if (storedCats) {
-        loadedCats = JSON.parse(storedCats);
-      } else {
-        try {
-          const { data: cats } = await supabase.from('categories').select('*');
-          if (cats && cats.length > 0) {
-            loadedCats = cats;
-          }
-        } catch (catErr) {
-          console.error('Failed to load DB categories:', catErr);
-        }
-      }
-
-      // Merge default categories if any are missing
-      for (const defCat of defaultCategories) {
-        if (!loadedCats.some((c: any) => c.slug === defCat.slug || c.name.toLowerCase() === defCat.name.toLowerCase())) {
-          loadedCats.push(defCat);
-        }
-      }
-      localStorage.setItem('arviik_custom_categories', JSON.stringify(loadedCats));
-      setCategories(loadedCats);
-
-      // Check products
-      let loadedProds = [];
-      const storedProds = localStorage.getItem('arviik_custom_products');
-      if (storedProds) {
-        const parsed = JSON.parse(storedProds);
-        const hasOldMocks = parsed.some((p: any) => p.name === 'ARCHIVE-01 GRAPHIC TEE' || p.name === 'ESSENTIALS LOGO TEE');
-        if (hasOldMocks) {
-          loadedProds = MOCK_PRODUCTS.map((p: any) => ({
-            ...p,
-            categoryName: typeof p.category === 'object' ? p.category?.name : (p.category || 'Limited Edition'),
-            images: p.product_images?.map((img: any) => img.image_url) || [],
-            sizes: p.inventory || [{ size: 'S', quantity: 10 }, { size: 'M', quantity: 15 }, { size: 'L', quantity: 20 }, { size: 'XL', quantity: 10 }, { size: 'XXL', quantity: 5 }],
-            inventory: p.inventory || [{ size: 'S', quantity: 10 }, { size: 'M', quantity: 15 }, { size: 'L', quantity: 20 }, { size: 'XL', quantity: 10 }, { size: 'XXL', quantity: 5 }]
-          }));
-          localStorage.setItem('arviik_custom_products', JSON.stringify(loadedProds));
-        } else {
-          loadedProds = parsed;
-        }
-      } else {
-        try {
-          const { data: prods } = await supabase
-            .from('products')
-            .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)');
-
-          if (prods && prods.length > 0) {
-            loadedProds = prods.map((p) => ({
-              ...p,
-              categoryName: p.category?.name || 'Streetwear',
-              images: p.product_images?.map((img: any) => img.image_url) || [],
-              sizes: p.inventory || [],
-            }));
-            localStorage.setItem('arviik_custom_products', JSON.stringify(loadedProds));
-          }
-        } catch (prodErr) {
-          console.error('Failed to load DB products:', prodErr);
-        }
-      }
-
-      if (loadedProds.length === 0) {
-        loadedProds = MOCK_PRODUCTS.map((p: any) => ({
+      setCategories(cats || []);
+      setProducts(
+        (prods || []).map((p) => ({
           ...p,
-          categoryName: typeof p.category === 'object' ? p.category?.name : (p.category || 'Limited Edition'),
-          images: p.product_images?.map((img: any) => img.image_url) || [],
-          sizes: p.inventory || [{ size: 'S', quantity: 10 }, { size: 'M', quantity: 15 }, { size: 'L', quantity: 20 }, { size: 'XL', quantity: 10 }, { size: 'XXL', quantity: 5 }],
-          inventory: p.inventory || [{ size: 'S', quantity: 10 }, { size: 'M', quantity: 15 }, { size: 'L', quantity: 20 }, { size: 'XL', quantity: 10 }, { size: 'XXL', quantity: 5 }]
-        }));
-        localStorage.setItem('arviik_custom_products', JSON.stringify(loadedProds));
-      }
-      setProducts(loadedProds);
+          categoryName: (p.category as any)?.name || 'Uncategorised',
+          images: (p.product_images || [])
+            .sort((a: any, b: any) => a.display_order - b.display_order)
+            .map((img: any) => img.image_url),
+          sizes: p.inventory || [],
+        }))
+      );
     } catch (e) {
-      console.error('Error loading data:', e);
+      console.error('Error loading products:', e);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
-  const openAddForm = () => {
+  const resetForm = () => {
     setEditingId(null);
     setName('');
     setDescription('');
     setPrice('');
     setDiscountPrice('');
-    setCategoryId(categories[0]?.id || 'cat-limited-edition');
+    setCategoryId(categories[0]?.id || '');
     setFabric('100% Premium Cotton');
     setGsm('240 GSM');
     setFitType('Oversized Fit');
-    setWashInstructions('Cold machine wash inside out. Do not iron print.');
+    setWashInstructions('Cold machine wash inside out. Do not iron directly on print.');
     setProductImages(['', '', '', '', '']);
     setUploadingSlots([false, false, false, false, false]);
     setStockS('10');
@@ -204,22 +128,28 @@ export default function AdminProducts() {
     setStockL('20');
     setStockXL('10');
     setStockXXL('5');
+    setSaveError(null);
+  };
+
+  const openAddForm = () => {
+    resetForm();
     setFormOpen(true);
   };
 
   const openEditForm = (prod: any) => {
+    resetForm();
     setEditingId(prod.id);
     setName(prod.name);
     setDescription(prod.description || '');
-    setPrice(prod.price.toString());
+    setPrice(prod.price?.toString() || '');
     setDiscountPrice(prod.discount_price ? prod.discount_price.toString() : '');
-    setCategoryId(prod.category_id || categories[0]?.id || 'cat-limited-edition');
+    setCategoryId(prod.category_id || categories[0]?.id || '');
     setFabric(prod.fabric || '100% Premium Cotton');
     setGsm(prod.gsm || '240 GSM');
     setFitType(prod.fit_type || 'Oversized Fit');
-    setWashInstructions(prod.wash_instructions || 'Cold wash inside out');
-    
-    const existingImgs = prod.images || prod.product_images?.map((i: any) => i.image_url) || [];
+    setWashInstructions(prod.wash_instructions || 'Cold machine wash inside out.');
+
+    const existingImgs = prod.images || [];
     setProductImages([
       existingImgs[0] || '',
       existingImgs[1] || '',
@@ -227,9 +157,7 @@ export default function AdminProducts() {
       existingImgs[3] || '',
       existingImgs[4] || '',
     ]);
-    setUploadingSlots([false, false, false, false, false]);
 
-    // Set stock values from sizes array
     const getQty = (sz: string) => {
       const item = prod.sizes?.find((s: any) => s.size === sz);
       return item ? item.quantity.toString() : '0';
@@ -245,13 +173,30 @@ export default function AdminProducts() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaveError(null);
+    setSaveLoading(true);
+
+    // Validate
+    const priceNum = parseFloat(price);
+    const discountPriceNum = discountPrice ? parseFloat(discountPrice) : null;
+
+    if (isNaN(priceNum) || priceNum <= 0) {
+      setSaveError('Please enter a valid price.');
+      setSaveLoading(false);
+      return;
+    }
+    if (discountPriceNum !== null && discountPriceNum >= priceNum) {
+      setSaveError('Discount price must be less than the original price.');
+      setSaveLoading(false);
+      return;
+    }
 
     const productPayload = {
-      name,
-      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-      description,
-      price: parseFloat(price),
-      discount_price: discountPrice ? parseFloat(discountPrice) : null,
+      name: name.trim(),
+      slug: name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      description: description.trim(),
+      price: priceNum,
+      discount_price: discountPriceNum,
       category_id: categoryId || null,
       fabric,
       gsm,
@@ -261,144 +206,94 @@ export default function AdminProducts() {
 
     const validImages = productImages.filter((img) => img && img.trim() !== '');
 
-    const mockNewItem = {
-      id: editingId || `prod-${Math.random()}`,
-      name,
-      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-      description,
-      price: parseFloat(price),
-      discount_price: discountPrice ? parseFloat(discountPrice) : undefined,
-      category: { name: categories.find(c => c.id === categoryId)?.name || 'Limited Edition' },
-      categoryName: categories.find(c => c.id === categoryId)?.name || 'Limited Edition',
-      category_id: categoryId,
-      fabric,
-      gsm,
-      fit_type: fitType,
-      wash_instructions: washInstructions,
-      images: validImages,
-      product_images: validImages.map((imgUrl) => ({ image_url: imgUrl })),
-      sizes: [
-        { size: 'S', quantity: parseInt(stockS) },
-        { size: 'M', quantity: parseInt(stockM) },
-        { size: 'L', quantity: parseInt(stockL) },
-        { size: 'XL', quantity: parseInt(stockXL) },
-        { size: 'XXL', quantity: parseInt(stockXXL) },
-      ],
-      inventory: [
-        { size: 'S', quantity: parseInt(stockS) },
-        { size: 'M', quantity: parseInt(stockM) },
-        { size: 'L', quantity: parseInt(stockL) },
-        { size: 'XL', quantity: parseInt(stockXL) },
-        { size: 'XXL', quantity: parseInt(stockXXL) },
-      ]
-    };
-
     try {
       if (editingId) {
-        // Edit product in Supabase if online
+        // UPDATE existing product
         const { error } = await supabase.from('products').update(productPayload).eq('id', editingId);
-        if (error) throw error;
+        if (error) throw new Error(error.message);
 
+        // Replace images
         await supabase.from('product_images').delete().eq('product_id', editingId);
         for (let i = 0; i < validImages.length; i++) {
           await supabase.from('product_images').insert({ product_id: editingId, image_url: validImages[i], display_order: i });
         }
 
-        const sizesToUpdate = [
-          { size: 'S', qty: parseInt(stockS) },
-          { size: 'M', qty: parseInt(stockM) },
-          { size: 'L', qty: parseInt(stockL) },
-          { size: 'XL', qty: parseInt(stockXL) },
-          { size: 'XXL', qty: parseInt(stockXXL) },
+        // Upsert inventory
+        const sizes = [
+          { size: 'S', qty: parseInt(stockS) || 0 },
+          { size: 'M', qty: parseInt(stockM) || 0 },
+          { size: 'L', qty: parseInt(stockL) || 0 },
+          { size: 'XL', qty: parseInt(stockXL) || 0 },
+          { size: 'XXL', qty: parseInt(stockXXL) || 0 },
         ];
-        for (const item of sizesToUpdate) {
-          await supabase
-            .from('inventory')
-            .upsert({ product_id: editingId, size: item.size, quantity: item.qty }, { onConflict: 'product_id,size' });
+        for (const item of sizes) {
+          await supabase.from('inventory').upsert(
+            { product_id: editingId, size: item.size, quantity: item.qty },
+            { onConflict: 'product_id,size' }
+          );
         }
       } else {
-        // Add new product in Supabase if online
+        // INSERT new product
         const { data: newProd, error: insertError } = await supabase
           .from('products')
           .insert(productPayload)
           .select('id')
           .single();
 
-        if (insertError) throw insertError;
+        if (insertError) throw new Error(insertError.message);
 
         const newId = newProd.id;
-        mockNewItem.id = newId;
 
         for (let i = 0; i < validImages.length; i++) {
           await supabase.from('product_images').insert({ product_id: newId, image_url: validImages[i], display_order: i });
         }
 
-        const inventoryPayload = [
-          { product_id: newId, size: 'S', quantity: parseInt(stockS) },
-          { product_id: newId, size: 'M', quantity: parseInt(stockM) },
-          { product_id: newId, size: 'L', quantity: parseInt(stockL) },
-          { product_id: newId, size: 'XL', quantity: parseInt(stockXL) },
-          { product_id: newId, size: 'XXL', quantity: parseInt(stockXXL) },
-        ];
-        await supabase.from('inventory').insert(inventoryPayload);
+        await supabase.from('inventory').insert([
+          { product_id: newId, size: 'S', quantity: parseInt(stockS) || 0 },
+          { product_id: newId, size: 'M', quantity: parseInt(stockM) || 0 },
+          { product_id: newId, size: 'L', quantity: parseInt(stockL) || 0 },
+          { product_id: newId, size: 'XL', quantity: parseInt(stockXL) || 0 },
+          { product_id: newId, size: 'XXL', quantity: parseInt(stockXXL) || 0 },
+        ]);
       }
 
-      // Sync local storage as well
-      const updated = editingId
-        ? products.map((p) => (p.id === editingId ? { ...p, ...mockNewItem } : p))
-        : [mockNewItem, ...products];
-      setProducts(updated);
-      localStorage.setItem('arviik_custom_products', JSON.stringify(updated));
       setFormOpen(false);
-    } catch (err) {
-      console.warn('Supabase DB write skipped/failed, applying changes locally in localStorage:', err);
-      // Demo fallback: update state locally
-      const updated = editingId
-        ? products.map((p) => (p.id === editingId ? { ...p, ...mockNewItem } : p))
-        : [mockNewItem, ...products];
-      setProducts(updated);
-      localStorage.setItem('arviik_custom_products', JSON.stringify(updated));
-      setFormOpen(false);
+      await loadData(); // Reload fresh from DB
+    } catch (err: any) {
+      console.error('Save product error:', err);
+      setSaveError(err.message || 'Failed to save product. Please try again.');
+    } finally {
+      setSaveLoading(false);
     }
   };
 
   const toggleHide = async (id: string, currentHidden: boolean) => {
-    try {
-      await supabase.from('products').update({ is_hidden: !currentHidden }).eq('id', id);
-    } catch (e) {
-      console.warn('Supabase update hidden state failed, applying locally');
+    const { error } = await supabase.from('products').update({ is_hidden: !currentHidden }).eq('id', id);
+    if (!error) {
+      setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, is_hidden: !currentHidden } : p)));
     }
-    const updated = products.map((p) => (p.id === id ? { ...p, is_hidden: !currentHidden } : p));
-    setProducts(updated);
-    localStorage.setItem('arviik_custom_products', JSON.stringify(updated));
   };
 
   const toggleFeatured = async (id: string, currentFeatured: boolean) => {
-    try {
-      await supabase.from('products').update({ is_featured: !currentFeatured }).eq('id', id);
-    } catch (e) {
-      console.warn('Supabase update featured state failed, applying locally');
+    const { error } = await supabase.from('products').update({ is_featured: !currentFeatured }).eq('id', id);
+    if (!error) {
+      setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, is_featured: !currentFeatured } : p)));
     }
-    const updated = products.map((p) => (p.id === id ? { ...p, is_featured: !currentFeatured } : p));
-    setProducts(updated);
-    localStorage.setItem('arviik_custom_products', JSON.stringify(updated));
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
-    try {
-      await supabase.from('products').delete().eq('id', id);
-    } catch (e) {
-      console.warn('Supabase delete failed, applying locally');
+    if (!confirm('Are you sure you want to delete this product? This cannot be undone.')) return;
+    const { error } = await supabase.from('products').delete().eq('id', id);
+    if (error) {
+      alert('Failed to delete product: ' + error.message);
+      return;
     }
-    const updated = products.filter((p) => p.id !== id);
-    setProducts(updated);
-    localStorage.setItem('arviik_custom_products', JSON.stringify(updated));
+    setProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
   return (
     <div className="space-y-8">
-      {/* Header Banner */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-stone-200 pb-5 gap-4">
         <div>
           <h1 className="font-syne font-extrabold text-2xl uppercase tracking-wider text-stone-900">
@@ -406,22 +301,34 @@ export default function AdminProducts() {
           </h1>
           <p className="text-xs text-stone-500 font-light mt-0.5">Add, edit, toggle visibility and manage stocks.</p>
         </div>
-
-        <button
-          onClick={openAddForm}
-          className="inline-flex items-center space-x-1.5 bg-stone-950 text-white px-5 py-3 text-xs font-bold uppercase tracking-widest hover:opacity-90 rounded-sm shadow-md"
-        >
-          <Plus className="h-4.5 w-4.5" />
-          <span>Add T-Shirt</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={loadData}
+            className="inline-flex items-center space-x-1.5 bg-stone-100 border border-stone-200 text-stone-700 px-4 py-3 text-xs font-bold uppercase tracking-widest hover:bg-stone-200 rounded-sm"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            <span>Refresh</span>
+          </button>
+          <button
+            onClick={openAddForm}
+            className="inline-flex items-center space-x-1.5 bg-stone-950 text-white px-5 py-3 text-xs font-bold uppercase tracking-widest hover:opacity-90 rounded-sm shadow-md"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add T-Shirt</span>
+          </button>
+        </div>
       </div>
 
-      {/* Products list table */}
+      {/* Products table */}
       <div className="bg-white border border-stone-200/60 rounded-xs p-6 shadow-xs">
         {loading ? (
           <div className="flex items-center justify-center py-10 text-stone-400 text-xs font-bold uppercase tracking-widest space-x-2">
             <RefreshCw className="h-4 w-4 animate-spin text-stone-600" />
             <span>Loading database products...</span>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="py-16 text-center text-stone-400 text-xs font-semibold uppercase tracking-wider">
+            No products yet. Click "Add T-Shirt" to create your first product.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -446,12 +353,18 @@ export default function AdminProducts() {
                     <tr key={prod.id} className="hover:bg-stone-50/50">
                       <td className="py-4 font-semibold text-stone-900 uppercase tracking-wide">
                         {prod.name}
+                        {prod.is_hidden && (
+                          <span className="ml-2 text-[9px] text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-sm font-bold uppercase">Hidden</span>
+                        )}
                       </td>
                       <td className="py-4 uppercase tracking-wider text-[10px] font-semibold text-stone-500">
                         {prod.categoryName}
                       </td>
                       <td className="py-4 font-mono font-semibold text-stone-900">
                         {formatPrice(prod.discount_price || prod.price)}
+                        {prod.discount_price && (
+                          <span className="ml-1 text-stone-400 line-through text-[10px]">{formatPrice(prod.price)}</span>
+                        )}
                       </td>
                       <td className="py-4 font-semibold text-stone-700">
                         {getSzStock('S')}/{getSzStock('M')}/{getSzStock('L')}/{getSzStock('XL')}/{getSzStock('XXL')}
@@ -459,9 +372,7 @@ export default function AdminProducts() {
                       <td className="py-4">
                         <button
                           onClick={() => toggleFeatured(prod.id, prod.is_featured)}
-                          className={`p-1 rounded-sm border ${
-                            prod.is_featured ? 'bg-amber-50 border-amber-100 text-amber-800' : 'text-stone-300'
-                          }`}
+                          className={`p-1 rounded-sm border ${prod.is_featured ? 'bg-amber-50 border-amber-100 text-amber-800' : 'text-stone-300 border-transparent'}`}
                         >
                           <Star className="h-4 w-4 fill-current" />
                         </button>
@@ -469,21 +380,16 @@ export default function AdminProducts() {
                       <td className="py-4 flex items-center space-x-2.5">
                         <button
                           onClick={() => toggleHide(prod.id, prod.is_hidden)}
+                          title={prod.is_hidden ? 'Show product' : 'Hide product'}
                           className={`p-1 hover:opacity-80 ${prod.is_hidden ? 'text-amber-800' : 'text-stone-500'}`}
                         >
-                          {prod.is_hidden ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
+                          {prod.is_hidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
-                        <button
-                          onClick={() => openEditForm(prod)}
-                          className="p-1 text-stone-500 hover:text-stone-900"
-                        >
-                          <Edit2 className="h-4.5 w-4.5" />
+                        <button onClick={() => openEditForm(prod)} className="p-1 text-stone-500 hover:text-stone-900">
+                          <Edit2 className="h-4 w-4" />
                         </button>
-                        <button
-                          onClick={() => handleDelete(prod.id)}
-                          className="p-1 text-stone-400 hover:text-red-750"
-                        >
-                          <Trash2 className="h-4.5 w-4.5" />
+                        <button onClick={() => handleDelete(prod.id)} className="p-1 text-stone-400 hover:text-red-700">
+                          <Trash2 className="h-4 w-4" />
                         </button>
                       </td>
                     </tr>
@@ -495,23 +401,29 @@ export default function AdminProducts() {
         )}
       </div>
 
-      {/* Add / Edit Drawer Modal overlay */}
+      {/* Add / Edit Drawer */}
       {formOpen && (
         <div className="fixed inset-0 bg-stone-950/45 backdrop-blur-xs z-50 flex justify-end">
           <div className="bg-white w-full max-w-xl p-6 shadow-2xl flex flex-col h-full overflow-y-auto">
             <div className="flex justify-between items-center border-b border-stone-200 pb-3.5 mb-5">
               <h3 className="font-syne font-bold uppercase text-stone-900 text-sm tracking-wider">
-                {editingId ? 'Edit product details' : 'Add new product'}
+                {editingId ? 'Edit Product' : 'Add New Product'}
               </h3>
               <button onClick={() => setFormOpen(false)} className="text-stone-500 hover:text-stone-900">
                 <X className="h-5 w-5" />
               </button>
             </div>
 
+            {saveError && (
+              <div className="mb-4 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-sm text-[11px] text-red-800 font-bold">
+                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                <span>{saveError}</span>
+              </div>
+            )}
+
             <form onSubmit={handleSave} className="space-y-4 text-xs font-semibold text-stone-850">
-              
               <div className="space-y-1">
-                <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Product Name</label>
+                <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Product Name *</label>
                 <input
                   type="text"
                   required
@@ -523,7 +435,7 @@ export default function AdminProducts() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Description</label>
+                <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Description *</label>
                 <textarea
                   required
                   rows={3}
@@ -536,10 +448,11 @@ export default function AdminProducts() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Price (INR)</label>
+                  <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Price (INR) *</label>
                   <input
                     type="number"
                     required
+                    min="1"
                     placeholder="1499"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
@@ -550,6 +463,7 @@ export default function AdminProducts() {
                   <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Discount Price (Optional)</label>
                   <input
                     type="number"
+                    min="1"
                     placeholder="1299"
                     value={discountPrice}
                     onChange={(e) => setDiscountPrice(e.target.value)}
@@ -567,9 +481,7 @@ export default function AdminProducts() {
                     className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
                   >
                     {categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
+                      <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                   </select>
                 </div>
@@ -586,7 +498,7 @@ export default function AdminProducts() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Fabric Specs</label>
+                  <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Fabric</label>
                   <input
                     type="text"
                     value={fabric}
@@ -595,7 +507,7 @@ export default function AdminProducts() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">GSM weight</label>
+                  <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">GSM Weight</label>
                   <input
                     type="text"
                     value={gsm}
@@ -606,7 +518,7 @@ export default function AdminProducts() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Wash Care Instructions</label>
+                <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Wash Instructions</label>
                 <input
                   type="text"
                   value={washInstructions}
@@ -615,24 +527,21 @@ export default function AdminProducts() {
                 />
               </div>
 
-              {/* Image Upload / Links (Up to 5 Photos) */}
+              {/* Image Upload */}
               <div className="space-y-4 p-4 bg-stone-50 rounded-sm border border-stone-200/60">
                 <div className="flex justify-between items-center border-b pb-1.5 mb-2">
-                  <span className="text-[10px] text-stone-600 font-extrabold uppercase tracking-wider">Product Gallery Photos (Upload up to 5 photos)</span>
-                  <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">{productImages.filter(Boolean).length} / 5 Uploaded</span>
+                  <span className="text-[10px] text-stone-600 font-extrabold uppercase tracking-wider">
+                    Product Gallery (Up to 5 Photos)
+                  </span>
+                  <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">
+                    {productImages.filter(Boolean).length} / 5 Uploaded
+                  </span>
                 </div>
-                
-                {[
-                  'Photo 1: Main / Front View (Primary)',
-                  'Photo 2: Back View',
-                  'Photo 3: Detail / Fabric Close-up',
-                  'Photo 4: Fit / Side View',
-                  'Photo 5: Studio / On-Model View'
-                ].map((label, idx) => (
+
+                {['Photo 1: Main / Front View', 'Photo 2: Back View', 'Photo 3: Detail / Close-up', 'Photo 4: Fit / Side View', 'Photo 5: Studio / On-Model'].map((label, idx) => (
                   <div key={idx} className="space-y-1.5 p-2.5 bg-white border border-stone-200 rounded-sm">
                     <label className="text-[9px] text-stone-700 font-bold uppercase tracking-wider block">{label}</label>
                     <div className="flex items-center space-x-3">
-                      {/* Image preview / upload state slot */}
                       {uploadingSlots[idx] ? (
                         <div className="w-14 h-16 bg-stone-100 border border-stone-200 rounded-sm flex items-center justify-center flex-shrink-0">
                           <Loader2 className="h-5 w-5 text-stone-500 animate-spin" />
@@ -643,7 +552,7 @@ export default function AdminProducts() {
                           <button
                             type="button"
                             onClick={() => handleRemoveImage(idx)}
-                            className="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full p-0.5 shadow-sm hover:opacity-90 transition-opacity"
+                            className="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full p-0.5 shadow-sm hover:opacity-90"
                           >
                             <X className="h-3 w-3" />
                           </button>
@@ -675,64 +584,32 @@ export default function AdminProducts() {
                 ))}
               </div>
 
-              {/* Inventory Sizes */}
+              {/* Inventory */}
               <div className="bg-stone-50 p-3 rounded-sm border border-stone-200/60">
-                <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider block border-b pb-1 mb-2">Inventory Stock levels</span>
+                <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider block border-b pb-1 mb-2">Inventory Stock Levels</span>
                 <div className="grid grid-cols-5 gap-2.5">
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-center block">S</label>
-                    <input
-                      type="number"
-                      value={stockS}
-                      onChange={(e) => setStockS(e.target.value)}
-                      className="w-full bg-white border border-stone-200 px-2 py-1 text-center focus:outline-none focus:border-stone-950 rounded-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-center block">M</label>
-                    <input
-                      type="number"
-                      value={stockM}
-                      onChange={(e) => setStockM(e.target.value)}
-                      className="w-full bg-white border border-stone-200 px-2 py-1 text-center focus:outline-none focus:border-stone-950 rounded-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-center block">L</label>
-                    <input
-                      type="number"
-                      value={stockL}
-                      onChange={(e) => setStockL(e.target.value)}
-                      className="w-full bg-white border border-stone-200 px-2 py-1 text-center focus:outline-none focus:border-stone-950 rounded-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-center block">XL</label>
-                    <input
-                      type="number"
-                      value={stockXL}
-                      onChange={(e) => setStockXL(e.target.value)}
-                      className="w-full bg-white border border-stone-200 px-2 py-1 text-center focus:outline-none focus:border-stone-950 rounded-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-center block">XXL</label>
-                    <input
-                      type="number"
-                      value={stockXXL}
-                      onChange={(e) => setStockXXL(e.target.value)}
-                      className="w-full bg-white border border-stone-200 px-2 py-1 text-center focus:outline-none focus:border-stone-950 rounded-sm"
-                    />
-                  </div>
+                  {[['S', stockS, setStockS], ['M', stockM, setStockM], ['L', stockL, setStockL], ['XL', stockXL, setStockXL], ['XXL', stockXXL, setStockXXL]].map(([sz, val, setter]: any) => (
+                    <div key={sz} className="space-y-1">
+                      <label className="text-[9px] font-bold text-center block">{sz}</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={val}
+                        onChange={(e) => setter(e.target.value)}
+                        className="w-full bg-white border border-stone-200 px-2 py-1 text-center focus:outline-none focus:border-stone-950 rounded-sm"
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Submit CTA */}
               <button
                 type="submit"
-                className="w-full bg-stone-950 text-white text-xs font-bold uppercase tracking-widest py-3.5 hover:opacity-90 transition-opacity rounded-xs shadow-sm"
+                disabled={saveLoading}
+                className="w-full bg-stone-950 text-white text-xs font-bold uppercase tracking-widest py-3.5 hover:opacity-90 transition-opacity rounded-xs shadow-sm flex items-center justify-center gap-2 disabled:opacity-60"
               >
-                {editingId ? 'Update Product' : 'Add Product'}
+                {saveLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {saveLoading ? 'Saving...' : editingId ? 'Update Product' : 'Add Product'}
               </button>
             </form>
           </div>
