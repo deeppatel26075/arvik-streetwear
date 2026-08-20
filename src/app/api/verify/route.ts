@@ -89,16 +89,8 @@ export async function POST(request: Request) {
 
     // ── 4. Create Supabase client with user's JWT ─────────────────────────────
     // This ensures place_order() runs with auth.uid() = the real user
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      console.error('Supabase environment variables are not configured.');
-      return NextResponse.json(
-        { error: 'Database is not configured.' },
-        { status: 503 }
-      );
-    }
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://tquoyphmzpsuiwnchctg.supabase.co';
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxdW95cGhtenBzdWl3bmNoY3RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NjY2NTQsImV4cCI6MjA5NzI0MjY1NH0.4jgW1wQ1HiTJ3PSlmwSAqUP-GIV8aDYVok-ffyXt_OY';
 
     const supabaseUser = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: `Bearer ${userJwt}` } },
