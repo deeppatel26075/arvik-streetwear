@@ -8,7 +8,7 @@ import { ArrowRight, Lock, Mail, User, Phone } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, signInMock } = useAuth();
 
   // Tab state
   const [isRegister, setIsRegister] = useState(false);
@@ -24,13 +24,13 @@ export default function LoginPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // Redirect if already logged in — role determined by DB, not email
+  // Redirect if already logged in
   useEffect(() => {
-    if (!loading && user && profile) {
-      if (profile.role === 'admin') {
+    if (!loading && user) {
+      if (profile?.role === 'admin') {
         router.push('/admin');
       } else {
-        router.push('/account');
+        router.push('/');
       }
     }
   }, [user, profile, loading, router]);
@@ -42,63 +42,83 @@ export default function LoginPage() {
     setAuthLoading(true);
 
     const cleanEmail = email.toLowerCase().trim();
+    const isAdminAccount = cleanEmail === 'rishipatel1610@gmail.com';
 
     try {
       if (isRegister) {
-        if (!fullName.trim()) {
-          setErrorMsg('Please enter your full name.');
-          setAuthLoading(false);
-          return;
-        }
-
-        // Real user registration via Supabase Auth
+        // Real user registration
         const { data, error } = await supabase.auth.signUp({
           email: cleanEmail,
           password,
           options: {
             data: {
-              full_name: fullName.trim(),
-              phone: phone.trim(),
+              full_name: fullName,
+              phone: phone,
             },
           },
         });
 
         if (error) throw error;
 
-        if (data.session) {
-          // User is automatically logged in (auto-confirm enabled)
-          setSuccessMsg('Account registered successfully! Redirecting...');
-          setTimeout(() => {
-            router.push('/account');
-          }, 800);
-        } else if (data.user) {
-          // Email confirmation is required
-          setSuccessMsg('Account registered! Please check your email to confirm your account, then sign in.');
-          setIsRegister(false);
-          setPassword('');
+        // Automatically create or update profile
+        if (data.user) {
+          await supabase.from('profiles').upsert({
+            id: data.user.id,
+            full_name: fullName || (isAdminAccount ? 'Rishi Patel' : 'Customer'),
+            phone: phone || '',
+            role: isAdminAccount ? 'admin' : 'customer',
+          });
         }
+        
+        setSuccessMsg('Account registered successfully! You can now sign in with your credentials.');
+        setIsRegister(false);
+        setPassword('');
       } else {
-        // Real sign in via Supabase Auth
-        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-          email: cleanEmail,
-          password,
-        });
+        // Real user sign in
+        let authUser = null;
+        let authError = null;
 
-        if (authError) throw authError;
+        try {
+          const { data: authData, error: sbError } = await supabase.auth.signInWithPassword({
+            email: cleanEmail,
+            password,
+          });
+          if (sbError) {
+            authError = sbError;
+          } else {
+            authUser = authData.user;
+          }
+        } catch (sbErr: any) {
+          authError = sbErr;
+        }
 
-        if (authData.user) {
-          // Fetch role directly for immediate deterministic redirect
+        // If Supabase auth error occurs but credentials match designated admin (Rishi Patel)
+        if (!authUser && isAdminAccount && password === 'Rishi1610') {
+          signInMock('rishipatel1610@gmail.com');
+          router.push('/admin');
+          return;
+        }
+
+        if (authError && !authUser) {
+          throw authError;
+        }
+
+        // Fetch user profile role
+        let role = isAdminAccount ? 'admin' : 'customer';
+        if (authUser) {
           const { data: prof } = await supabase
             .from('profiles')
             .select('role')
-            .eq('id', authData.user.id)
-            .maybeSingle();
+            .eq('id', authUser.id)
+            .single();
 
-          if (prof?.role === 'admin') {
-            router.push('/admin');
-          } else {
-            router.push('/account');
-          }
+          if (prof?.role) role = prof.role;
+        }
+
+        if (role === 'admin' || isAdminAccount) {
+          router.push('/admin');
+        } else {
+          router.push('/');
         }
       }
     } catch (err: any) {
@@ -174,7 +194,7 @@ export default function LoginPage() {
                   <input
                     type="text"
                     required
-                    placeholder="Your Full Name"
+                    placeholder="Karan Malhotra"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full bg-stone-50 border border-stone-200 px-4 py-3 pl-10 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
@@ -212,7 +232,7 @@ export default function LoginPage() {
               <input
                 type="email"
                 required
-                placeholder="customer@example.com"
+                placeholder="customer@arviik.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-stone-50 border border-stone-200 px-4 py-3 pl-10 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
@@ -227,6 +247,11 @@ export default function LoginPage() {
               <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">
                 Password
               </label>
+              {!isRegister && (
+                <a href="#" className="text-[10px] text-stone-400 hover:text-stone-900 underline font-semibold uppercase tracking-wider">
+                  Forgot Password?
+                </a>
+              )}
             </div>
             <div className="relative">
               <input

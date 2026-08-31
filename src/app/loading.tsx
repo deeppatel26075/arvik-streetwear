@@ -1,14 +1,17 @@
 import React from 'react';
+import Image from 'next/image';
 
 export default function Loading() {
   return (
-    <div className="w-full min-h-[50vh] flex flex-col items-center justify-center py-20 bg-white">
-      <div className="flex flex-col items-center space-y-3">
-        <div className="w-7 h-7 border-2 border-stone-200 border-t-stone-950 rounded-full animate-spin" />
-        <span className="text-[10px] font-extrabold uppercase tracking-widest text-stone-500">
-          Loading ARVIIK...
-        </span>
-      </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+      <Image
+        src="/arviik-mark.png"
+        alt="ARVIIK"
+        width={64}
+        height={64}
+        priority
+        className="animate-pulse"
+      />
     </div>
   );
 }

@@ -1,12 +1,39 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+
+// Shown once per browser session, not on every page load/refresh — the
+// root layout remounts on a hard reload of *any* route (not just "/"),
+// so without this it replayed this full-screen splash no matter which
+// page (a product, checkout, account, etc.) was actually being reloaded,
+// making the site feel like it always "opened from the front" instead
+// of staying on the page the user was on.
+const SESSION_FLAG = 'arviik_intro_shown';
 
 export default function ArviikPageAnimation() {
+  // Starts visible on every render (server and client alike) so the
+  // very first client render matches the server-rendered HTML — reading
+  // sessionStorage to decide the *initial* state would make that first
+  // render diverge between server (no window) and client, triggering a
+  // hydration mismatch. The sessionStorage check instead happens inside
+  // the effect below, which only ever runs client-side after hydration.
   const [visible, setVisible] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
 
+  // Runs before the browser paints (unlike useEffect), so on a repeat
+  // load within the same session this hides the splash before it ever
+  // becomes visible — no one-frame flash of it appearing then vanishing.
+  useLayoutEffect(() => {
+    if (sessionStorage.getItem(SESSION_FLAG) === '1') {
+      setVisible(false);
+    } else {
+      sessionStorage.setItem(SESSION_FLAG, '1');
+    }
+  }, []);
+
   useEffect(() => {
+    if (!visible) return;
+
     // Smooth, ultra-fast 550ms animation that never blocks interaction
     const timer1 = setTimeout(() => {
       setFadeOut(true);

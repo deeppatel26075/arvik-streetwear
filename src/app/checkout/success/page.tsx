@@ -1,15 +1,22 @@
 'use client';
 
-import React, { useEffect, Suspense } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Check, Truck, ShieldAlert, RotateCcw } from 'lucide-react';
+import { Check, Truck, ShieldAlert, RotateCcw, Eye, FileText, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { fetchOrderById, Order } from '@/lib/orders';
+import { downloadInvoice } from '@/lib/invoice';
+import InvoiceViewModal from '@/components/InvoiceViewModal';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams?.get('orderId') || 'ARVIIK345678';
   const email = searchParams?.get('email') || 'your email';
+
+  const [order, setOrder] = useState<Order | null>(null);
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [generatingInvoice, setGeneratingInvoice] = useState(false);
 
   useEffect(() => {
     confetti({
@@ -18,6 +25,36 @@ function SuccessContent() {
       origin: { y: 0.6 },
     });
   }, []);
+
+  // The invoice needs the full order (items, payment, shipping) — this
+  // page only gets orderId/email/total as URL params from the redirect,
+  // so it fetches the rest the same way the order-detail page does. A
+  // failed/slow fetch just means the invoice buttons don't appear yet;
+  // it never blocks the confirmation itself.
+  useEffect(() => {
+    let cancelled = false;
+    fetchOrderById(orderId)
+      .then((data) => {
+        if (!cancelled) setOrder(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [orderId]);
+
+  const handleDownloadInvoice = async () => {
+    if (!order || generatingInvoice) return;
+    setGeneratingInvoice(true);
+    try {
+      await downloadInvoice(order);
+    } catch (err) {
+      console.error('Failed to generate invoice PDF:', err);
+      alert('Could not generate the invoice right now. Please try again.');
+    } finally {
+      setGeneratingInvoice(false);
+    }
+  };
 
   return (
     <div className="max-w-xl mx-auto px-4 py-16 text-center space-y-8">
@@ -28,6 +65,7 @@ function SuccessContent() {
       
       {/* Success Messages */}
       <div className="space-y-3">
+        <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#16A34A]">✓ Order Confirmed</p>
         <h1 className="font-bold text-2xl uppercase tracking-widest text-[#111111]">
           THANK YOU!
         </h1>
@@ -42,10 +80,30 @@ function SuccessContent() {
         </div>
       </div>
 
-      {/* Button */}
-      <div className="pt-2">
+      {/* Buttons */}
+      <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
+        {order && (
+          <>
+            <button
+              type="button"
+              onClick={() => setShowInvoice(true)}
+              className="inline-flex items-center gap-1.5 bg-white border border-[#111111] text-[#111111] text-xs font-bold uppercase tracking-widest px-5 py-3.5 hover:bg-[#F7F7F7] transition-all rounded-[10px] shadow-xs"
+            >
+              <Eye className="h-3.5 w-3.5" /> View Invoice
+            </button>
+            <button
+              type="button"
+              onClick={handleDownloadInvoice}
+              disabled={generatingInvoice}
+              className="inline-flex items-center gap-1.5 bg-[#111111] text-white text-xs font-bold uppercase tracking-widest px-5 py-3.5 hover:opacity-90 transition-all rounded-[10px] shadow-xs disabled:opacity-60"
+            >
+              {generatingInvoice ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5" />}
+              {generatingInvoice ? 'Generating...' : 'Download Invoice'}
+            </button>
+          </>
+        )}
         <Link
-          href="/shop"
+          href="/"
           className="inline-block bg-white border border-[#111111] text-[#111111] text-xs font-bold uppercase tracking-widest px-8 py-3.5 hover:bg-[#F7F7F7] transition-all rounded-[10px] shadow-xs"
         >
           CONTINUE SHOPPING
@@ -67,6 +125,8 @@ function SuccessContent() {
           <span>Easy Returns<br/><span className="text-[#111111] font-bold">7 Days Return</span></span>
         </div>
       </div>
+
+      {order && showInvoice && <InvoiceViewModal order={order} onClose={() => setShowInvoice(false)} />}
     </div>
   );
 }

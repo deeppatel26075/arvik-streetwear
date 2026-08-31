@@ -5,8 +5,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart, WishlistItem } from '@/context/CartContext';
+import { useTheme } from '@/context/ThemeContext';
 import { formatPrice } from '@/lib/utils';
 import ProductCard from '@/components/ProductCard';
+import PanoramicCurveCarousel from '@/components/PanoramicCurveCarousel';
 import {
   Heart,
   ShoppingBag,
@@ -51,7 +53,7 @@ interface ProductDetailClientProps {
     fit_type?: string;
     wash_instructions?: string;
     description?: string;
-    category?: { name: string };
+    category?: { name: string } | string;
     product_images?: ProductImage[];
     inventory?: InventoryItem[];
   };
@@ -81,6 +83,8 @@ function SafeImage({
   className,
   priority,
   sizes,
+  style,
+  onLoad,
 }: {
   src: string;
   fallbackIndex?: number;
@@ -89,6 +93,8 @@ function SafeImage({
   className?: string;
   priority?: boolean;
   sizes?: string;
+  style?: React.CSSProperties;
+  onLoad?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
 }) {
   const [errored, setErrored] = useState(false);
   const resolvedSrc = errored
@@ -103,7 +109,9 @@ function SafeImage({
       className={className}
       priority={priority}
       sizes={sizes}
+      style={style}
       onError={() => setErrored(true)}
+      onLoad={onLoad}
     />
   );
 }
@@ -111,13 +119,45 @@ function SafeImage({
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const router = useRouter();
   const { addToCart, toggleWishlist, isInWishlist } = useCart();
+  const { setThemePreset } = useTheme();
+
+  const rawCategoryName = typeof product.category === 'string' ? product.category : product.category?.name;
+  // "Psychology Edition" is the real category name in the database — shown
+  // to customers as "Hidden Patterns" everywhere, matching the shop listing.
+  const categoryName = rawCategoryName?.toLowerCase() === 'psychology edition' ? 'Hidden Patterns' : rawCategoryName;
+
+  // Psychology Edition (like On Fire) only repaints the shop listing tab.
+  // Individual product pages always stay on the default theme.
+  useEffect(() => {
+    setThemePreset('chaos');
+  }, [setThemePreset]);
 
   const [activeImageIdx, setActiveImageIdx] = useState(0);
-  const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L' | 'XL' | 'XXL' | ''>('M');
+  const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L' | 'XL' | 'XXL' | ''>('');
   const [quantity, setQuantity] = useState(1);
   const [sizeWarning, setSizeWarning] = useState(false);
+  const [wobble, setWobble] = useState(false);
   const [adding, setAdding] = useState(false);
   const [showZoomModal, setShowZoomModal] = useState(false);
+  // Two separate interaction models: desktop (mouse) clicks to zoom in,
+  // centered on the click point, with the origin then following the
+  // cursor while zoomed; touch pinches to zoom with a translate+scale pan.
+  // isDesktopView tracks real input capability (fine pointer + hover), not
+  // just viewport width, so a touchscreen laptop still gets pinch.
+  const [isDesktopView, setIsDesktopView] = useState(false);
+  const [zoomScale, setZoomScale] = useState(1);
+  const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 });
+  const [zoomPan, setZoomPan] = useState({ x: 0, y: 0 });
+  const [zoomInteracting, setZoomInteracting] = useState(false);
+  const pinchStateRef = useRef<{ dist: number; scale: number } | null>(null);
+  const panStateRef = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
+  // The frame's pixel box is computed in JS from the photo's real aspect
+  // ratio once it loads, so it hugs the photo exactly (no letterboxed
+  // empty space) — CSS aspect-ratio auto-sizing doesn't help here since
+  // this box's only child is an absolutely-positioned `fill` image, which
+  // contributes no intrinsic size for the box to size itself against.
+  const [zoomBoxSize, setZoomBoxSize] = useState<{ w: number; h: number } | null>(null);
+  const zoomSlotRef = useRef<HTMLDivElement>(null);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [showSmartCalculator, setShowSmartCalculator] = useState(false);
   const [userHeight, setUserHeight] = useState('175');
@@ -139,6 +179,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       setCurrentReview((prev) => (prev + 1) % REVIEWS.length);
     }, 2500);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const mql = window.matchMedia('(hover: hover) and (pointer: fine)');
+    setIsDesktopView(mql.matches);
+    const handleChange = (e: MediaQueryListEvent) => setIsDesktopView(e.matches);
+    mql.addEventListener('change', handleChange);
+    return () => mql.removeEventListener('change', handleChange);
   }, []);
 
   const handlePrevReview = () => {
@@ -168,15 +216,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     } else if (distance < -minReviewSwipeDistance) {
       handlePrevReview();
     }
-  };
-
-  const storyScrollRef = useRef<HTMLDivElement>(null);
-  const scrollStory = (direction: 1 | -1) => {
-    const el = storyScrollRef.current;
-    if (!el) return;
-    const card = el.firstElementChild as HTMLElement | null;
-    const step = (card?.offsetWidth || el.clientWidth) + 16;
-    el.scrollBy({ left: direction * step, behavior: 'smooth' });
   };
 
   // Main product image carousel — swipeable, synced with the thumbnail strip
@@ -213,6 +252,21 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     : [{ image_url: '/placeholder-tee.jpg' }];
 
   const primaryImage = images[activeImageIdx]?.image_url || images[0]?.image_url || '/placeholder-tee.jpg';
+
+  // Product Story panels for the curved carousel — cycles this product's
+  // own photos through a set of craft/story beats.
+  const STORY_CAPTIONS = [
+    'Heavyweight 240 GSM cotton, brushed for softness.',
+    'Signature boxy, oversized silhouette — cut to drop.',
+    'High-density graphic print, laid down screen by screen.',
+    'Garment-washed for a lived-in, vintage finish.',
+    'Reinforced double-stitched hems, built for the long run.',
+  ];
+  const storyPanels = images.map((img, i) => ({
+    id: `story-${i}`,
+    image: img.image_url,
+    caption: STORY_CAPTIONS[i % STORY_CAPTIONS.length],
+  }));
 
   const activePrice = product.discount_price && product.discount_price > 0
     ? product.discount_price
@@ -284,6 +338,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const handleAddToCart = (redirectToCheck = false) => {
     if (!selectedSize) {
       setSizeWarning(true);
+      setWobble(false);
+      requestAnimationFrame(() => setWobble(true));
       return;
     }
     setSizeWarning(false);
@@ -326,8 +382,117 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     setOpenAccordion(openAccordion === tab ? null : tab);
   };
 
+  // Pinch-to-zoom + drag-to-pan for the zoom modal. Scale/pan are applied
+  // as a single `translate(...) scale(...)` transform with a fixed center
+  // origin, so pinching and dragging compose naturally.
+  const ZOOM_MIN = 1;
+  const ZOOM_MAX = 3;
+
+  const clampPan = (px: number, py: number, scale: number, box: { width: number; height: number }) => {
+    const maxX = (box.width * (scale - 1)) / 2;
+    const maxY = (box.height * (scale - 1)) / 2;
+    return {
+      x: Math.max(-maxX, Math.min(maxX, px)),
+      y: Math.max(-maxY, Math.min(maxY, py)),
+    };
+  };
+
+  const touchDistance = (touches: React.TouchList) =>
+    Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+
+  const handleZoomTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 2) {
+      setZoomInteracting(true);
+      pinchStateRef.current = { dist: touchDistance(e.touches), scale: zoomScale };
+    } else if (e.touches.length === 1 && zoomScale > 1) {
+      setZoomInteracting(true);
+      panStateRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, panX: zoomPan.x, panY: zoomPan.y };
+    }
+  };
+
+  const handleZoomTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    if (e.touches.length === 2 && pinchStateRef.current) {
+      e.preventDefault();
+      const nextScale = Math.min(
+        ZOOM_MAX,
+        Math.max(ZOOM_MIN, pinchStateRef.current.scale * (touchDistance(e.touches) / pinchStateRef.current.dist))
+      );
+      setZoomScale(nextScale);
+      setZoomPan((p) => clampPan(p.x, p.y, nextScale, rect));
+    } else if (e.touches.length === 1 && panStateRef.current) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - panStateRef.current.x;
+      const dy = e.touches[0].clientY - panStateRef.current.y;
+      setZoomPan(clampPan(panStateRef.current.panX + dx, panStateRef.current.panY + dy, zoomScale, rect));
+    }
+  };
+
+  const handleZoomTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length < 2) pinchStateRef.current = null;
+    if (e.touches.length === 0) {
+      panStateRef.current = null;
+      setZoomInteracting(false);
+      if (zoomScale <= ZOOM_MIN + 0.02) {
+        setZoomScale(ZOOM_MIN);
+        setZoomPan({ x: 0, y: 0 });
+      }
+    }
+  };
+
+  // Desktop: click zooms in centered on the click point (click again to
+  // zoom back out); while zoomed, the origin follows the cursor so moving
+  // the mouse pans around the photo without needing to click-drag.
+  const handleZoomClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDesktopView) return;
+    if (zoomScale > 1) {
+      setZoomScale(1);
+      return;
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    setZoomOrigin({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    });
+    setZoomScale(2.2);
+  };
+
+  const handleZoomHoverMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDesktopView || zoomScale <= 1) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    setZoomOrigin({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    });
+  };
+
+  const closeZoomModal = () => {
+    setShowZoomModal(false);
+    setZoomScale(1);
+    setZoomOrigin({ x: 50, y: 50 });
+    setZoomPan({ x: 0, y: 0 });
+    setZoomBoxSize(null);
+  };
+
+  const handleZoomImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const t = e.currentTarget;
+    if (!t.naturalWidth || !t.naturalHeight) return;
+    const aspect = t.naturalWidth / t.naturalHeight;
+    const availW = zoomSlotRef.current?.clientWidth || window.innerWidth * 0.85;
+    const isSmUp = window.innerWidth >= 640;
+    const maxH = window.innerHeight * (isSmUp ? 0.82 : 0.74);
+    let w = availW;
+    let h = w / aspect;
+    if (h > maxH) {
+      h = maxH;
+      w = h * aspect;
+    }
+    setZoomBoxSize({ w, h });
+  };
+
   return (
-    <div className="space-y-6 sm:space-y-12">
+    <>
+      <div className="relative z-10 space-y-6 sm:space-y-12">
       {/* Breadcrumb & Navigation */}
       <div className="flex justify-between items-center pb-3 border-b border-stone-200">
         <button
@@ -362,7 +527,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               className="absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth touch-pan-x"
             >
               {images.map((img, i) => (
-                <div key={i} className="relative flex-shrink-0 w-full h-full snap-center">
+                <div
+                  key={i}
+                  onClick={() => setShowZoomModal(true)}
+                  className="relative flex-shrink-0 w-full h-full snap-center cursor-pointer"
+                >
                   <SafeImage
                     src={img.image_url}
                     fallbackIndex={i}
@@ -466,7 +635,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <span className="text-[10px] font-extrabold uppercase tracking-widest bg-stone-100 text-stone-700 px-2.5 py-0.5 rounded-full border border-stone-200/80">
-                {product.category?.name || 'Oversized Streetwear'}
+                {categoryName || 'Oversized Streetwear'}
               </span>
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                 In Stock
@@ -513,8 +682,12 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <div className="space-y-3 pt-1">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-1.5">
-                <span className="text-xs font-extrabold text-stone-900 uppercase tracking-wider">Select Size:</span>
-                <span className="text-xs text-stone-950 font-extrabold uppercase bg-stone-100 px-2 py-0.5 rounded-md">{selectedSize || 'Choose'}</span>
+                <span className="text-xs font-extrabold text-stone-900 uppercase tracking-wider">
+                  Select Size <span className="text-red-500">*</span>:
+                </span>
+                {selectedSize && (
+                  <span className="text-xs text-stone-950 font-extrabold uppercase bg-stone-100 px-2 py-0.5 rounded-md">{selectedSize}</span>
+                )}
               </div>
               <div className="flex items-center space-x-3">
                 <button
@@ -578,8 +751,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <div className="space-y-2.5 pt-2">
             <button
               onClick={() => handleAddToCart(false)}
+              onAnimationEnd={() => setWobble(false)}
               disabled={adding}
-              className="w-full bg-stone-950 hover:bg-stone-900 text-white text-xs sm:text-sm font-extrabold uppercase tracking-widest py-4 rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer group"
+              className={`w-full bg-stone-950 hover:bg-stone-900 text-white text-xs sm:text-sm font-extrabold uppercase tracking-widest py-4 rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer group ${
+                wobble ? 'animate-wobble' : ''
+              }`}
             >
               <ShoppingBag className="h-4 w-4" />
               <span>{adding ? 'Adding To Bag...' : 'ADD TO BAG'}</span>
@@ -587,8 +763,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
             <button
               onClick={() => handleAddToCart(true)}
+              onAnimationEnd={() => setWobble(false)}
               disabled={adding}
-              className="w-full bg-white border-2 border-stone-950 text-stone-950 hover:bg-stone-950 hover:text-white text-xs font-extrabold uppercase tracking-widest py-3.5 rounded-xl transition-all flex items-center justify-center space-x-2 shadow-xs cursor-pointer"
+              className={`w-full bg-white border-2 border-stone-950 text-stone-950 hover:bg-stone-950 hover:text-white text-xs font-extrabold uppercase tracking-widest py-3.5 rounded-xl transition-all flex items-center justify-center space-x-2 shadow-xs cursor-pointer ${
+                wobble ? 'animate-wobble' : ''
+              }`}
             >
               <Sparkles className="h-4 w-4" />
               <span>BUY IT NOW (EXPRESS CHECKOUT)</span>
@@ -657,108 +836,20 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         </div>
       </div>
 
-      {/* Product Story Section */}
-      <div className="pt-12 border-t border-stone-200 space-y-6">
-        {/* 3 Story Images Carousel */}
-        <div className="relative group/carousel">
-          <div
-            ref={storyScrollRef}
-            className="flex gap-4 overflow-x-auto pt-2 pb-1 snap-x snap-mandatory scroll-smooth scrollbar-hide"
-          >
-            {[
-              {
-                src: images[0]?.image_url || '/products/farebi-olive.jpg',
-                alt: 'Product Detail 1',
-                caption: 'Heavyweight 240 GSM Cotton',
-              },
-              {
-                src: images[1]?.image_url || images[0]?.image_url || '/products/polarize-cream.jpg',
-                alt: 'Product Detail 2',
-                caption: 'Signature Boxy Oversized Fit',
-              },
-              {
-                src: images[2]?.image_url || images[0]?.image_url || '/products/polarize-navy.jpg',
-                alt: 'Product Detail 3',
-                caption: 'High-Density Graphic Craft',
-              },
-            ].map((slide, idx) => (
-              <div
-                key={slide.alt}
-                className="relative flex-shrink-0 w-[92%] sm:w-[80%] md:w-[65%] lg:w-[55%] snap-center aspect-4/5 rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80 shadow-xs group"
-              >
-                <SafeImage
-                  src={slide.src}
-                  fallbackIndex={idx}
-                  alt={slide.alt}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-stone-950/70 via-transparent to-transparent" />
-                <div className="absolute bottom-3 left-3 right-3 text-white text-center">
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest block text-stone-200">
-                    {slide.caption}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={() => scrollStory(-1)}
-            aria-label="Previous"
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 border border-stone-200 shadow-md hover:bg-white active:scale-95 transition-all"
-          >
-            <ChevronLeft className="h-4 w-4 text-stone-900" />
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollStory(1)}
-            aria-label="Next"
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 border border-stone-200 shadow-md hover:bg-white active:scale-95 transition-all"
-          >
-            <ChevronRight className="h-4 w-4 text-stone-900" />
-          </button>
-        </div>
-
-        <div className="text-center space-y-2 max-w-2xl mx-auto">
-          <span className="text-[10px] text-stone-400 font-extrabold tracking-[0.3em] uppercase block">
-            The Craft & Concept
-          </span>
-          <h3 className="font-syne font-extrabold text-xl sm:text-2xl uppercase tracking-wider text-stone-900">
-            Product Story
-          </h3>
-        </div>
-
-        {/* Product Story Image Collage */}
-        <div className="grid grid-cols-2 gap-3 max-w-3xl mx-auto">
-          <div className="relative row-span-2 aspect-3/4 rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80 shadow-xs">
-            <SafeImage
-              src={images[0]?.image_url || '/products/farebi-olive.jpg'}
-              fallbackIndex={0}
-              alt="Product story collage 1"
-              fill
-              className="object-cover"
-            />
-          </div>
-          <div className="relative aspect-square rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80 shadow-xs">
-            <SafeImage
-              src={images[1]?.image_url || images[0]?.image_url || '/products/polarize-cream.jpg'}
-              fallbackIndex={1}
-              alt="Product story collage 2"
-              fill
-              className="object-cover"
-            />
-          </div>
-          <div className="relative aspect-square rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80 shadow-xs">
-            <SafeImage
-              src={images[2]?.image_url || images[0]?.image_url || '/products/polarize-navy.jpg'}
-              fallbackIndex={2}
-              alt="Product story collage 3"
-              fill
-              className="object-cover"
-            />
-          </div>
+      {/* Product Story Section — full-bleed curved panoramic carousel,
+          breaking out of the page's own side padding (via matching
+          negative margins) so it reads as an immersive dark band instead
+          of being boxed in like the rest of this light-themed page. */}
+      <div className="pt-12 border-t border-stone-200 space-y-8">
+        <div className="-mx-4 sm:-mx-6 lg:-mx-8">
+          <PanoramicCurveCarousel
+            panels={storyPanels}
+            eyebrow="The Craft & Concept"
+            heading="Product Story"
+            ctaLabel=""
+            autoplay={false}
+            filmStrip
+          />
         </div>
 
         <div className="text-center max-w-2xl mx-auto">
@@ -933,24 +1024,63 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         </div>
       </div>
 
-      {/* Image Zoom Modal */}
+      {/* Image Zoom Modal — opens showing the photo fully framed. Pinch
+          with two fingers to zoom (drag with one finger to pan once
+          zoomed); on desktop, scroll/trackpad-pinch to zoom and click-drag
+          to pan. */}
       {showZoomModal && (
-        <div className="fixed inset-0 z-50 bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="relative max-w-4xl w-full max-h-[90vh] bg-stone-900 border border-stone-800 rounded-sm overflow-hidden flex flex-col items-center">
+        <div
+          onClick={closeZoomModal}
+          className="fixed inset-0 z-50 bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-8"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-w-4xl w-full max-h-[90vh] bg-stone-900 border border-stone-800 rounded-lg shadow-2xl overflow-hidden flex flex-col items-center p-3 sm:p-6"
+          >
             <button
-              onClick={() => setShowZoomModal(false)}
+              onClick={closeZoomModal}
               className="absolute top-4 right-4 z-50 bg-stone-800 text-white p-2 rounded-full hover:bg-stone-700 transition-colors"
+              aria-label="Close zoom"
             >
               <X className="h-5 w-5" />
             </button>
-            <div className="relative w-full h-[80vh]">
-              <SafeImage
-                src={primaryImage}
-                fallbackIndex={activeImageIdx}
-                alt="Zoomed product preview"
-                fill
-                className="object-contain"
-              />
+            <div ref={zoomSlotRef} className="w-full flex justify-center">
+              <div
+                onClick={handleZoomClick}
+                onMouseMove={handleZoomHoverMove}
+                onTouchStart={handleZoomTouchStart}
+                onTouchMove={handleZoomTouchMove}
+                onTouchEnd={handleZoomTouchEnd}
+                data-zoom-interactive="true"
+                className="relative rounded-md overflow-hidden bg-stone-950 touch-none select-none"
+                style={{
+                  width: zoomBoxSize ? `${zoomBoxSize.w}px` : '100%',
+                  height: zoomBoxSize ? `${zoomBoxSize.h}px` : '70vh',
+                  cursor: isDesktopView ? (zoomScale > 1 ? 'zoom-out' : 'zoom-in') : 'default',
+                }}
+              >
+                <SafeImage
+                  src={primaryImage}
+                  fallbackIndex={activeImageIdx}
+                  alt="Zoomed product preview"
+                  fill
+                  className={`object-contain ${zoomInteracting ? '' : 'transition-transform duration-300 ease-out'}`}
+                  style={
+                    isDesktopView
+                      ? { transform: `scale(${zoomScale})`, transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%` }
+                      : { transform: `translate(${zoomPan.x}px, ${zoomPan.y}px) scale(${zoomScale})`, transformOrigin: '50% 50%' }
+                  }
+                  onLoad={handleZoomImageLoad}
+                />
+                {/* Hint sits over the photo instead of adding a caption row
+                    below it, so the frame hugs the photo with no leftover
+                    space and stays evenly padded on every side. */}
+                {zoomScale <= 1 && (
+                  <span className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-xs text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full pointer-events-none">
+                    {isDesktopView ? 'Click to zoom' : 'Pinch to zoom'}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -1093,6 +1223,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         </div>
       )}
 
-    </div>
+      </div>
+    </>
   );
 }

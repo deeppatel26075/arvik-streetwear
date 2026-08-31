@@ -1,5 +1,4 @@
 import { supabase } from '@/lib/supabase';
-import { MOCK_PRODUCTS } from '../../page';
 import EditionClient from './EditionClient';
 import { notFound } from 'next/navigation';
 
@@ -46,14 +45,14 @@ export default async function EditionDetailPage({ params }: EditionPageProps) {
 
   // Fallbacks
   const edition = dbEdition || getMockEdition(slug);
-  const products = dbProducts.length > 0 ? dbProducts : MOCK_PRODUCTS;
+  const products = dbProducts;
 
   if (!edition) {
     return notFound();
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       <EditionClient edition={edition as any} products={products as any} />
     </div>
   );

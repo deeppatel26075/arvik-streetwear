@@ -2,10 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ChevronUp, Shield, Truck, RefreshCw, Award } from 'lucide-react';
+import { ChevronUp, Shield, Truck, RefreshCw, Award, Check, X } from 'lucide-react';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
+  const [showJoined, setShowJoined] = useState(false);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -15,13 +16,13 @@ export default function Footer() {
     e.preventDefault();
     if (email.trim()) {
       setEmail('');
-      alert('Thank you for subscribing!');
+      setShowJoined(true);
     }
   };
 
   return (
     <footer className="bg-stone-950 text-stone-400 text-xs select-none">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 pt-14 pb-6 space-y-10">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-10 pt-14 pb-6 space-y-10">
 
         {/* Brand + Social Icons */}
         <div className="text-center space-y-5">
@@ -217,6 +218,52 @@ export default function Footer() {
           </button>
         </div>
       </div>
+
+      {showJoined && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+          role="alertdialog"
+          aria-modal="true"
+          aria-label="Welcome to the ARVIIK Club"
+        >
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowJoined(false)} />
+          <div className="animate-fade-in relative w-full max-w-sm bg-stone-950 border border-lime-400/25 rounded-2xl p-8 text-center space-y-5 shadow-[0_0_70px_-15px_rgba(163,230,53,0.35)]">
+            <button
+              type="button"
+              onClick={() => setShowJoined(false)}
+              className="absolute top-4 right-4 text-stone-500 hover:text-white transition-colors"
+              aria-label="Close"
+            >
+              <X className="h-4.5 w-4.5" />
+            </button>
+
+            <div className="mx-auto w-14 h-14 rounded-full bg-lime-400/10 border border-lime-400/40 flex items-center justify-center">
+              <Check className="h-6 w-6 text-lime-400" strokeWidth={3} />
+            </div>
+
+            <div className="space-y-1.5">
+              <span className="text-[9px] font-extrabold text-lime-400 uppercase tracking-[0.35em] block">
+                Membership Confirmed
+              </span>
+              <h3 className="font-syne font-extrabold text-2xl uppercase tracking-wide text-white">
+                Welcome To The Club
+              </h3>
+            </div>
+
+            <p className="text-xs text-stone-400 leading-relaxed max-w-[280px] mx-auto">
+              You&apos;re officially on the list. Early access to drops, private restocks, and member-only offers land straight in your inbox.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setShowJoined(false)}
+              className="w-full bg-lime-400 text-stone-950 font-extrabold uppercase text-xs tracking-[0.2em] py-3 rounded-sm hover:bg-lime-300 transition-all duration-200 active:scale-[0.97]"
+            >
+              Keep Exploring
+            </button>
+          </div>
+        </div>
+      )}
     </footer>
   );
 }

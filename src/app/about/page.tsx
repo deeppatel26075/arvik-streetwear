@@ -16,7 +16,7 @@ const VALUES = [
   {
     icon: Users,
     title: 'Culture, Not Just Clothing',
-    text: 'Every edition is rooted in a mindset — chaos, psychology, rebellion — worn by people who relate to the idea, not just the fit.',
+    text: 'Every edition is rooted in a mindset: chaos, psychology, rebellion, worn by people who relate to the idea, not just the fit.',
   },
   {
     icon: ShieldCheck,
@@ -45,11 +45,11 @@ export default function AboutPage() {
             The ARVIIK Manifesto
           </span>
           <h1 className="font-syne font-extrabold text-4xl sm:text-6xl uppercase tracking-wider text-white leading-none">
-            Wear Your Mind
+            Wear Your Identity
           </h1>
           <p className="text-xs sm:text-sm text-stone-300 font-medium max-w-lg mx-auto leading-relaxed pt-2">
             ARVIIK isn&apos;t built for a season. It&apos;s built for whatever is going on in your head
-            right now — worn as heavyweight cotton, bold print, and an oversized silhouette that
+            right now, worn as heavyweight cotton, bold print, and an oversized silhouette that
             doesn&apos;t ask permission.
           </p>
         </div>
@@ -65,8 +65,8 @@ export default function AboutPage() {
         </h2>
         <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-medium">
           Most oversized tees are just fabric with a logo on it. ARVIIK started because we wanted
-          the opposite — pieces that carried an actual idea. Limited Edition, On Fire, Graphic Tee,
-          Psychology Edition — every collection is a different headspace, not just a different print.
+          the opposite, pieces that carried an actual idea. Limited Edition, On Fire, Graphic Tee,
+          Hidden Patterns, every collection is a different headspace, not just a different print.
           We obsess over 240 GSM combed cotton, drop-shoulder cuts, and screen prints that survive
           real washes, so the piece still means something a year in.
         </p>
@@ -126,7 +126,7 @@ export default function AboutPage() {
       {/* Closing CTA */}
       <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center space-y-5">
         <h2 className="font-syne font-extrabold text-xl sm:text-2xl uppercase tracking-wider text-stone-950">
-          Ready To Wear Your Mind?
+          Ready To Wear Your Identity?
         </h2>
         <Link
           href="/shop"

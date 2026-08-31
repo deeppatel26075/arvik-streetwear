@@ -23,7 +23,7 @@ export default function RecentlyViewed() {
   if (items.length === 0) return null;
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-stone-200/60 select-none">
+    <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-stone-200/60 select-none">
       <div className="flex items-center space-x-2 pb-4">
         <Clock className="h-4 w-4 text-stone-500" />
         <h3 className="font-syne font-extrabold text-sm uppercase tracking-wider text-stone-950">

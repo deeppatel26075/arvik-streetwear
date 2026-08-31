@@ -17,6 +17,7 @@ html {
 body {
   background-color: var(--background);
   color: var(--foreground);
+  transition: background-color 0.6s ease, color 0.6s ease;
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden !important;
   max-width: 100vw;
@@ -41,8 +42,31 @@ img {
   content-visibility: auto;
 }
 
+/* Browsers don't give <button> a pointer cursor by default (only <a> does),
+   so any clickable button/tab across the site would otherwise show the
+   plain arrow cursor instead of the hand cursor. Force it everywhere. */
+button:not(:disabled),
+a,
+[role="button"],
+input[type="button"]:not(:disabled),
+input[type="submit"]:not(:disabled),
+input[type="reset"]:not(:disabled),
+select,
+label[for] {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled {
+  cursor: not-allowed;
+}
+
 .font-syne {
   font-family: var(--font-syne), 'Syne', sans-serif;
+}
+
+.font-bebas {
+  font-family: var(--font-bebas), 'Bebas Neue', sans-serif;
 }
 
 .scrollbar-hide {
@@ -64,7 +88,7 @@ img {
   display: flex;
   width: max-content;
   will-change: transform;
-  animation: marquee 25s linear infinite;
+  animation: marquee 140s linear infinite;
   backface-visibility: hidden;
 }
 
@@ -82,5 +106,74 @@ img {
 
 .animate-fade-in {
   animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Draws the eye up to a required selection (e.g. "pick a size first")
+   when a shopper taps an action that needs it. */
+@keyframes wobble {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  15% { transform: translateX(-4px) rotate(-2deg); }
+  30% { transform: translateX(3px) rotate(2deg); }
+  45% { transform: translateX(-3px) rotate(-1.5deg); }
+  60% { transform: translateX(2px) rotate(1deg); }
+  75% { transform: translateX(-1px) rotate(-0.5deg); }
+}
+
+.animate-wobble {
+  animation: wobble 0.5s ease-in-out;
+}
+
+/* Slow, breathing drift for the Psychology Edition wire backdrop */
+@keyframes psychDrift {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.035) rotate(0.6deg); }
+}
+
+.animate-psych-drift {
+  animation: psychDrift 14s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-psych-drift {
+    animation: none;
+  }
+}
+
+/* Slow Ken Burns drift for the On Fire eye-wall backdrop */
+@keyframes onfireDrift {
+  0% { transform: scale(1.04) translate(0, 0); }
+  50% { transform: scale(1.12) translate(-1.2%, -1%); }
+  100% { transform: scale(1.04) translate(0, 0); }
+}
+
+.animate-onfire-drift {
+  animation: onfireDrift 22s ease-in-out infinite;
+}
+
+/* Embers rising out of the On Fire backdrop and fading as they cool */
+@keyframes emberRise {
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  12% { opacity: 1; }
+  100% { transform: translate(var(--ember-drift, 12px), -60vh) scale(0.3); opacity: 0; }
+}
+
+.animate-ember {
+  animation: emberRise linear infinite;
+}
+
+/* Small twinkling light glints scattered over the On Fire backdrop */
+@keyframes sparkleTwinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+.animate-sparkle {
+  animation: sparkleTwinkle ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-onfire-drift, .animate-ember, .animate-sparkle {
+    animation: none;
+  }
 }
 

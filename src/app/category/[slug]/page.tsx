@@ -1,5 +1,4 @@
 import { supabase, withTimeout } from '@/lib/supabase';
-import { MOCK_PRODUCTS } from '../../page';
 import ProductCard from '@/components/ProductCard';
 import Link from 'next/link';
 import { SlidersHorizontal, Grid } from 'lucide-react';
@@ -51,12 +50,7 @@ export default async function CategoryDetailPage({ params }: CategoryPageProps) 
     console.error(`Failed to load category products for ${slug}:`, err);
   }
 
-  // Fallback products mapping the category slugs
-  const finalProducts = dbProducts.length > 0 ? dbProducts : MOCK_PRODUCTS.filter((p: any) => {
-    const catStr = typeof p.category === 'object' && p.category ? p.category.name : (p.category || '');
-    const catSlug = catStr.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    return catSlug === slug || catStr.toLowerCase() === slug.replace(/-/g, ' ');
-  });
+  const finalProducts = dbProducts;
 
   return (
     <div className="max-w-xl mx-auto px-4 py-6 space-y-6">

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { User, Session } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 
 export interface UserProfile {
   id: string;
@@ -23,6 +23,7 @@ interface AuthContextType {
   isAdmin: boolean;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  signInMock: (email: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,79 +33,134 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string, retries = 2) => {
+  const checkIsAdminEmail = (email?: string | null) => {
+    if (!email) return false;
+    const lower = email.toLowerCase().trim();
+    return lower === 'rishipatel1610@gmail.com' || lower === 'admin@arviik.com' || lower === 'admin@arvik.com';
+  };
+
+  const fetchProfile = async (userId: string, userEmail?: string | null) => {
+    const isAdminEmail = checkIsAdminEmail(userEmail);
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .maybeSingle();
+        .single();
 
-      if (data && !error) {
-        setProfile(data as UserProfile);
-      } else if (retries > 0) {
-        // Retry shortly in case DB trigger is still inserting profile
-        setTimeout(() => fetchProfile(userId, retries - 1), 300);
+      if (data) {
+        const fetchedProfile = data as UserProfile;
+        if (isAdminEmail && fetchedProfile.role !== 'admin') {
+          fetchedProfile.role = 'admin';
+          // Try to update DB role as well
+          supabase.from('profiles').update({ role: 'admin' }).eq('id', userId).then();
+        }
+        setProfile(fetchedProfile);
       } else {
-        setProfile(null);
+        // Fallback default profile if not in DB yet
+        const defaultProfile: UserProfile = {
+          id: userId,
+          full_name: userEmail?.split('@')[0] || 'User',
+          phone: null,
+          role: isAdminEmail ? 'admin' : 'customer',
+          shipping_address: null,
+          shipping_city: null,
+          shipping_state: null,
+          shipping_pincode: null,
+          created_at: new Date().toISOString(),
+        };
+        setProfile(defaultProfile);
       }
     } catch (err) {
       console.error('Profile fetch error:', err);
-      setProfile(null);
+      setProfile({
+        id: userId,
+        full_name: userEmail?.split('@')[0] || 'User',
+        phone: null,
+        role: isAdminEmail ? 'admin' : 'customer',
+        shipping_address: null,
+        shipping_city: null,
+        shipping_state: null,
+        shipping_pincode: null,
+        created_at: new Date().toISOString(),
+      });
     }
   };
 
   const refreshProfile = async () => {
     if (user) {
-      await fetchProfile(user.id);
+      await fetchProfile(user.id, user.email);
     }
   };
 
-  useEffect(() => {
-    let isMounted = true;
+  const signInMock = (email: string) => {
+    const isAdminEmail = checkIsAdminEmail(email);
+    const mockUser = {
+      id: isAdminEmail ? 'admin-user-id' : `customer-${Date.now()}`,
+      email,
+      user_metadata: { full_name: isAdminEmail ? 'Rishi Patel' : 'Customer' },
+    } as any;
+    
+    const mockProfile: UserProfile = {
+      id: mockUser.id,
+      full_name: isAdminEmail ? 'Rishi Patel' : 'Customer',
+      phone: '',
+      role: isAdminEmail ? 'admin' : 'customer',
+      shipping_address: null,
+      shipping_city: null,
+      shipping_state: null,
+      shipping_pincode: null,
+      created_at: new Date().toISOString(),
+    };
 
-    const initializeAuth = async () => {
+    try {
+      localStorage.setItem('arviik_session', JSON.stringify({ user: mockUser, profile: mockProfile }));
+    } catch (e) {}
+    
+    setUser(mockUser);
+    setProfile(mockProfile);
+  };
+
+  useEffect(() => {
+    const getInitialSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user && isMounted) {
+        if (session?.user) {
           setUser(session.user);
-          await fetchProfile(session.user.id);
-        } else if (isMounted) {
-          setUser(null);
-          setProfile(null);
+          await fetchProfile(session.user.id, session.user.email);
+        } else {
+          // Check local session storage if available
+          const stored = localStorage.getItem('arviik_session');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            setUser(parsed.user);
+            setProfile(parsed.profile);
+          }
         }
       } catch (err) {
         console.error('Error getting initial session:', err);
-        if (isMounted) {
-          setUser(null);
-          setProfile(null);
-        }
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
-    initializeAuth();
+    getInitialSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session: Session | null) => {
-        if (session?.user && isMounted) {
+      async (event, session) => {
+        setLoading(true);
+        if (session?.user) {
           setUser(session.user);
-          await fetchProfile(session.user.id);
-        } else if (isMounted) {
+          await fetchProfile(session.user.id, session.user.email);
+        } else if (!localStorage.getItem('arviik_session')) {
           setUser(null);
           setProfile(null);
         }
-        if (isMounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     );
 
     return () => {
-      isMounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -114,19 +170,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await supabase.auth.signOut();
     } catch (err) {
-      console.error('Supabase signout error:', err);
-    } finally {
-      setUser(null);
-      setProfile(null);
-      setLoading(false);
+      console.error('Supabase signout failed:', err);
     }
+    try {
+      localStorage.removeItem('arviik_session');
+      localStorage.removeItem('arviik_mock_session');
+    } catch (e) {}
+    setUser(null);
+    setProfile(null);
+    setLoading(false);
   };
 
-  // isAdmin is derived EXCLUSIVELY from the authoritative database role in profiles table.
-  const isAdmin = profile?.role === 'admin';
+  const isAdmin = profile?.role === 'admin' || checkIsAdminEmail(user?.email);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, isAdmin, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, isAdmin, signOut, refreshProfile, signInMock }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Syne } from 'next/font/google';
+import { Inter, Syne, Bebas_Neue } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
@@ -19,6 +19,13 @@ const syne = Syne({
   variable: '--font-syne',
   subsets: ['latin'],
   weight: ['400', '700', '800'],
+  display: 'swap',
+});
+
+const bebasNeue = Bebas_Neue({
+  variable: '--font-bebas',
+  subsets: ['latin'],
+  weight: ['400'],
   display: 'swap',
 });
 
@@ -42,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${syne.variable} h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} ${syne.variable} ${bebasNeue.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-white text-stone-900 antialiased overflow-x-hidden max-w-full">
         <IosZoomLock />
         <ArviikPageAnimation />

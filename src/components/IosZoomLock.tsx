@@ -6,23 +6,33 @@ export default function IosZoomLock() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    // Elements that implement their own pinch-to-zoom (e.g. the product
+    // photo zoom modal) opt out of this global page-zoom guard via this
+    // marker, so their gesture isn't fought over by two competing
+    // preventDefault calls on every touchmove — which was making their
+    // own pinch feel laggy/unresponsive.
+    const isZoomInteractive = (target: EventTarget | null) =>
+      target instanceof Element && !!target.closest('[data-zoom-interactive]');
+
     // 1. Prevent 2-finger touchstart (pinch start)
     const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches && e.touches.length > 1) {
+      if (e.touches && e.touches.length > 1 && !isZoomInteractive(e.target)) {
         e.preventDefault();
       }
     };
 
     // 3. Prevent 2-finger touchmove (pinch moving)
     const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches && e.touches.length > 1) {
+      if (e.touches && e.touches.length > 1 && !isZoomInteractive(e.target)) {
         e.preventDefault();
       }
     };
 
     // 4. Prevent WebKit gestures (iOS native pinch/zoom)
     const handleGesture = (e: Event) => {
-      e.preventDefault();
+      if (!isZoomInteractive(e.target)) {
+        e.preventDefault();
+      }
     };
 
     // 5. Prevent Ctrl + Wheel zoom (trackpad pinch)
