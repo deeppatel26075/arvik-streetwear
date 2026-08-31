@@ -4,69 +4,6 @@ import HomeClientWrapper from './HomeClientWrapper';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export const MOCK_PRODUCTS = [
-  {
-    id: '00000000-0000-0000-0000-000000000001',
-    name: 'Eternal Vision',
-    slug: 'eternal-vision-black-tee',
-    category: 'Limited Edition',
-    price: 1299,
-    mrp: 1299,
-    discount_price: 1299,
-    product_images: [
-      { image_url: '/products/farebi-olive.jpg' },
-      { image_url: '/products/polarize-navy.jpg' },
-      { image_url: '/products/mard-paisa-maroon.jpg' },
-      { image_url: '/products/polarize-cream.jpg' },
-    ]
-  },
-  {
-    id: '00000000-0000-0000-0000-000000000002',
-    name: 'Chaos Bloom',
-    slug: 'chaos-bloom-ivory-tee',
-    category: 'On Fire',
-    price: 1199,
-    mrp: 1199,
-    discount_price: 1199,
-    product_images: [
-      { image_url: '/products/polarize-cream.jpg' },
-      { image_url: '/products/farebi-olive.jpg' },
-      { image_url: '/products/polarize-navy.jpg' },
-      { image_url: '/products/mard-paisa-maroon.jpg' },
-    ]
-  },
-  {
-    id: '00000000-0000-0000-0000-000000000003',
-    name: 'Midnight Tales',
-    slug: 'midnight-tales-black-tee',
-    category: 'Graphic Tee',
-    price: 1299,
-    mrp: 1299,
-    discount_price: 1299,
-    product_images: [
-      { image_url: '/products/polarize-navy.jpg' },
-      { image_url: '/products/mard-paisa-maroon.jpg' },
-      { image_url: '/products/farebi-olive.jpg' },
-      { image_url: '/products/polarize-cream.jpg' },
-    ]
-  },
-  {
-    id: '00000000-0000-0000-0000-000000000004',
-    name: 'Lost Paradise',
-    slug: 'lost-paradise-black-tee',
-    category: 'Psychology Edition',
-    price: 1299,
-    mrp: 1299,
-    discount_price: 1299,
-    product_images: [
-      { image_url: '/products/mard-paisa-maroon.jpg' },
-      { image_url: '/products/polarize-cream.jpg' },
-      { image_url: '/products/polarize-navy.jpg' },
-      { image_url: '/products/farebi-olive.jpg' },
-    ]
-  }
-];
-
 export default async function HomePage() {
   let dbProducts: any[] = [];
 
@@ -106,9 +43,7 @@ export default async function HomePage() {
     console.error('Error loading Supabase products:', err);
   }
 
-  const displayProducts = dbProducts.length > 0 ? dbProducts : MOCK_PRODUCTS;
-
   return (
-    <HomeClientWrapper products={displayProducts} />
+    <HomeClientWrapper products={dbProducts} />
   );
 }

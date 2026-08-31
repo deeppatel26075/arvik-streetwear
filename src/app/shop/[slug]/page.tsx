@@ -1,5 +1,4 @@
 import { supabase, withTimeout } from '@/lib/supabase';
-import { MOCK_PRODUCTS } from '../../page';
 import ProductDetailClient from './ProductDetailClient';
 import ProductDetailFallback from './ProductDetailFallback';
 import { notFound } from 'next/navigation';
@@ -38,19 +37,18 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     console.error(`Error loading product details for ${slug}:`, err);
   }
 
-  // Fallback to Mock Products
-  const product = dbProduct || MOCK_PRODUCTS.find(p => p.slug === slug);
+  const product = dbProduct;
 
   if (!product) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
         <ProductDetailFallback slug={slug} />
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
       <ProductDetailClient product={product as any} />
     </div>
   );

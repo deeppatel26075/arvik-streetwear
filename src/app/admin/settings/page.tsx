@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Settings, Save, Check, RefreshCw, Loader2, Upload } from 'lucide-react';
+import { Settings, Save, Check, RefreshCw } from 'lucide-react';
 
 export default function AdminSettings() {
   const [heroTitle, setHeroTitle] = useState('WEAR YOUR IDENTITY');
@@ -14,27 +14,6 @@ export default function AdminSettings() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [heroImageUploading, setHeroImageUploading] = useState(false);
-
-  const handleHeroImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setHeroImageUploading(true);
-    try {
-      const ext = file.name.split('.').pop();
-      const filePath = `hero/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, file, { upsert: true, contentType: file.type });
-      if (uploadError) throw uploadError;
-      const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(filePath);
-      setHeroImageUrl(urlData.publicUrl);
-    } catch (err) {
-      console.error('Hero image upload failed:', err);
-    } finally {
-      setHeroImageUploading(false);
-    }
-  };
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -155,26 +134,11 @@ export default function AdminSettings() {
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Hero Banner Image</label>
-              {/* Upload file */}
-              <div className="flex items-center gap-2">
-                <label className={`inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-950 text-white text-[10px] font-bold uppercase tracking-widest rounded-sm cursor-pointer hover:opacity-90 transition-opacity ${heroImageUploading ? 'opacity-50 pointer-events-none' : ''}`}>
-                  {heroImageUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
-                  <span>{heroImageUploading ? 'Uploading...' : 'Upload Image'}</span>
-                  <input type="file" accept="image/*" className="hidden" onChange={handleHeroImageUpload} disabled={heroImageUploading} />
-                </label>
-                <span className="text-[10px] text-stone-400 font-medium">or paste URL below</span>
-              </div>
-              {/* Preview */}
-              {heroImageUrl && (
-                <div className="relative w-full h-28 rounded-sm overflow-hidden border border-stone-200 bg-stone-100">
-                  <img src={heroImageUrl} alt="Hero preview" className="w-full h-full object-cover" />
-                </div>
-              )}
+            <div className="space-y-1">
+              <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Hero Banner image URL</label>
               <input
                 type="text"
-                placeholder="https://..."
+                required
                 value={heroImageUrl}
                 onChange={(e) => setHeroImageUrl(e.target.value)}
                 className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm"

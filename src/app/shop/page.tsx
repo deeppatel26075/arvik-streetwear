@@ -1,5 +1,4 @@
 import { supabase, withTimeout } from '@/lib/supabase';
-import { MOCK_PRODUCTS } from '../page';
 import ShopClient from './ShopClient';
 import PageLoader from '@/components/PageLoader';
 import { Suspense } from 'react';
@@ -36,20 +35,19 @@ export default async function ShopPage() {
       }));
     }
   } catch (err) {
-    console.error('Error fetching shop data from Supabase, using mocks:', err);
+    console.error('Error fetching shop data from Supabase:', err);
   }
 
-  const finalProducts = dbProducts.length > 0 ? dbProducts : MOCK_PRODUCTS;
-  
+  const finalProducts = dbProducts;
+
   // Set default categories if database is empty
   const defaultCategories = [
     { id: 'cat-limited-edition', name: 'Limited Edition', slug: 'limited-edition' },
     { id: 'cat-on-fire', name: 'On Fire', slug: 'on-fire' },
-    { id: 'cat-graphic-tee', name: 'Graphic Tee', slug: 'graphic-tee' },
     { id: 'cat-psychology-edition', name: 'Psychology Edition', slug: 'psychology-edition' }
   ];
 
-  // Merge database categories with default categories to ensure all 4 exist
+  // Merge database categories with default categories to ensure all 3 exist
   const combinedCategories = [...dbCategories];
   for (const defCat of defaultCategories) {
     if (!combinedCategories.some(c => c.slug === defCat.slug || c.name.toLowerCase() === defCat.name.toLowerCase())) {
@@ -57,10 +55,16 @@ export default async function ShopPage() {
     }
   }
 
-  const finalCategories = combinedCategories.length > 0 ? combinedCategories : defaultCategories;
+  // Hidden categories: no longer shown as shop filter chips
+  const HIDDEN_CATEGORY_NAMES = ['anime', 'graphic tee', 'graphic prints'];
+  const filteredCategories = combinedCategories.filter(
+    (c) => !HIDDEN_CATEGORY_NAMES.includes(c.name.toLowerCase())
+  );
+
+  const finalCategories = filteredCategories.length > 0 ? filteredCategories : defaultCategories;
 
   return (
-    <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-10 overflow-x-hidden">
+    <div className="w-full max-w-[1440px] mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-10 overflow-x-hidden">
       <Suspense fallback={<PageLoader fullScreen={false} />}>
         <ShopClient initialProducts={finalProducts as any} categories={finalCategories as any} />
       </Suspense>

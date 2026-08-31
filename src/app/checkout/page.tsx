@@ -7,12 +7,13 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { formatPrice } from '@/lib/utils';
+import { FLAT_SHIPPING_FEE_RUPEES } from '@/lib/shippingConfig';
 import SlideToConfirm from '@/components/SlideToConfirm';
+import AuthGateModal from '@/components/AuthGateModal';
 import {
   ArrowLeft,
   Check,
   Lock,
-  Truck,
   ShieldCheck,
   Tag,
   Sparkles,
@@ -22,13 +23,11 @@ import {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const {
     cart,
     getCartSubtotal,
     getDiscountAmount,
-    getShippingFee,
-    getCartTotal,
     coupon,
     applyCoupon,
     removeCoupon
@@ -45,8 +44,58 @@ export default function CheckoutPage() {
   const [couponInput, setCouponInput] = useState('');
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
-  const [shippingMethod, setShippingMethod] = useState<'express' | 'standard'>('express');
+  const [shippingMethod] = useState<'standard'>('standard');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Pincode serviceability — checked against prepaid delivery (the
+  // baseline; COD-specific availability/charges are re-checked on the
+  // payment page once a payment method is actually chosen). This is
+  // purely early UI feedback — /api/orders/place re-verifies for real at
+  // order-placement time regardless of what this shows.
+  const [pincodeCheck, setPincodeCheck] = useState<'idle' | 'checking' | 'serviceable' | 'unserviceable'>('idle');
+
+  useEffect(() => {
+    if (!/^\d{6}$/.test(pincode)) {
+      setPincodeCheck('idle');
+      return;
+    }
+    let cancelled = false;
+    setPincodeCheck('checking');
+    const timer = setTimeout(() => {
+      const itemQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+      fetch('/api/nimbuspost/serviceability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pincode, paymentMode: 'prepaid', itemQuantity, orderValueRupees: getCartSubtotal() }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (cancelled) return;
+          setPincodeCheck(data.serviceable === false ? 'unserviceable' : 'serviceable');
+        })
+        .catch(() => {
+          if (!cancelled) setPincodeCheck('serviceable'); // logistics outage shouldn't block the form
+        });
+
+      // Auto-fill City/State from the pincode (India Post public data) —
+      // always overwrites on a new valid pincode, on the assumption that
+      // whatever the pincode says is more trustworthy than a stale value
+      // from a previously-typed pincode.
+      fetch(`/api/pincode-lookup?pincode=${pincode}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (cancelled || !data.found) return;
+          setCity(data.city);
+          setState(data.state);
+        })
+        .catch(() => {});
+    }, 500);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pincode]);
 
   useEffect(() => {
     if (profile) {
@@ -86,6 +135,36 @@ export default function CheckoutPage() {
     );
   }
 
+  // Placing an order requires a signed-in account. Show a blocking sign-in
+  // gate instead of the shipping form until AuthContext confirms a user —
+  // it disappears on its own once a session lands, no manual close needed.
+  if (authLoading) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 py-24 flex items-center justify-center min-h-[50vh]">
+        <div className="w-7 h-7 border-2 border-stone-200 border-t-stone-950 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 flex flex-col items-center justify-center text-center space-y-3 min-h-[60vh]">
+          <div className="w-14 h-14 bg-stone-100 border border-stone-200 rounded-full flex items-center justify-center text-stone-400">
+            <Lock className="h-6 w-6" />
+          </div>
+          <h1 className="font-syne font-extrabold text-lg uppercase tracking-wider text-stone-900">
+            Sign In Required
+          </h1>
+          <p className="text-stone-500 text-xs font-medium max-w-xs mx-auto leading-relaxed">
+            Your {cart.reduce((sum, item) => sum + item.quantity, 0)} item{cart.length === 1 ? '' : 's'} are saved in your bag — sign in to continue to checkout.
+          </p>
+        </div>
+        <AuthGateModal onCancel={() => router.push('/cart')} />
+      </>
+    );
+  }
+
   const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
     setCouponError(null);
@@ -105,7 +184,11 @@ export default function CheckoutPage() {
   const submitShipping = () => {
     if (!name || !phone || !email || !address || !city || !state || !pincode) {
       setErrorMsg('Please complete all required shipping fields');
-      return;
+      return false;
+    }
+    if (pincodeCheck === 'unserviceable') {
+      setErrorMsg('We currently cannot deliver to this pincode. Please check the address.');
+      return false;
     }
     setErrorMsg(null);
 
@@ -123,6 +206,7 @@ export default function CheckoutPage() {
 
     localStorage.setItem('arviik_shipping', JSON.stringify(shippingDetails));
     router.push('/checkout/payment');
+    return true;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -194,7 +278,7 @@ export default function CheckoutPage() {
               <input
                 type="email"
                 required
-                placeholder="your@email.com"
+                placeholder="rishipatel1610@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-stone-50 border border-stone-200 px-3.5 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-xs"
@@ -301,63 +385,36 @@ export default function CheckoutPage() {
                   placeholder="363001"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-200 px-3.5 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-xs"
+                  className={`w-full bg-stone-50 border px-3.5 py-2.5 text-xs focus:outline-none rounded-xs ${
+                    pincodeCheck === 'unserviceable' ? 'border-red-300 focus:border-red-500' : 'border-stone-200 focus:border-stone-900'
+                  }`}
                 />
+                {pincodeCheck === 'checking' && (
+                  <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-wider">Checking deliverability...</p>
+                )}
+                {pincodeCheck === 'serviceable' && (
+                  <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">✓ Delivery available to this pincode</p>
+                )}
+                {pincodeCheck === 'unserviceable' && (
+                  <p className="text-[10px] text-red-600 font-bold uppercase tracking-wider">✗ Not deliverable to this pincode</p>
+                )}
               </div>
             </div>
 
-            {/* Shipping Speed Options */}
+            {/* Shipping Method */}
             <div className="pt-3 space-y-2">
               <label className="text-[10px] text-stone-700 font-extrabold uppercase tracking-wider block">
-                Select Shipping Method
+                Shipping Method
               </label>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label
-                  className={`p-3.5 rounded-xs border cursor-pointer flex items-center space-x-3 transition-all ${
-                    shippingMethod === 'express'
-                      ? 'border-stone-950 bg-stone-50/80 shadow-xs'
-                      : 'border-stone-200 bg-white'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="shippingSpeed"
-                    checked={shippingMethod === 'express'}
-                    onChange={() => setShippingMethod('express')}
-                    className="text-stone-950 focus:ring-stone-950 h-4 w-4"
-                  />
-                  <div className="space-y-0.5">
-                    <div className="flex items-center space-x-1.5">
-                      <Truck className="h-3.5 w-3.5 text-stone-900" />
-                      <span className="text-xs font-bold text-stone-900 uppercase tracking-wider">Express Courier</span>
-                    </div>
-                    <span className="text-[10px] text-stone-500 block font-medium">Pan-India 2-4 Days • Free</span>
-                  </div>
-                </label>
 
-                <label
-                  className={`p-3.5 rounded-xs border cursor-pointer flex items-center space-x-3 transition-all ${
-                    shippingMethod === 'standard'
-                      ? 'border-stone-950 bg-stone-50/80 shadow-xs'
-                      : 'border-stone-200 bg-white'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="shippingSpeed"
-                    checked={shippingMethod === 'standard'}
-                    onChange={() => setShippingMethod('standard')}
-                    className="text-stone-950 focus:ring-stone-950 h-4 w-4"
-                  />
-                  <div className="space-y-0.5">
-                    <div className="flex items-center space-x-1.5">
-                      <Clock className="h-3.5 w-3.5 text-stone-900" />
-                      <span className="text-xs font-bold text-stone-900 uppercase tracking-wider">Standard Postal</span>
-                    </div>
-                    <span className="text-[10px] text-stone-500 block font-medium">Pan-India 5-7 Days • Free</span>
+              <div className="p-3.5 rounded-xs border border-stone-950 bg-stone-50/80 shadow-xs flex items-center space-x-3">
+                <div className="space-y-0.5">
+                  <div className="flex items-center space-x-1.5">
+                    <Clock className="h-3.5 w-3.5 text-stone-900" />
+                    <span className="text-xs font-bold text-stone-900 uppercase tracking-wider">Standard Courier</span>
                   </div>
-                </label>
+                  <span className="text-[10px] text-stone-500 block font-medium">Pan-India 5-7 Days</span>
+                </div>
               </div>
             </div>
 
@@ -476,12 +533,14 @@ export default function CheckoutPage() {
                 </div>
               )}
               <div className="flex justify-between pb-2 border-b border-stone-200">
-                <span>Express Pan-India Shipping</span>
-                <span className="text-emerald-700 font-bold uppercase tracking-wider">FREE</span>
+                <span>Shipping</span>
+                <span className="text-stone-900">{formatPrice(FLAT_SHIPPING_FEE_RUPEES)}</span>
               </div>
               <div className="flex justify-between text-base font-extrabold text-stone-950 pt-1">
                 <span>Total Amount</span>
-                <span className="font-mono">{formatPrice(getCartTotal())}</span>
+                <span className="font-mono">
+                  {formatPrice(getCartSubtotal() - getDiscountAmount() + FLAT_SHIPPING_FEE_RUPEES)}
+                </span>
               </div>
             </div>
 

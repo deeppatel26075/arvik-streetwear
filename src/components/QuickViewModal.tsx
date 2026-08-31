@@ -14,9 +14,11 @@ interface QuickViewModalProps {
 
 export default function QuickViewModal({ product, onClose }: QuickViewModalProps) {
   const { addToCart, toggleWishlist, isInWishlist } = useCart();
-  const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L' | 'XL' | 'XXL'>('M');
+  const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L' | 'XL' | 'XXL' | ''>('');
   const [activeImgIdx, setActiveImgIdx] = useState(0);
   const [added, setAdded] = useState(false);
+  const [sizeWarning, setSizeWarning] = useState(false);
+  const [wobble, setWobble] = useState(false);
 
   if (!product) return null;
 
@@ -31,7 +33,32 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
   const isDiscounted = mrp > price;
   const isWishlisted = isInWishlist(product.id);
 
+  const rawCategoryName = typeof product.category === 'string' ? product.category : product.category?.name || 'Streetwear';
+  // "Psychology Edition" is the real category name in the database — shown
+  // to customers as "Hidden Patterns" everywhere.
+  const categoryName = rawCategoryName.toLowerCase() === 'psychology edition' ? 'Hidden Patterns' : rawCategoryName;
+
+  const getStock = (size: string) => {
+    if (!product.inventory || product.inventory.length === 0) return 10;
+    const item = product.inventory.find((i: any) => i.size === size);
+    return item ? item.quantity : 0;
+  };
+
   const handleAddToCart = (express = false) => {
+    if (!selectedSize) {
+      setSizeWarning(true);
+      setWobble(false);
+      requestAnimationFrame(() => setWobble(true));
+      return;
+    }
+    const stockLimit = getStock(selectedSize);
+    if (stockLimit <= 0) {
+      setSizeWarning(true);
+      setWobble(false);
+      requestAnimationFrame(() => setWobble(true));
+      return;
+    }
+    setSizeWarning(false);
     setAdded(true);
     addToCart({
       productId: product.id,
@@ -42,7 +69,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
       slug: product.slug,
       size: selectedSize,
       quantity: 1,
-      maxStock: 10,
+      maxStock: stockLimit,
     });
 
     setTimeout(() => {
@@ -97,7 +124,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
               <div className="flex justify-between items-start">
                 <div>
                   <span className="text-[9px] font-extrabold text-stone-400 uppercase tracking-widest block">
-                    {typeof product.category === 'string' ? product.category : product.category?.name || 'Streetwear'}
+                    {categoryName}
                   </span>
                   <h2 className="font-syne font-extrabold text-xl uppercase tracking-wider text-stone-950">
                     {product.name}
@@ -137,23 +164,37 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
               {/* Size Selector */}
               <div className="space-y-1.5 pt-1">
                 <label className="text-[10px] font-extrabold uppercase tracking-wider text-stone-700 block">
-                  Select Size: <span className="text-stone-950">{selectedSize}</span>
+                  Select Size <span className="text-red-500">*</span>: <span className="text-stone-950">{selectedSize || 'Choose'}</span>
                 </label>
                 <div className="flex gap-2">
-                  {(['S', 'M', 'L', 'XL', 'XXL'] as const).map((sz) => (
-                    <button
-                      key={sz}
-                      onClick={() => setSelectedSize(sz)}
-                      className={`flex-1 py-2 text-xs font-bold uppercase rounded-xs border transition-all ${
-                        selectedSize === sz
-                          ? 'bg-stone-950 text-white border-stone-950 shadow-xs'
-                          : 'bg-white text-stone-900 border-stone-200 hover:border-stone-400'
-                      }`}
-                    >
-                      {sz}
-                    </button>
-                  ))}
+                  {(['S', 'M', 'L', 'XL', 'XXL'] as const).map((sz) => {
+                    const isAvailable = getStock(sz) > 0;
+                    return (
+                      <button
+                        key={sz}
+                        disabled={!isAvailable}
+                        onClick={() => {
+                          setSelectedSize(sz);
+                          setSizeWarning(false);
+                        }}
+                        className={`flex-1 py-2 text-xs font-bold uppercase rounded-xs border transition-all ${
+                          !isAvailable
+                            ? 'bg-stone-50 text-stone-300 border-stone-100 line-through cursor-not-allowed'
+                            : selectedSize === sz
+                            ? 'bg-stone-950 text-white border-stone-950 shadow-xs'
+                            : 'bg-white text-stone-900 border-stone-200 hover:border-stone-400'
+                        }`}
+                      >
+                        {sz}
+                      </button>
+                    );
+                  })}
                 </div>
+                {sizeWarning && (
+                  <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
+                    ⚠️ Please select a size before adding to bag.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -161,8 +202,11 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
             <div className="space-y-2 pt-2">
               <button
                 onClick={() => handleAddToCart(false)}
+                onAnimationEnd={() => setWobble(false)}
                 disabled={added}
-                className="w-full bg-stone-950 hover:bg-stone-900 text-white font-extrabold text-xs uppercase tracking-widest py-3.5 rounded-xs transition-all flex items-center justify-center space-x-2 shadow-md"
+                className={`w-full bg-stone-950 hover:bg-stone-900 text-white font-extrabold text-xs uppercase tracking-widest py-3.5 rounded-xs transition-all flex items-center justify-center space-x-2 shadow-md ${
+                  wobble ? 'animate-wobble' : ''
+                }`}
               >
                 {added ? <Check className="h-4 w-4 text-emerald-400" /> : <ShoppingBag className="h-4 w-4" />}
                 <span>{added ? 'ADDED TO BAG!' : 'ADD TO BAG'}</span>

@@ -7,11 +7,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
+    detectSessionInUrl: true
+  }
 });
 
-export async function withTimeout<T>(promise: PromiseLike<T> | Promise<T> | any, timeoutMs = 1000): Promise<T | null> {
+export async function withTimeout<T>(promise: PromiseLike<T> | Promise<T> | any, timeoutMs = 10000): Promise<T | null> {
   let timeoutId: NodeJS.Timeout;
   const timeoutPromise = new Promise<null>((resolve) => {
     timeoutId = setTimeout(() => resolve(null), timeoutMs);

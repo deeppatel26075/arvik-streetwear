@@ -22,12 +22,20 @@ export default function AdminDashboard() {
       try {
         setLoading(true);
 
-        // Fetch all orders from Supabase
+        // Fetch local custom orders if any
+        let localOrders: any[] = [];
+        try {
+          const stored = localStorage.getItem('arviik_custom_orders');
+          if (stored) {
+            localOrders = JSON.parse(stored).filter((o: any) => o.id !== 'ORD-89472' && o.id !== 'ORD-89469' && o.id !== 'ORD-89468');
+          }
+        } catch (e) {}
+
+        // 1. Fetch metrics from Supabase
         const { data: orders } = await supabase
           .from('orders')
-          .select('id, status, total_amount, created_at, shipping_name')
-          .order('created_at', { ascending: false });
-
+          .select('*, profiles(full_name)');
+        
         const { data: inventory } = await supabase
           .from('inventory')
           .select('*')
@@ -38,37 +46,52 @@ export default function AdminDashboard() {
           .select('id')
           .eq('role', 'customer');
 
-        const allOrders = orders || [];
+        const allOrders = [...localOrders, ...(orders || [])];
 
-        const totalPaid = allOrders
-          .filter(o => o.status !== 'cancelled')
-          .reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+        if (allOrders.length > 0) {
+          // Calculate revenue
+          const totalPaid = allOrders
+            .filter(o => o.status !== 'cancelled')
+            .reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+          
+          const pending = allOrders.filter(o => o.status === 'pending').length;
 
-        const pending = allOrders.filter(o => o.status === 'pending').length;
+          const todayStr = new Date().toISOString().split('T')[0];
+          const todayRevenue = allOrders
+            .filter(o => o.created_at && o.created_at.startsWith(todayStr) && o.status !== 'cancelled')
+            .reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
 
-        const todayStr = new Date().toISOString().split('T')[0];
-        const todayRevenue = allOrders
-          .filter(o => o.created_at && o.created_at.startsWith(todayStr) && o.status !== 'cancelled')
-          .reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+          setMetrics({
+            todayRevenue,
+            monthlyRevenue: totalPaid,
+            totalOrders: allOrders.length,
+            pendingOrders: pending,
+            totalCustomers: profiles?.length || 0,
+            lowStockCount: inventory?.length || 0,
+          });
 
-        setMetrics({
-          todayRevenue,
-          monthlyRevenue: totalPaid,
-          totalOrders: allOrders.length,
-          pendingOrders: pending,
-          totalCustomers: profiles?.length || 0,
-          lowStockCount: inventory?.length || 0,
-        });
-
-        setRecentOrders(
-          allOrders.slice(0, 5).map(o => ({
-            id: o.id,
-            name: o.shipping_name || 'Customer',
-            total: o.total_amount || 0,
-            status: o.status || 'pending',
-            date: o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN') : 'Today',
-          }))
-        );
+          // Set recent orders list
+          const formattedOrders = allOrders
+            .slice(0, 5)
+            .map(o => ({
+              id: o.id,
+              name: o.shipping_name || 'Customer',
+              total: o.total_amount || 0,
+              status: o.status || 'pending',
+              date: o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN') : 'Today',
+            }));
+          setRecentOrders(formattedOrders);
+        } else {
+          setMetrics({
+            todayRevenue: 0,
+            monthlyRevenue: 0,
+            totalOrders: 0,
+            pendingOrders: 0,
+            totalCustomers: profiles?.length || 0,
+            lowStockCount: inventory?.length || 0,
+          });
+          setRecentOrders([]);
+        }
       } catch (err) {
         console.error('Failed to load admin stats:', err);
       } finally {

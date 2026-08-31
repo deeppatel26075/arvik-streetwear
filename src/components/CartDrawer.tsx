@@ -238,10 +238,10 @@ export default function CartDrawer() {
                       <form onSubmit={handleApplyCoupon} className="flex gap-2">
                         <input
                           type="text"
-                          placeholder="COUPON CODE"
+                          placeholder="ENTER CODE"
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                          className="apple-input flex-grow text-[10px] uppercase font-bold py-2 px-3"
+                          className="flex-grow bg-white border-2 border-stone-300 rounded-xs text-[10px] uppercase font-bold py-2 px-3 placeholder:text-stone-400 focus:outline-none focus:border-stone-900 transition-colors"
                         />
                         <button
                           type="submit"
