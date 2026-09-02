@@ -47,9 +47,30 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     );
   }
 
+  let relatedProducts: any[] = [];
+  try {
+    const relRes: any = await withTimeout(
+      supabase
+        .from('products')
+        .select('id, name, slug, price, discount_price, category:categories(name), product_images(image_url), inventory(size, quantity)')
+        .eq('is_hidden', false)
+        .eq('category_id', product.category_id)
+        .neq('id', product.id)
+        .limit(4)
+    );
+    relatedProducts = (relRes?.data || []).map((p: any) => ({
+      ...p,
+      category: p.category ? { name: p.category.name } : undefined,
+      product_images: p.product_images || [],
+      inventory: p.inventory || []
+    }));
+  } catch (err) {
+    console.error(`Error loading related products for ${slug}:`, err);
+  }
+
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-      <ProductDetailClient product={product as any} />
+      <ProductDetailClient product={product as any} relatedProducts={relatedProducts as any} />
     </div>
   );
 }
