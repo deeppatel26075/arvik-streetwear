@@ -24,6 +24,7 @@ export default function AdminProducts() {
   const [fitType, setFitType] = useState('Oversized Fit');
   const [washInstructions, setWashInstructions] = useState('Cold wash inside out');
   const [productImages, setProductImages] = useState<string[]>(['', '', '', '', '']);
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
 
   // Stock sizes
   const [stockS, setStockS] = useState('10');
@@ -32,18 +33,32 @@ export default function AdminProducts() {
   const [stockXL, setStockXL] = useState('10');
   const [stockXXL, setStockXXL] = useState('5');
 
-  const handleSingleImageUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSingleImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result as string;
+    setUploadingIdx(index);
+    try {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `${crypto.randomUUID()}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(path, file, { contentType: file.type });
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage.from('product-images').getPublicUrl(path);
+
       const next = [...productImages];
-      next[index] = base64String;
+      next[index] = data.publicUrl;
       setProductImages(next);
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('Failed to upload image to Supabase Storage:', err);
+      alert('Failed to upload this photo. Please try again.');
+    } finally {
+      setUploadingIdx(null);
+      e.target.value = '';
+    }
   };
 
   const handleImageUrlChange = (index: number, value: string) => {
@@ -529,9 +544,13 @@ export default function AdminProducts() {
                         <input
                           type="file"
                           accept="image/*"
+                          disabled={uploadingIdx === idx}
                           onChange={(e) => handleSingleImageUpload(idx, e)}
-                          className="w-full text-[11px] text-stone-500 file:mr-2 file:py-0.5 file:px-2 file:rounded-sm file:border-0 file:text-[9px] file:font-bold file:uppercase file:bg-stone-950 file:text-white hover:file:opacity-90"
+                          className="w-full text-[11px] text-stone-500 file:mr-2 file:py-0.5 file:px-2 file:rounded-sm file:border-0 file:text-[9px] file:font-bold file:uppercase file:bg-stone-950 file:text-white hover:file:opacity-90 disabled:opacity-50"
                         />
+                        {uploadingIdx === idx && (
+                          <span className="text-[9px] text-stone-500 font-bold uppercase tracking-wider">Uploading…</span>
+                        )}
                         <input
                           type="text"
                           placeholder={`Or paste photo ${idx + 1} URL...`}
