@@ -174,7 +174,10 @@ export default function PanoramicCurveCarousel({
     return () => window.removeEventListener('resize', measure);
   }, []);
 
-  const panelWidth = viewportWidth / effectiveVisible;
+  // Mobile gets its own full-bleed "story" layout (see render branch below)
+  // instead of the peeking-sliver panoramic band, so each panel there
+  // should claim the full viewport width — no adjacent sliver.
+  const panelWidth = isNarrow ? viewportWidth : viewportWidth / effectiveVisible;
   const effBandHeight = bandHeight * bandScale;
   const effCurveDepth = Math.min(curveDepth * bandScale, effBandHeight / 2 - 4);
   const tunnelClipPath = useMemo(() => buildTunnelClipPath(effCurveDepth), [effCurveDepth]);
@@ -294,6 +297,122 @@ export default function PanoramicCurveCarousel({
   const useTransition = !isDragging && !reducedMotion && !jumping;
 
   const startPanel = extIndex;
+
+  // Mobile gets a dedicated "story" presentation instead of the desktop
+  // panoramic tunnel: the tunnel curve is built for a wide landscape band,
+  // and on a narrow phone it just letterboxes these tall portrait product
+  // photos into a squat strip. A full-bleed, swipeable, Instagram/Snapchat-
+  // style vertical carousel (segmented progress bar, caption burned into
+  // the photo) suits both the "Product Story" name and a phone screen far
+  // better, while the desktop branch below is untouched.
+  if (isNarrow) {
+    return (
+      <section className={`relative w-full bg-black overflow-hidden py-16 ${className}`}>
+        {(eyebrow || heading) && (
+          <div className="flex items-end justify-between gap-3 px-4 mb-4">
+            <div className="min-w-0">
+              {eyebrow && (
+                <span className="block text-[10px] font-extrabold uppercase tracking-[0.3em] text-white/50">
+                  {eyebrow}
+                </span>
+              )}
+              {heading && (
+                <h2 className="font-syne font-extrabold uppercase text-lg text-white mt-0.5 leading-tight">
+                  {heading}
+                </h2>
+              )}
+            </div>
+            {pageCount > 1 && (
+              <span className="flex-shrink-0 text-white/40 text-[11px] font-mono font-bold tracking-wider pb-0.5">
+                {String(activePage + 1).padStart(2, '0')}/{String(pageCount).padStart(2, '0')}
+              </span>
+            )}
+          </div>
+        )}
+
+        <div
+          ref={viewportRef}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label={heading || 'Product story'}
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
+          className="relative w-full overflow-hidden touch-pan-y outline-none"
+          style={{ aspectRatio: '4 / 5', cursor: isDragging ? 'grabbing' : pageCount > 1 ? 'grab' : 'default' }}
+        >
+          <div
+            className="absolute inset-y-0 left-0 flex h-full"
+            style={{
+              transform: `translateX(${trackOffset}px)`,
+              transition: useTransition ? `transform ${transitionDuration}ms cubic-bezier(0.22, 1, 0.36, 1)` : 'none',
+              width: viewportWidth ? panelWidth * displayPanels.length : '100%',
+            }}
+          >
+            {displayPanels.map((panel, i) => {
+              const realIndex = canLoop ? (((i - cloneCount) % total) + total) % total : i;
+              return (
+                <div
+                  key={`story-slot-${i}-${panel.id}`}
+                  className="relative h-full flex-shrink-0"
+                  style={{ width: panelWidth || '100%' }}
+                >
+                  <PanelImage
+                    src={panel.image}
+                    fallbackIndex={realIndex}
+                    alt=""
+                    loading={i >= startPanel - 1 && i <= startPanel + step ? 'eager' : 'lazy'}
+                  />
+                  <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
+                  <div className="absolute left-4 right-4 bottom-4 flex items-end justify-between gap-3">
+                    <p className="text-white text-sm font-medium leading-snug drop-shadow-sm max-w-[78%]">
+                      {panel.caption}
+                    </p>
+                    <span className="flex-shrink-0 text-white/60 text-[10px] font-mono font-bold tracking-wider">
+                      {String(realIndex + 1).padStart(2, '0')}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {pageCount > 1 && (
+            <div className="absolute top-3 left-3 right-3 z-20 flex gap-1">
+              {Array.from({ length: pageCount }).map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-[3px] flex-1 rounded-full transition-colors duration-300 ${
+                    i === activePage ? 'bg-white' : 'bg-white/25'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+
+          {pageCount > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={() => { if (!didDragRef.current) goPrev(); }}
+                aria-label="Previous"
+                className="absolute left-0 inset-y-0 w-1/3 z-10"
+              />
+              <button
+                type="button"
+                onClick={() => { if (!didDragRef.current) goNext(); }}
+                aria-label="Next"
+                className="absolute right-0 inset-y-0 w-1/3 z-10"
+              />
+            </>
+          )}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className={`relative w-full bg-black overflow-hidden py-16 sm:py-24 ${className}`}>
