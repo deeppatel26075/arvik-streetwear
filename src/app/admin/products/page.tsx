@@ -123,25 +123,15 @@ export default function AdminProducts() {
     try {
       setLoading(true);
 
-      const defaultCategories = [
-        { id: 'cat-limited-edition', name: 'Limited Edition', slug: 'limited-edition' },
-        { id: 'cat-on-fire', name: 'On Fire', slug: 'on-fire' },
-        { id: 'cat-graphic-tee', name: 'Graphic Tee', slug: 'graphic-tee' },
-        { id: 'cat-psychology-edition', name: 'Psychology Edition', slug: 'psychology-edition' }
-      ];
-
-      let loadedCats: any[] = [];
+      // Only real DB rows are offered here — the shop page's filter chips
+      // separately inject a few always-shown placeholder categories
+      // (Limited Edition, On Fire, Psychology Edition) for display, but
+      // those aren't valid category_id values unless they also exist as
+      // real rows here. Offering a fake id in this dropdown let a product
+      // get assigned a category_id that fails to save (invalid UUID).
       const { data: cats, error: catError } = await supabase.from('categories').select('*');
       if (catError) throw catError;
-      if (cats) loadedCats = cats;
-
-      // Merge default filter categories if any are missing from the DB
-      for (const defCat of defaultCategories) {
-        if (!loadedCats.some((c: any) => c.slug === defCat.slug || c.name.toLowerCase() === defCat.name.toLowerCase())) {
-          loadedCats.push(defCat);
-        }
-      }
-      setCategories(loadedCats);
+      setCategories(cats || []);
 
       const { data: prods, error: prodError } = await supabase
         .from('products')
@@ -194,7 +184,7 @@ export default function AdminProducts() {
     setDescription('');
     setPrice('');
     setDiscountPrice('');
-    setCategoryId(categories[0]?.id || 'cat-limited-edition');
+    setCategoryId(categories[0]?.id || '');
     setFabric('100% Premium Cotton');
     setGsm('240 GSM');
     setFitType('Oversized Fit');
@@ -216,7 +206,7 @@ export default function AdminProducts() {
     setDescription(prod.description || '');
     setPrice(prod.price.toString());
     setDiscountPrice(prod.discount_price ? prod.discount_price.toString() : '');
-    setCategoryId(prod.category_id || categories[0]?.id || 'cat-limited-edition');
+    setCategoryId(prod.category_id || categories[0]?.id || '');
     setFabric(prod.fabric || '100% Premium Cotton');
     setGsm(prod.gsm || '240 GSM');
     setFitType(prod.fit_type || 'Oversized Fit');
