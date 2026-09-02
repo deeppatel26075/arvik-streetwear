@@ -30,11 +30,30 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         ...data,
         category: data.category ? { name: (data.category as any).name } : undefined,
         product_images: data.product_images || [],
-        inventory: data.inventory || []
+        inventory: data.inventory || [],
+        product_story_panels: [] as any[]
       };
     }
   } catch (err) {
     console.error(`Error loading product details for ${slug}:`, err);
+  }
+
+  // Fetched separately (not embedded above) so that a missing/pending
+  // product_story_panels migration degrades to the frontend's own
+  // gallery-photo fallback instead of taking down the whole product page.
+  if (dbProduct) {
+    try {
+      const storyRes: any = await withTimeout(
+        supabase
+          .from('product_story_panels')
+          .select('image_url, caption, display_order')
+          .eq('product_id', dbProduct.id)
+          .order('display_order')
+      );
+      dbProduct.product_story_panels = storyRes?.data || [];
+    } catch (err) {
+      console.error(`Error loading story panels for ${slug}:`, err);
+    }
   }
 
   const product = dbProduct;

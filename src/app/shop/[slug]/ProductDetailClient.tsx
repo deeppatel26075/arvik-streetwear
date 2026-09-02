@@ -56,6 +56,7 @@ interface ProductDetailClientProps {
     category?: { name: string } | string;
     product_images?: ProductImage[];
     inventory?: InventoryItem[];
+    product_story_panels?: { image_url: string; caption?: string }[];
   };
   relatedProducts?: {
     id: string;
@@ -272,11 +273,17 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: P
     'Garment-washed for a lived-in, vintage finish.',
     'Reinforced double-stitched hems, built for the long run.',
   ];
-  const storyPanels = images.map((img, i) => ({
-    id: `story-${i}`,
-    image: img.image_url,
-    caption: STORY_CAPTIONS[i % STORY_CAPTIONS.length],
-  }));
+  const storyPanels = product.product_story_panels && product.product_story_panels.length > 0
+    ? product.product_story_panels.map((panel, i) => ({
+        id: `story-${i}`,
+        image: panel.image_url,
+        caption: panel.caption || '',
+      }))
+    : images.map((img, i) => ({
+        id: `story-${i}`,
+        image: img.image_url,
+        caption: STORY_CAPTIONS[i % STORY_CAPTIONS.length],
+      }));
 
   const activePrice = product.discount_price && product.discount_price > 0
     ? product.discount_price

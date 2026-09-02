@@ -26,6 +26,13 @@ export default function AdminProducts() {
   const [productImages, setProductImages] = useState<string[]>(['', '', '', '', '']);
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
 
+  // Product Story panels — the curated photo + caption strip shown on the
+  // product detail page. Falls back to the gallery photos above (with
+  // generic captions) on the frontend until these are set.
+  const [storyImages, setStoryImages] = useState<string[]>(['', '', '', '', '']);
+  const [storyCaptions, setStoryCaptions] = useState<string[]>(['', '', '', '', '']);
+  const [uploadingStoryIdx, setUploadingStoryIdx] = useState<number | null>(null);
+
   // Stock sizes
   const [stockS, setStockS] = useState('10');
   const [stockM, setStockM] = useState('15');
@@ -33,24 +40,28 @@ export default function AdminProducts() {
   const [stockXL, setStockXL] = useState('10');
   const [stockXXL, setStockXXL] = useState('5');
 
+  const uploadToStorage = async (file: File) => {
+    const ext = file.name.split('.').pop() || 'jpg';
+    const path = `${crypto.randomUUID()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('product-images')
+      .upload(path, file, { contentType: file.type });
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage.from('product-images').getPublicUrl(path);
+    return data.publicUrl;
+  };
+
   const handleSingleImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setUploadingIdx(index);
     try {
-      const ext = file.name.split('.').pop() || 'jpg';
-      const path = `${crypto.randomUUID()}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(path, file, { contentType: file.type });
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage.from('product-images').getPublicUrl(path);
-
+      const publicUrl = await uploadToStorage(file);
       const next = [...productImages];
-      next[index] = data.publicUrl;
+      next[index] = publicUrl;
       setProductImages(next);
     } catch (err) {
       console.error('Failed to upload image to Supabase Storage:', err);
@@ -71,6 +82,40 @@ export default function AdminProducts() {
     const next = [...productImages];
     next[index] = '';
     setProductImages(next);
+  };
+
+  const handleStoryImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingStoryIdx(index);
+    try {
+      const publicUrl = await uploadToStorage(file);
+      const next = [...storyImages];
+      next[index] = publicUrl;
+      setStoryImages(next);
+    } catch (err) {
+      console.error('Failed to upload story photo to Supabase Storage:', err);
+      alert('Failed to upload this photo. Please try again.');
+    } finally {
+      setUploadingStoryIdx(null);
+      e.target.value = '';
+    }
+  };
+
+  const handleStoryCaptionChange = (index: number, value: string) => {
+    const next = [...storyCaptions];
+    next[index] = value;
+    setStoryCaptions(next);
+  };
+
+  const handleRemoveStoryImage = (index: number) => {
+    const nextImages = [...storyImages];
+    nextImages[index] = '';
+    setStoryImages(nextImages);
+    const nextCaptions = [...storyCaptions];
+    nextCaptions[index] = '';
+    setStoryCaptions(nextCaptions);
   };
 
   // Load products & categories — always straight from Supabase, never from a local cache
@@ -105,11 +150,30 @@ export default function AdminProducts() {
 
       if (prodError) throw prodError;
 
+      // Fetched separately (not embedded above) so a missing/pending
+      // product_story_panels migration doesn't take down the whole catalog
+      // list — it just leaves story panels empty until the table exists.
+      let storyPanelsByProduct: Record<string, any[]> = {};
+      try {
+        const { data: storyRows, error: storyError } = await supabase
+          .from('product_story_panels')
+          .select('product_id, image_url, caption, display_order')
+          .order('display_order');
+        if (storyError) throw storyError;
+        storyPanelsByProduct = (storyRows || []).reduce((acc: Record<string, any[]>, row: any) => {
+          (acc[row.product_id] = acc[row.product_id] || []).push(row);
+          return acc;
+        }, {});
+      } catch (storyErr) {
+        console.error('Error loading product story panels:', storyErr);
+      }
+
       const loadedProds = (prods || []).map((p) => ({
         ...p,
         categoryName: p.category?.name || 'Streetwear',
         images: p.product_images?.map((img: any) => img.image_url) || [],
         sizes: p.inventory || [],
+        storyPanels: storyPanelsByProduct[p.id] || [],
       }));
       setProducts(loadedProds);
     } catch (e) {
@@ -136,6 +200,8 @@ export default function AdminProducts() {
     setFitType('Oversized Fit');
     setWashInstructions('Cold machine wash inside out. Do not iron print.');
     setProductImages(['', '', '', '', '']);
+    setStoryImages(['', '', '', '', '']);
+    setStoryCaptions(['', '', '', '', '']);
     setStockS('10');
     setStockM('15');
     setStockL('20');
@@ -165,6 +231,22 @@ export default function AdminProducts() {
       existingImgs[4] || '',
     ]);
 
+    const existingStoryPanels = prod.storyPanels || prod.product_story_panels || [];
+    setStoryImages([
+      existingStoryPanels[0]?.image_url || '',
+      existingStoryPanels[1]?.image_url || '',
+      existingStoryPanels[2]?.image_url || '',
+      existingStoryPanels[3]?.image_url || '',
+      existingStoryPanels[4]?.image_url || '',
+    ]);
+    setStoryCaptions([
+      existingStoryPanels[0]?.caption || '',
+      existingStoryPanels[1]?.caption || '',
+      existingStoryPanels[2]?.caption || '',
+      existingStoryPanels[3]?.caption || '',
+      existingStoryPanels[4]?.caption || '',
+    ]);
+
     // Set stock values from sizes array
     const getQty = (sz: string) => {
       const item = prod.sizes?.find((s: any) => s.size === sz);
@@ -177,6 +259,26 @@ export default function AdminProducts() {
     setStockXXL(getQty('XXL'));
 
     setFormOpen(true);
+  };
+
+  // Isolated from the main product save so that a missing/pending
+  // product_story_panels migration only fails the story-panel step (with
+  // a warning) instead of blocking the entire product save.
+  const saveStoryPanels = async (productId: string, panels: { image_url: string; caption?: string }[]) => {
+    try {
+      const { error: delStoryError } = await supabase.from('product_story_panels').delete().eq('product_id', productId);
+      if (delStoryError) throw delStoryError;
+      for (let i = 0; i < panels.length; i++) {
+        const { error: storyError } = await supabase
+          .from('product_story_panels')
+          .insert({ product_id: productId, image_url: panels[i].image_url, caption: panels[i].caption || null, display_order: i });
+        if (storyError) throw storyError;
+      }
+      return true;
+    } catch (err) {
+      console.error('Failed to save product story panels:', err);
+      return false;
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -196,6 +298,10 @@ export default function AdminProducts() {
     };
 
     const validImages = productImages.filter((img) => img && img.trim() !== '');
+    const validStoryPanels = storyImages
+      .map((img, i) => ({ image_url: img, caption: storyCaptions[i] }))
+      .filter((panel) => panel.image_url && panel.image_url.trim() !== '');
+    let storyPanelsSaved = true;
 
     try {
       if (editingId) {
@@ -208,6 +314,8 @@ export default function AdminProducts() {
           const { error: imgError } = await supabase.from('product_images').insert({ product_id: editingId, image_url: validImages[i], display_order: i });
           if (imgError) throw imgError;
         }
+
+        storyPanelsSaved = await saveStoryPanels(editingId, validStoryPanels);
 
         const sizesToUpdate = [
           { size: 'S', qty: parseInt(stockS) },
@@ -238,6 +346,8 @@ export default function AdminProducts() {
           if (imgError) throw imgError;
         }
 
+        storyPanelsSaved = await saveStoryPanels(newId, validStoryPanels);
+
         const inventoryPayload = [
           { product_id: newId, size: 'S', quantity: parseInt(stockS) },
           { product_id: newId, size: 'M', quantity: parseInt(stockM) },
@@ -251,6 +361,9 @@ export default function AdminProducts() {
 
       setFormOpen(false);
       await loadData();
+      if (!storyPanelsSaved && validStoryPanels.length > 0) {
+        alert('Product saved, but the Product Story photos/captions could not be saved — the product_story_panels migration may not be run yet.');
+      }
     } catch (err) {
       console.error('Failed to save product to Supabase:', err);
       alert('Failed to save this product to the database. Nothing was changed — please try again.');
@@ -556,6 +669,59 @@ export default function AdminProducts() {
                           placeholder={`Or paste photo ${idx + 1} URL...`}
                           value={productImages[idx]?.startsWith('data:') ? '' : productImages[idx] || ''}
                           onChange={(e) => handleImageUrlChange(idx, e.target.value)}
+                          className="w-full bg-stone-50 border border-stone-200 px-2.5 py-1 text-[11px] focus:outline-none focus:border-stone-900 rounded-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Product Story Photos & Captions (Up to 5) */}
+              <div className="space-y-4 p-4 bg-stone-50 rounded-sm border border-stone-200/60">
+                <div className="border-b pb-1.5 mb-2">
+                  <span className="text-[10px] text-stone-600 font-extrabold uppercase tracking-wider block">Product Story Photos &amp; Captions (Optional, up to 5)</span>
+                  <span className="text-[9px] text-stone-400 font-medium block mt-0.5">
+                    Shown in the &quot;Product Story&quot; strip on the product page. Leave blank to fall back to the gallery photos above with generic captions.
+                  </span>
+                </div>
+
+                {[0, 1, 2, 3, 4].map((idx) => (
+                  <div key={idx} className="space-y-1.5 p-2.5 bg-white border border-stone-200 rounded-sm">
+                    <label className="text-[9px] text-stone-700 font-bold uppercase tracking-wider block">Story Photo {idx + 1}</label>
+                    <div className="flex items-center space-x-3">
+                      {storyImages[idx] ? (
+                        <div className="relative w-14 h-16 bg-stone-100 border border-stone-200 rounded-sm overflow-hidden flex-shrink-0 shadow-xs">
+                          <img src={storyImages[idx]} alt={`Story photo ${idx + 1}`} className="object-cover w-full h-full" />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveStoryImage(idx)}
+                            className="absolute top-0.5 right-0.5 bg-red-650 text-white rounded-full p-0.5 shadow-sm hover:opacity-90 transition-opacity"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-14 h-16 border border-dashed border-stone-300 rounded-sm flex flex-col items-center justify-center text-stone-400 flex-shrink-0 text-[9px] font-bold">
+                          <span>Slot {idx + 1}</span>
+                        </div>
+                      )}
+                      <div className="flex-grow space-y-1">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingStoryIdx === idx}
+                          onChange={(e) => handleStoryImageUpload(idx, e)}
+                          className="w-full text-[11px] text-stone-500 file:mr-2 file:py-0.5 file:px-2 file:rounded-sm file:border-0 file:text-[9px] file:font-bold file:uppercase file:bg-stone-950 file:text-white hover:file:opacity-90 disabled:opacity-50"
+                        />
+                        {uploadingStoryIdx === idx && (
+                          <span className="text-[9px] text-stone-500 font-bold uppercase tracking-wider">Uploading…</span>
+                        )}
+                        <input
+                          type="text"
+                          placeholder={`Caption for story photo ${idx + 1}...`}
+                          value={storyCaptions[idx] || ''}
+                          onChange={(e) => handleStoryCaptionChange(idx, e.target.value)}
                           className="w-full bg-stone-50 border border-stone-200 px-2.5 py-1 text-[11px] focus:outline-none focus:border-stone-900 rounded-sm"
                         />
                       </div>
