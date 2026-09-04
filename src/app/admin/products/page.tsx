@@ -131,7 +131,12 @@ export default function AdminProducts() {
       // get assigned a category_id that fails to save (invalid UUID).
       const { data: cats, error: catError } = await supabase.from('categories').select('*');
       if (catError) throw catError;
-      setCategories(cats || []);
+
+      // Same categories the shop page's filter chips hide from shoppers —
+      // keep the admin picker from offering ones nothing on the live site
+      // actually surfaces.
+      const HIDDEN_CATEGORY_NAMES = ['anime', 'graphic prints'];
+      setCategories((cats || []).filter((c) => !HIDDEN_CATEGORY_NAMES.includes(c.name.toLowerCase())));
 
       const { data: prods, error: prodError } = await supabase
         .from('products')
