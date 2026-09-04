@@ -57,6 +57,11 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (!/^\d{6}$/.test(pincode)) {
       setPincodeCheck('idle');
+      // City/State are read-only and only ever come from a resolved
+      // pincode — clear them so a stale value from a previous pincode
+      // can't linger once the field no longer matches it.
+      setCity('');
+      setState('');
       return;
     }
     let cancelled = false;
@@ -93,11 +98,20 @@ export default function CheckoutPage() {
       fetch(`/api/pincode-lookup?pincode=${pincode}`)
         .then((r) => r.json())
         .then((data) => {
-          if (cancelled || !data.found) return;
+          if (cancelled) return;
+          if (!data.found) {
+            setCity('');
+            setState('');
+            return;
+          }
           setCity(data.city);
           setState(data.state);
         })
-        .catch(() => {});
+        .catch(() => {
+          if (cancelled) return;
+          setCity('');
+          setState('');
+        });
     }, 500);
     return () => {
       cancelled = true;
@@ -354,36 +368,11 @@ export default function CheckoutPage() {
               />
             </div>
 
-            {/* City, State, Pincode Grid */}
+            {/* Pincode, City, State Grid — pincode comes first since it
+                drives the other two: typing it auto-fills City/State
+                (via /api/pincode-lookup), which then stay read-only so
+                they can never drift from what the pincode actually is. */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-stone-600 font-bold uppercase tracking-wider block">
-                  City *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Surendranagar"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-200 px-3.5 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-xs"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-stone-600 font-bold uppercase tracking-wider block">
-                  State *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Gujarat"
-                  value={state}
-                  onChange={(e) => setState(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-200 px-3.5 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-xs"
-                />
-              </div>
-
               <div className="space-y-1.5">
                 <label className="text-[10px] text-stone-600 font-bold uppercase tracking-wider block">
                   PIN Code *
@@ -407,6 +396,34 @@ export default function CheckoutPage() {
                 {pincodeCheck === 'unserviceable' && (
                   <p className="text-[10px] text-red-600 font-bold uppercase tracking-wider">✗ Not deliverable to this pincode</p>
                 )}
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] text-stone-600 font-bold uppercase tracking-wider block">
+                  City *
+                </label>
+                <input
+                  type="text"
+                  required
+                  readOnly
+                  placeholder="Auto-filled from PIN code"
+                  value={city}
+                  className="w-full bg-stone-100 border border-stone-200 px-3.5 py-2.5 text-xs text-stone-600 rounded-xs cursor-not-allowed focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] text-stone-600 font-bold uppercase tracking-wider block">
+                  State *
+                </label>
+                <input
+                  type="text"
+                  required
+                  readOnly
+                  placeholder="Auto-filled from PIN code"
+                  value={state}
+                  className="w-full bg-stone-100 border border-stone-200 px-3.5 py-2.5 text-xs text-stone-600 rounded-xs cursor-not-allowed focus:outline-none"
+                />
               </div>
             </div>
 
