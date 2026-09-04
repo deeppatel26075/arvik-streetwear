@@ -9,11 +9,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid checkout amount' }, { status: 400 });
     }
 
-    const key_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    // Deliberately NOT process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID here — Next.js
+    // statically inlines NEXT_PUBLIC_* vars into the compiled output at BUILD
+    // time, even inside server-only route handlers like this one. A stale
+    // build (e.g. a "Redeploy" that reuses cached build output instead of
+    // rebuilding) would keep using whatever Key ID was baked in at the last
+    // real build, silently mismatched against a newer key_secret. A plain
+    // server-only env var is read at actual runtime, every request.
+    const key_id = process.env.RAZORPAY_KEY_ID;
     const key_secret = process.env.RAZORPAY_KEY_SECRET;
 
     if (!key_id || !key_secret) {
-      console.error('NEXT_PUBLIC_RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET are not configured.');
+      console.error('RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET are not configured.');
       return NextResponse.json({ error: 'Payments are not configured right now. Please try again later.' }, { status: 500 });
     }
 
