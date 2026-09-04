@@ -63,18 +63,27 @@ export async function POST(request: Request) {
     });
 
     // ── Razorpay signature verification ──────────────────────────────
+    // This HMAC check is the ONLY thing standing between "a real payment
+    // happened" and "someone POSTed fabricated IDs at this endpoint." It
+    // must actually reject a mismatch — Razorpay's test mode still signs
+    // with a real key secret, so there's no legitimate reason for a
+    // genuine checkout to ever produce a bad signature here.
     if (paymentMethod === 'razorpay') {
       if (!razorpay?.paymentId || !razorpay?.orderId || !razorpay?.signature) {
         return NextResponse.json({ error: 'Missing Razorpay payment details.' }, { status: 400 });
       }
-      const keySecret = process.env.RAZORPAY_KEY_SECRET || 'JfoiYCtlva3SX1q1lcGOHY3Q';
-      const isMock = keySecret === 'mockkeysecret456' || razorpay.signature === 'mock_signature' || keySecret === 'JfoiYCtlva3SX1q1lcGOHY3Q';
+      const keySecret = process.env.RAZORPAY_KEY_SECRET;
+      if (!keySecret) {
+        console.error('RAZORPAY_KEY_SECRET is not configured — cannot verify payment.');
+        return NextResponse.json({ error: 'Payment verification is not configured. Please contact support.' }, { status: 500 });
+      }
       const generatedSignature = crypto
         .createHmac('sha256', keySecret)
         .update(`${razorpay.orderId}|${razorpay.paymentId}`)
         .digest('hex');
-      if (generatedSignature !== razorpay.signature && !isMock) {
-        console.warn('Razorpay signature verification mismatch, accepting test transaction safely.');
+      if (generatedSignature !== razorpay.signature) {
+        console.error('Razorpay signature verification failed — rejecting order.');
+        return NextResponse.json({ error: 'Payment verification failed. If you were charged, contact support.' }, { status: 402 });
       }
     }
 

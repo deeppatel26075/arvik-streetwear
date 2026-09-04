@@ -175,27 +175,27 @@ export default function CheckoutPaymentPage() {
         throw new Error('Razorpay SDK failed to load. Please check your internet connection.');
       }
 
-      // Call backend route to generate Razorpay Order ID
-      let razorpayOrderId = null;
-      try {
-        const res = await fetch('/api/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: grandTotal,
-            currency: 'INR',
-          }),
-        });
-
-        const data = await res.json();
-        if (data.id) {
-          razorpayOrderId = data.id;
-        }
-      } catch (err) {
-        console.warn('API checkout order creation fallback:', err);
+      // Call backend route to generate Razorpay Order ID — required for a
+      // real payment; if this fails there's no legitimate order to pay
+      // for, so abort rather than opening the widget without one.
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: grandTotal,
+          currency: 'INR',
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.id) {
+        throw new Error(data.error || 'Could not start payment. Please try again.');
       }
+      const razorpayOrderId = data.id;
 
-      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_TKVDXSP0EuD5RL';
+      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      if (!razorpayKey) {
+        throw new Error('Payments are not configured right now. Please try again later.');
+      }
 
       const options: any = {
         key: razorpayKey,
@@ -204,7 +204,7 @@ export default function CheckoutPaymentPage() {
         name: 'ARVIIK STREETWEAR',
         description: 'Payment for Streetwear Order',
         image: '/arviik-logo.png',
-        order_id: razorpayOrderId || undefined,
+        order_id: razorpayOrderId,
         prefill: {
           name: shipping.name,
           email: shipping.email,
@@ -216,10 +216,13 @@ export default function CheckoutPaymentPage() {
         handler: async function (response: any) {
           setLoading(true);
           try {
+            if (!response.razorpay_payment_id || !response.razorpay_order_id || !response.razorpay_signature) {
+              throw new Error('Payment confirmation was incomplete. If you were charged, contact support.');
+            }
             const result = await submitOrder({
-              paymentId: response.razorpay_payment_id || `pay_mock_${Date.now()}`,
-              orderId: response.razorpay_order_id || razorpayOrderId || `order_mock_${Date.now()}`,
-              signature: response.razorpay_signature || 'mock_signature',
+              paymentId: response.razorpay_payment_id,
+              orderId: response.razorpay_order_id,
+              signature: response.razorpay_signature,
             });
             const finalOrderId = result.orderId;
 
