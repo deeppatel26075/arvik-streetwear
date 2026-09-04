@@ -64,8 +64,14 @@ export default function CheckoutPaymentPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pincode: shipping.pincode, paymentMode, itemQuantity, orderValueRupees }),
       })
-        .then((r) => r.json())
-        .then((data) => data.serviceable !== false)
+        .then(async (r) => {
+          const data = await r.json().catch(() => ({}));
+          if (r.ok) return data.serviceable !== false;
+          // The route rejected the pincode itself (bad format/doesn't
+          // exist) — that's a real "invalid", not a logistics outage.
+          if (r.status === 400) return false;
+          return true; // logistics outage shouldn't block checkout
+        })
         .catch(() => true); // logistics outage shouldn't block checkout
 
     Promise.all([checkMode('prepaid'), checkMode('cod')]).then(([prepaid, cod]) => {

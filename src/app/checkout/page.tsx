@@ -68,10 +68,19 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pincode, paymentMode: 'prepaid', itemQuantity, orderValueRupees: getCartSubtotal() }),
       })
-        .then((r) => r.json())
-        .then((data) => {
+        .then(async (r) => {
+          const data = await r.json().catch(() => ({}));
           if (cancelled) return;
-          setPincodeCheck(data.serviceable === false ? 'unserviceable' : 'serviceable');
+          if (r.ok) {
+            setPincodeCheck(data.serviceable === false ? 'unserviceable' : 'serviceable');
+          } else if (r.status === 400) {
+            // The route rejected the pincode itself (bad format/doesn't
+            // exist) — that's a real "invalid", not a logistics outage,
+            // so it shouldn't fall through to the outage-tolerant default.
+            setPincodeCheck('unserviceable');
+          } else {
+            setPincodeCheck('serviceable'); // logistics outage shouldn't block the form
+          }
         })
         .catch(() => {
           if (!cancelled) setPincodeCheck('serviceable'); // logistics outage shouldn't block the form
