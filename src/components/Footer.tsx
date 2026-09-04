@@ -93,10 +93,10 @@ export default function Footer() {
           <div className="space-y-3">
             <h4 className="font-bold text-lime-400 uppercase text-[10px] tracking-[0.2em]">Legal</h4>
             <ul className="space-y-2.5 text-xs">
-              <li><Link href="/contact" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">Refund Policy</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">Payment Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
+              <li><Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link></li>
+              <li><Link href="/payment-policy" className="hover:text-white transition-colors">Payment Policy</Link></li>
             </ul>
           </div>
         </div>
@@ -197,11 +197,11 @@ export default function Footer() {
             Wear Your Identity.
           </p>
           <div className="flex items-center justify-center space-x-4 pt-1">
-            <Link href="/contact" className="text-[10px] tracking-widest uppercase text-stone-500 hover:text-white transition-colors">
+            <Link href="/privacy-policy" className="text-[10px] tracking-widest uppercase text-stone-500 hover:text-white transition-colors">
               Privacy Policy
             </Link>
             <span className="text-stone-700">|</span>
-            <Link href="/contact" className="text-[10px] tracking-widest uppercase text-stone-500 hover:text-white transition-colors">
+            <Link href="/terms" className="text-[10px] tracking-widest uppercase text-stone-500 hover:text-white transition-colors">
               Terms & Conditions
             </Link>
           </div>

@@ -157,8 +157,8 @@ export default function SettingsPage() {
         <p className="text-[10px] font-extrabold uppercase tracking-wider text-stone-400 pb-1 border-b border-stone-100">
           Legal
         </p>
-        <SettingsLink href="/contact" icon={FileText} label="Privacy Policy" />
-        <SettingsLink href="/contact" icon={ShieldCheck} label="Terms & Conditions" />
+        <SettingsLink href="/privacy-policy" icon={FileText} label="Privacy Policy" />
+        <SettingsLink href="/terms" icon={ShieldCheck} label="Terms & Conditions" />
       </section>
 
       {/* Support */}
