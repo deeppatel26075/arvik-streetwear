@@ -7,6 +7,7 @@ import PriceRangeSlider from '@/components/PriceRangeSlider';
 import { useTheme } from '@/context/ThemeContext';
 import PsychologyBackdrop from '@/components/PsychologyBackdrop';
 import OnFireBackdrop from '@/components/OnFireBackdrop';
+import { categoryDisplayName } from '@/lib/utils';
 import { SlidersHorizontal, ArrowUpDown, ChevronDown, X, Check } from 'lucide-react';
 
 interface Category {
@@ -213,12 +214,6 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
   };
 
   const sizes: ('S' | 'M' | 'L' | 'XL' | 'XXL')[] = ['S', 'M', 'L', 'XL'];
-
-  // "Psychology Edition" is the real category name in the database (and
-  // what filtering/theming key off of), but it's branded as "Hidden
-  // Patterns" everywhere it's shown to shoppers.
-  const categoryDisplayName = (name: string) =>
-    name.toLowerCase() === 'psychology edition' ? 'Hidden Patterns' : name;
 
   // Per-option result counts — each category/size shows how many products
   // would match if it were picked, given every OTHER active filter (so

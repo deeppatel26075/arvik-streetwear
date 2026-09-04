@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, categoryDisplayName } from '@/lib/utils';
 import { Plus, Edit2, Trash2, Check, Eye, EyeOff, Star, X, RefreshCw } from 'lucide-react';
 
 export default function AdminProducts() {
@@ -443,7 +443,7 @@ export default function AdminProducts() {
                         {prod.name}
                       </td>
                       <td className="py-4 uppercase tracking-wider text-[10px] font-semibold text-stone-500">
-                        {prod.categoryName}
+                        {categoryDisplayName(prod.categoryName)}
                       </td>
                       <td className="py-4 font-mono font-semibold text-stone-900">
                         {formatPrice(prod.discount_price || prod.price)}
@@ -563,7 +563,7 @@ export default function AdminProducts() {
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
-                        {c.name}
+                        {categoryDisplayName(c.name)}
                       </option>
                     ))}
                   </select>
