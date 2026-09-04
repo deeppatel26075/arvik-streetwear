@@ -68,16 +68,36 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
   let relatedProducts: any[] = [];
   try {
+    const relSelect = 'id, name, slug, price, discount_price, category:categories(name), product_images(image_url), inventory(size, quantity)';
+
     const relRes: any = await withTimeout(
       supabase
         .from('products')
-        .select('id, name, slug, price, discount_price, category:categories(name), product_images(image_url), inventory(size, quantity)')
+        .select(relSelect)
         .eq('is_hidden', false)
         .eq('category_id', product.category_id)
         .neq('id', product.id)
         .limit(4)
     );
-    relatedProducts = (relRes?.data || []).map((p: any) => ({
+    let relData = relRes?.data || [];
+
+    // Not enough other products in the same category yet (e.g. an early
+    // catalog with only one product per category) — fall back to any
+    // other products so the section still has something to show, rather
+    // than sitting invisible until the catalog fills out.
+    if (relData.length === 0) {
+      const fallbackRes: any = await withTimeout(
+        supabase
+          .from('products')
+          .select(relSelect)
+          .eq('is_hidden', false)
+          .neq('id', product.id)
+          .limit(4)
+      );
+      relData = fallbackRes?.data || [];
+    }
+
+    relatedProducts = relData.map((p: any) => ({
       ...p,
       category: p.category ? { name: p.category.name } : undefined,
       product_images: p.product_images || [],
