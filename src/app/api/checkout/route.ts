@@ -29,9 +29,9 @@ export async function POST(request: Request) {
     return NextResponse.json(order);
   } catch (error: any) {
     console.error('Error generating Razorpay Order ID:', error);
-    return NextResponse.json(
-      { error: error.message || 'Razorpay order creation failed' },
-      { status: 500 }
-    );
+    // The Razorpay SDK throws errors shaped like { statusCode, error: { code, description } },
+    // not a flat .message — surface the real reason instead of a generic string.
+    const detail = error?.error?.description || error?.message || 'Razorpay order creation failed';
+    return NextResponse.json({ error: detail }, { status: 500 });
   }
 }
