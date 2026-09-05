@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { supabase } from '@/lib/supabase';
 import { formatPrice } from '@/lib/utils';
-import { FLAT_SHIPPING_FEE_RUPEES, FLAT_COD_FEE_RUPEES } from '@/lib/shippingConfig';
+import { FLAT_COD_FEE_RUPEES, getShippingFeeRupees } from '@/lib/shippingConfig';
 import { ArrowLeft, Check, Lock, CreditCard, ShieldCheck, Zap } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -31,7 +31,8 @@ export default function CheckoutPaymentPage() {
 
   // NimbusPost is used only to confirm this pincode is actually
   // deliverable (and, separately, COD-eligible) — never to price
-  // shipping. The charge is always the flat FLAT_SHIPPING_FEE_RUPEES.
+  // shipping. The charge is the flat fee, or free above the threshold —
+  // see getShippingFeeRupees.
   const [prepaidServiceable, setPrepaidServiceable] = useState<boolean | null>(null);
   const [codServiceable, setCodServiceable] = useState<boolean | null>(null);
   const [quoteLoading, setQuoteLoading] = useState(false);
@@ -90,7 +91,8 @@ export default function CheckoutPaymentPage() {
 
   const isServiceable = paymentMethod === 'cod' ? codServiceable : prepaidServiceable;
   const codFeeRupees = paymentMethod === 'cod' ? FLAT_COD_FEE_RUPEES : 0;
-  const grandTotal = getCartSubtotal() - getDiscountAmount() + FLAT_SHIPPING_FEE_RUPEES + codFeeRupees;
+  const shippingFeeRupees = getShippingFeeRupees(getCartSubtotal());
+  const grandTotal = getCartSubtotal() - getDiscountAmount() + shippingFeeRupees + codFeeRupees;
 
   // Load Razorpay SDK script dynamically
   const loadRazorpayScript = () => {
@@ -490,7 +492,9 @@ export default function CheckoutPaymentPage() {
               )}
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span className="text-stone-900">{formatPrice(FLAT_SHIPPING_FEE_RUPEES)}</span>
+                <span className="text-stone-900">
+                  {shippingFeeRupees === 0 ? 'FREE' : formatPrice(shippingFeeRupees)}
+                </span>
               </div>
               {codFeeRupees > 0 && (
                 <div className="flex justify-between pb-2 border-b border-stone-200">

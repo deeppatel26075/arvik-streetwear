@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { formatPrice } from '@/lib/utils';
-import { FLAT_SHIPPING_FEE_RUPEES } from '@/lib/shippingConfig';
+import { getShippingFeeRupees } from '@/lib/shippingConfig';
 import SlideToConfirm from '@/components/SlideToConfirm';
 import AuthGateModal from '@/components/AuthGateModal';
 import {
@@ -560,12 +560,14 @@ export default function CheckoutPage() {
               )}
               <div className="flex justify-between pb-2 border-b border-stone-200">
                 <span>Shipping</span>
-                <span className="text-stone-900">{formatPrice(FLAT_SHIPPING_FEE_RUPEES)}</span>
+                <span className="text-stone-900">
+                  {getShippingFeeRupees(getCartSubtotal()) === 0 ? 'FREE' : formatPrice(getShippingFeeRupees(getCartSubtotal()))}
+                </span>
               </div>
               <div className="flex justify-between text-base font-extrabold text-stone-950 pt-1">
                 <span>Total Amount</span>
                 <span className="font-mono">
-                  {formatPrice(getCartSubtotal() - getDiscountAmount() + FLAT_SHIPPING_FEE_RUPEES)}
+                  {formatPrice(getCartSubtotal() - getDiscountAmount() + getShippingFeeRupees(getCartSubtotal()))}
                 </span>
               </div>
             </div>

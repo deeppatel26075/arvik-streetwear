@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 import { checkServiceability, estimatePackage, NimbusPostError } from '@/lib/nimbuspost';
-import { FLAT_SHIPPING_FEE_RUPEES, FLAT_COD_FEE_RUPEES } from '@/lib/shippingConfig';
+import { FLAT_COD_FEE_RUPEES, getShippingFeeRupees } from '@/lib/shippingConfig';
 
 interface PlaceOrderItem {
   productId: string;
@@ -96,8 +96,9 @@ export async function POST(request: Request) {
     const paymentMode: 'cod' | 'prepaid' = paymentMethod === 'cod' ? 'cod' : 'prepaid';
 
     // ── Confirm real deliverability before creating anything — this is
-    //    NimbusPost's only role here. The charge is always the flat
-    //    FLAT_SHIPPING_FEE_RUPEES regardless of what NimbusPost quotes. ──
+    //    NimbusPost's only role here. The charge is the flat fee (or free
+    //    above the threshold, see getShippingFeeRupees) regardless of
+    //    what NimbusPost quotes. ──
     try {
       const serviceability = await checkServiceability({
         deliveryPincode: shipping.pincode,
@@ -118,7 +119,7 @@ export async function POST(request: Request) {
       // don't block checkout on a logistics outage.
       console.error('Serviceability check failed, allowing checkout to proceed:', err);
     }
-    const shippingFeeRupees = FLAT_SHIPPING_FEE_RUPEES + (paymentMethod === 'cod' ? FLAT_COD_FEE_RUPEES : 0);
+    const shippingFeeRupees = getShippingFeeRupees(cartValueRupees) + (paymentMethod === 'cod' ? FLAT_COD_FEE_RUPEES : 0);
 
     // ── Create the order via the atomic DB function ──────────────────
     const { data: orderResult, error: orderError } = await supabase.rpc('place_order', {

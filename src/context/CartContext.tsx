@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { getShippingFeeRupees } from '@/lib/shippingConfig';
 
 export interface CartItem {
   id: string; // product_id + size combination
@@ -219,10 +220,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getShippingFee = () => {
-    const subtotal = getCartSubtotal();
-    if (subtotal === 0) return 0;
-    // Free shipping above ₹1500, otherwise flat ₹100
-    return subtotal >= 1500 ? 0 : 100;
+    return getShippingFeeRupees(getCartSubtotal());
   };
 
   const getCartTotal = () => {
