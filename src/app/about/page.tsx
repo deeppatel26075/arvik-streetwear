@@ -63,11 +63,10 @@ export default function AboutPage() {
           Streetwear Should Say Something
         </h2>
         <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-medium">
-          Most oversized tees are just fabric with a logo on it. ARVIIK started because we wanted
-          the opposite, pieces that carried an actual idea. Limited Edition, On Fire, Graphic Tee,
-          Hidden Patterns, every collection is a different headspace, not just a different print.
-          We obsess over 240 GSM combed cotton, drop-shoulder cuts, and screen prints that survive
-          real washes, so the piece still means something a year in.
+          Every ARVIIK piece starts long before it reaches your wardrobe. We obsess over the idea, the
+          design, the details, the fit, the fabric and the finish — refining every element until it
+          feels worth wearing. You don&apos;t need to figure it all out. Find the piece that speaks to
+          you, put it on, and let it do the talking.
         </p>
       </section>
 
