@@ -26,15 +26,30 @@ const SECTIONS: LegalSection[] = [
   },
   {
     id: 'how-to-return',
-    title: 'How to Start a Return',
+    title: 'How to Request an Exchange',
     body: (
       <>
         <p>
-          Go to <strong>Track Order</strong> or <strong>Profile → Orders</strong>, select the item, and choose
-          <strong> Return</strong>. A reverse pickup will be scheduled from your delivery address at no extra
-          cost — no need to visit a courier office yourself.
+          Go to <strong>Track Order</strong> or <strong>Profile → Orders</strong>, select the item, and choose{' '}
+          <strong>Exchange</strong>. Follow the instructions to submit your exchange request.
         </p>
-        <p>Once picked up, your return goes through quality check at our warehouse. If everything checks out, your refund or exchange is processed as below.</p>
+        <p>
+          Once your request is approved, the item will be collected from your delivery address as per our
+          exchange process. You do not need to visit a courier office yourself.
+        </p>
+        <p>
+          The returned item will undergo a quality check at our warehouse. To be eligible for exchange, the
+          product must be unused, unwashed, undamaged, and in its original condition with all tags and
+          packaging intact.
+        </p>
+        <p>
+          Once the product passes the quality check, your replacement item will be processed and delivered
+          within 7–10 working days, subject to product availability and your delivery location.
+        </p>
+        <p>
+          Please note: ARVIIK does not offer refunds after the 2-hour cancellation period. Eligible orders
+          can only be exchanged in accordance with our <a href="/terms#orders">Exchange Policy</a>.
+        </p>
       </>
     ),
   },
