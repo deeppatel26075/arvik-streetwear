@@ -31,7 +31,6 @@ import {
 const TRENDING_SEARCHES = ['Oversized Tees', 'New Arrivals', 'On Fire', 'Limited Edition'];
 const RECENT_SEARCHES_KEY = 'arviik_recent_searches';
 const PROMO_MESSAGES = [
-  'BUY ANY 3 T-SHIRTS AT ₹1199 — USE CODE: B31199',
   'FREE SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹1499',
   '10% OFF ON ALL PREPAID ORDERS',
 ];
