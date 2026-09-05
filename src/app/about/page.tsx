@@ -48,9 +48,8 @@ export default function AboutPage() {
             Wear Your Identity
           </h1>
           <p className="text-xs sm:text-sm text-stone-300 font-medium max-w-lg mx-auto leading-relaxed pt-2">
-            ARVIIK isn&apos;t built for a season. It&apos;s built for whatever is going on in your head
-            right now, worn as heavyweight cotton, bold print, and an oversized silhouette that
-            doesn&apos;t ask permission.
+            ARVIIK does the thinking, designing, experimenting, sourcing and refining. The customer
+            simply chooses the piece that feels like them.
           </p>
         </div>
       </section>
