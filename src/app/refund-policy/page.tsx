@@ -57,20 +57,21 @@ const SECTIONS: LegalSection[] = [
   },
   {
     id: 'refund-timeline',
-    title: 'Refund Timeline',
+    title: 'Refunds & Exchange Shipping',
     body: (
       <>
+        <p>We do not offer refunds after the 2-hour cancellation period.</p>
         <p>
-          Once your returned item passes quality check at our warehouse, refunds are processed within{' '}
-          <strong>5–7 business days</strong>, credited back to your original payment method:
+          Orders can be cancelled within 2 hours of order confirmation by contacting{' '}
+          <a href="mailto:support@arviik.com">support@arviik.com</a> with your order number.
         </p>
-        <ul>
-          <li><strong>Prepaid orders</strong> (Razorpay) — refunded to the original card, UPI ID, or bank account used.</li>
-          <li><strong>Cash on Delivery orders</strong> — refunded via bank transfer or UPI to an account you provide, since there&apos;s no original payment method to reverse.</li>
-        </ul>
-        <p className="pt-1">
-          Bank processing can add a few extra business days beyond what we control — if it&apos;s been longer
-          than 10 business days since we confirmed your refund, reach out and we&apos;ll look into it.
+        <p>
+          After the 2-hour cancellation period, the order cannot be cancelled or refunded. Eligible products
+          can only be exchanged according to our <a href="/terms#orders">Exchange Policy</a>.
+        </p>
+        <p>
+          For an approved exchange, the applicable exchange/return shipping process will be communicated by
+          our support team.
         </p>
       </>
     ),

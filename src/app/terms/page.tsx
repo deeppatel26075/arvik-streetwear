@@ -129,7 +129,7 @@ const SECTIONS: LegalSection[] = [
   },
   {
     id: 'orders',
-    title: 'Order Acceptance & Cancellation',
+    title: 'Order Cancellation & Exchange Policy',
     body: (
       <>
         <p>
@@ -138,11 +138,34 @@ const SECTIONS: LegalSection[] = [
           reasons including but not limited to: stock unavailability, pricing or typographical errors,
           suspected fraud, or an undeliverable address.
         </p>
-        <p>
-          Orders can be changed or cancelled free of charge within 2 hours of placing them, before they are
-          handed off for packing — contact <a href="mailto:support@arviik.com">support@arviik.com</a>{' '}with
-          your order number immediately. Once an order has shipped, it can no longer be cancelled; you are
-          welcome to return it instead under our <a href="/refund-policy">Refund Policy</a>.
+        <p className="pt-1"><strong>Order Cancellation</strong></p>
+        <ul>
+          <li>
+            Once an order is placed, you can cancel it within 2 hours of order confirmation by contacting us
+            at <a href="mailto:support@arviik.com">support@arviik.com</a>{' '}with your order number.
+          </li>
+          <li>After 2 hours, the order cannot be cancelled or refunded.</li>
+        </ul>
+        <p className="pt-1"><strong>Exchange Policy</strong></p>
+        <ul>
+          <li>We offer an exchange instead of a refund for eligible products.</li>
+          <li>
+            If you receive a product that is eligible for exchange, you must contact us within the specified
+            exchange period and provide your order number and reason for the exchange.
+          </li>
+          <li>
+            Once your exchange request is approved, the replacement item will be processed and delivered
+            within 7–10 working days, depending on availability and your delivery location.
+          </li>
+          <li>
+            The product must be unused, unwashed, undamaged, and in its original condition with all tags and
+            packaging intact. Products that do not meet these conditions may not be accepted for exchange.
+          </li>
+        </ul>
+        <p className="pt-1">
+          <strong>Important:</strong>{' '}We do not provide refunds after the 2-hour cancellation period.
+          Exchanges are subject to our exchange conditions and product availability. For exchange requests,
+          contact <a href="mailto:support@arviik.com">support@arviik.com</a>.
         </p>
       </>
     ),
@@ -261,6 +284,28 @@ const SECTIONS: LegalSection[] = [
         version — it is your responsibility to check this page periodically for changes. Continued use of the
         Site following any changes constitutes acceptance of those changes.
       </p>
+    ),
+  },
+  {
+    id: 'website-updates',
+    title: 'Website Updates & Technical Changes',
+    body: (
+      <>
+        <p>
+          ARVIIK may update, modify, or change its policies, information, pricing, offers, or other website
+          content from time to time. Due to technical, maintenance, or IT-related issues, there may be a
+          delay before such changes are reflected on the Website.
+        </p>
+        <p>
+          In such cases, ARVIIK will make reasonable efforts to update the Website as soon as possible.
+          Temporary discrepancies caused by technical or IT-related delays shall not, by themselves, be
+          considered a change in ARVIIK&apos;s applicable policy or terms.
+        </p>
+        <p>
+          The latest policy or terms communicated and confirmed by ARVIIK shall apply to the relevant order
+          or request, subject to applicable law.
+        </p>
+      </>
     ),
   },
   {
