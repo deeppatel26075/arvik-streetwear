@@ -6,6 +6,16 @@ export const revalidate = 0;
 
 export default async function HomePage() {
   let dbProducts: any[] = [];
+  let heroSlides: any[] = [];
+
+  try {
+    const heroRes: any = await withTimeout(
+      supabase.from('hero_slides').select('*').order('sort_order', { ascending: true })
+    );
+    heroSlides = heroRes?.data || [];
+  } catch (err) {
+    console.error('Error loading hero slides:', err);
+  }
 
   try {
     const res: any = await withTimeout(
@@ -44,6 +54,6 @@ export default async function HomePage() {
   }
 
   return (
-    <HomeClientWrapper products={dbProducts} />
+    <HomeClientWrapper products={dbProducts} heroSlides={heroSlides} />
   );
 }

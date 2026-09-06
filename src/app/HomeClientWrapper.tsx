@@ -4,7 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
-import { ArrowRight, Star, Flame, Shirt, Truck, Wallet, ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
+import { ArrowRight, Star, Flame, Shirt, Truck, Wallet, Tag, Percent, Gift, ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
+
+// Maps the icon name stored in the `hero_slides` table (edited from the
+// admin panel) back to the lucide component actually rendered.
+const HERO_ICON_MAP: Record<string, any> = { Flame, Shirt, Truck, Wallet, Star, Tag, Percent, Gift };
 
 const COLOR_FILTERS = [
   { name: 'Olive Green', hex: '#3f6212' },
@@ -50,6 +54,7 @@ const HERO_SLIDES = [
 
 interface HomeClientWrapperProps {
   products: any[];
+  heroSlides?: any[];
   settings?: any;
 }
 
@@ -74,7 +79,7 @@ const REVIEWS = [
   },
 ];
 
-export default function HomeClientWrapper({ products }: HomeClientWrapperProps) {
+export default function HomeClientWrapper({ products, heroSlides }: HomeClientWrapperProps) {
   const [currentReview, setCurrentReview] = React.useState(0);
   const [touchStart, setTouchStart] = React.useState<number | null>(null);
   const [touchEnd, setTouchEnd] = React.useState<number | null>(null);
@@ -119,24 +124,42 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
     }
   };
 
-  // Promo hero banner slider — auto-swipe + manual (arrows, dots, touch)
+  // Promo hero banner slider — auto-swipe + manual (arrows, dots, touch).
+  // Slides come from the admin-editable `hero_slides` table when present;
+  // hiding every slide there empties this list and the section disappears
+  // rather than silently falling back to the hardcoded defaults below.
+  const slides = React.useMemo(() => {
+    if (!heroSlides || heroSlides.length === 0) return HERO_SLIDES;
+    return heroSlides
+      .filter((s) => !s.is_hidden)
+      .map((s) => ({
+        badge: s.badge,
+        icon: HERO_ICON_MAP[s.icon] || Flame,
+        titleMain: s.title_main,
+        titleHighlight: s.title_highlight,
+        subtitle: s.subtitle,
+        image: s.image_url,
+      }));
+  }, [heroSlides]);
+
   const [bannerIndex, setBannerIndex] = React.useState(0);
   const [bannerTouchStart, setBannerTouchStart] = React.useState<number | null>(null);
   const [bannerTouchEnd, setBannerTouchEnd] = React.useState<number | null>(null);
 
   React.useEffect(() => {
+    if (slides.length === 0) return;
     const timer = setInterval(() => {
-      setBannerIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+      setBannerIndex((prev) => (prev + 1) % slides.length);
     }, 3000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides.length]);
 
   const handlePrevBanner = () => {
-    setBannerIndex((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    setBannerIndex((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
   const handleNextBanner = () => {
-    setBannerIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+    setBannerIndex((prev) => (prev + 1) % slides.length);
   };
 
   const minBannerSwipeDistance = 30;
@@ -164,12 +187,13 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
 
   const displayProducts = products || [];
 
-  const activeSlide = HERO_SLIDES[bannerIndex];
-  const ActiveSlideIcon = activeSlide.icon;
+  const activeSlide = slides[bannerIndex % (slides.length || 1)];
+  const ActiveSlideIcon = activeSlide?.icon;
 
   return (
     <div className="w-full space-y-10 sm:space-y-14">
-      {/* PROMO OFFER BANNER */}
+      {/* PROMO OFFER BANNER — hidden entirely when admin has hidden every slide */}
+      {activeSlide && (
       <section className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
         <Link
           href="/shop"
@@ -248,7 +272,7 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
 
               {/* Indicator Dots */}
               <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-1.5">
-                {HERO_SLIDES.map((_, index) => (
+                {slides.map((_, index) => (
                   <button
                     key={index}
                     type="button"
@@ -268,6 +292,7 @@ export default function HomeClientWrapper({ products }: HomeClientWrapperProps) 
           </div>
         </Link>
       </section>
+      )}
 
       {/* 2. CATEGORIES SECTION — compact editorial collection grid */}
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-0">

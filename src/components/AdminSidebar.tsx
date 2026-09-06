@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { LayoutDashboard, ShoppingBag, ClipboardList, Settings, Store, LogOut, Tags, Users, Menu, X } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, ClipboardList, Settings, Store, LogOut, Tags, Users, Menu, X, GalleryHorizontal } from 'lucide-react';
 
 export default function AdminSidebar() {
   const pathname = usePathname();
@@ -17,6 +17,7 @@ export default function AdminSidebar() {
     { name: 'Products', path: '/admin/products', icon: ClipboardList },
     { name: 'Orders', path: '/admin/orders', icon: ShoppingBag },
     { name: 'Coupons', path: '/admin/coupons', icon: Tags },
+    { name: 'Hero Banner', path: '/admin/hero-banner', icon: GalleryHorizontal },
     { name: 'Customers', path: '/admin/customers', icon: Users },
     { name: 'Website config', path: '/admin/settings', icon: Settings },
   ];
