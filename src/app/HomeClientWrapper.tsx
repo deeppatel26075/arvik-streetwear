@@ -352,7 +352,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
                 fill
                 sizes="(max-width: 767px) 170px, (max-width: 1279px) 50vw, 25vw"
                 loading="lazy"
-                className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-300"
+                className="object-cover object-center group-hover:scale-[1.03] transition-transform duration-300"
               />
             </div>
             <div className="p-2.5 sm:p-3 border-t border-stone-100">
