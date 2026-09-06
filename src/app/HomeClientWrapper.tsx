@@ -347,7 +347,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
           >
             <div className="relative h-[150px] sm:h-[175px] md:h-[200px] xl:h-[215px] bg-stone-100 overflow-hidden">
               <Image
-                src="/products/polarize-cream.jpg"
+                src="/products/5bd3dfaf3ac84a85a18925e9d3989206.jpg"
                 alt="On Fire"
                 fill
                 sizes="(max-width: 767px) 170px, (max-width: 1279px) 50vw, 25vw"
