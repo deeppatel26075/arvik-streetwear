@@ -318,7 +318,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
           </Link>
         </div>
 
-        <div className="flex md:grid md:grid-cols-3 gap-3 md:gap-5 xl:gap-6 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex md:grid md:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-5 xl:gap-6 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
           <Link
             href="/shop?category=Limited+Edition"
             className="group flex-shrink-0 w-[150px] sm:w-[160px] md:w-auto bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
@@ -352,13 +352,35 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
                 fill
                 sizes="(max-width: 767px) 170px, (max-width: 1279px) 50vw, 25vw"
                 loading="lazy"
-                className="object-cover object-center group-hover:scale-[1.03] transition-transform duration-300"
+                className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-300"
               />
             </div>
             <div className="p-2.5 sm:p-3 border-t border-stone-100">
               <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-orange-600 block mb-0.5">Hot Drop</span>
               <h3 className="font-syne font-extrabold text-[10px] sm:text-sm uppercase tracking-tight text-stone-950 leading-tight">
                 On Fire
+              </h3>
+            </div>
+          </Link>
+
+          <Link
+            href="/shop?filter=new"
+            className="group flex-shrink-0 w-[150px] sm:w-[160px] md:w-auto bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
+          >
+            <div className="relative h-[150px] sm:h-[175px] md:h-[200px] xl:h-[215px] bg-stone-100 overflow-hidden">
+              <Image
+                src="/products/polarize-navy.jpg"
+                alt="New Arrivals"
+                fill
+                sizes="(max-width: 767px) 170px, (max-width: 1279px) 50vw, 25vw"
+                loading="lazy"
+                className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-300"
+              />
+            </div>
+            <div className="p-2.5 sm:p-3 border-t border-stone-100">
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-indigo-600 block mb-0.5">Just In</span>
+              <h3 className="font-syne font-extrabold text-[10px] sm:text-sm uppercase tracking-tight text-stone-950 leading-tight">
+                New Arrivals
               </h3>
             </div>
           </Link>
