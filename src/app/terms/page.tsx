@@ -142,7 +142,7 @@ const SECTIONS: LegalSection[] = [
         <ul>
           <li>
             Once an order is placed, you can cancel it within 2 hours of order confirmation by contacting us
-            at <a href="mailto:support@arviik.com">support@arviik.com</a>{' '}with your order number.
+            at <a href="mailto:info@arviik.in">info@arviik.in</a>{' '}with your order number.
           </li>
           <li>After 2 hours, the order cannot be cancelled or refunded.</li>
         </ul>
@@ -165,7 +165,7 @@ const SECTIONS: LegalSection[] = [
         <p className="pt-1">
           <strong>Important:</strong>{' '}We do not provide refunds after the 2-hour cancellation period.
           Exchanges are subject to our exchange conditions and product availability. For exchange requests,
-          contact <a href="mailto:support@arviik.com">support@arviik.com</a>.
+          contact <a href="mailto:info@arviik.in">info@arviik.in</a>.
         </p>
       </>
     ),
@@ -314,7 +314,7 @@ const SECTIONS: LegalSection[] = [
     body: (
       <p>
         Questions about these Terms of Service should be sent to us at{' '}
-        <a href="mailto:support@arviik.com">support@arviik.com</a> or through our{' '}
+        <a href="mailto:info@arviik.in">info@arviik.in</a> or through our{' '}
         <a href="/contact">Contact page</a>.
       </p>
     ),

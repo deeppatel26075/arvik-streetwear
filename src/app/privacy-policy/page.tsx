@@ -150,7 +150,7 @@ const SECTIONS: LegalSection[] = [
         </ul>
         <p className="pt-1">
           To exercise any of these rights, write to us at{' '}
-          <a href="mailto:support@arviik.com">support@arviik.com</a>{' '}from the email address associated with
+          <a href="mailto:info@arviik.in">info@arviik.in</a>{' '}from the email address associated with
           your account.
         </p>
       </>
@@ -169,7 +169,7 @@ const SECTIONS: LegalSection[] = [
         </p>
         <ul>
           <li><strong>Name:</strong> Grievance Officer, ARVIIK</li>
-          <li><strong>Email:</strong> <a href="mailto:support@arviik.com">support@arviik.com</a></li>
+          <li><strong>Email:</strong> <a href="mailto:info@arviik.in">info@arviik.in</a></li>
           <li><strong>Address:</strong> ARVIIK HQ, Ahmedabad, Gujarat, India</li>
           <li><strong>Response Time:</strong> We will acknowledge your complaint within 48 hours and endeavour to redress it within one month of receipt.</li>
         </ul>
@@ -204,7 +204,7 @@ const SECTIONS: LegalSection[] = [
     body: (
       <p>
         For any queries regarding this Policy, write to us at{' '}
-        <a href="mailto:support@arviik.com">support@arviik.com</a> or through our{' '}
+        <a href="mailto:info@arviik.in">info@arviik.in</a> or through our{' '}
         <a href="/contact">Contact page</a>.
       </p>
     ),

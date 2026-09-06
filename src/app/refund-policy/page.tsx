@@ -78,7 +78,7 @@ const SECTIONS: LegalSection[] = [
         <p>We do not offer refunds after the 2-hour cancellation period.</p>
         <p>
           Orders can be cancelled within 2 hours of order confirmation by contacting{' '}
-          <a href="mailto:support@arviik.com">support@arviik.com</a> with your order number.
+          <a href="mailto:info@arviik.in">info@arviik.in</a> with your order number.
         </p>
         <p>
           After the 2-hour cancellation period, the order cannot be cancelled or refunded. Eligible products
@@ -108,7 +108,7 @@ const SECTIONS: LegalSection[] = [
     body: (
       <p>
         If your order arrives damaged, defective, or isn&apos;t what you ordered, contact us within{' '}
-        <strong>48 hours of delivery</strong> at <a href="mailto:support@arviik.com">support@arviik.com</a>{' '}with
+        <strong>48 hours of delivery</strong> at <a href="mailto:info@arviik.in">info@arviik.in</a>{' '}with
         your order number and a photo of the issue. We&apos;ll arrange a free replacement or full refund — this
         doesn&apos;t count against the standard 7-day window.
       </p>
@@ -130,7 +130,7 @@ const SECTIONS: LegalSection[] = [
     title: 'Need Help With a Return?',
     body: (
       <p>
-        Email <a href="mailto:support@arviik.com">support@arviik.com</a>{' '}with your order number, or reach us
+        Email <a href="mailto:info@arviik.in">info@arviik.in</a>{' '}with your order number, or reach us
         through our <a href="/contact">Contact page</a>{' '}— we&apos;re usually quick to respond.
       </p>
     ),

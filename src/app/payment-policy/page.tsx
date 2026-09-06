@@ -67,7 +67,7 @@ const SECTIONS: LegalSection[] = [
         If a payment fails or is stuck as &quot;pending&quot; but an amount was debited from your account, it&apos;s
         typically auto-reversed by your bank within 5–7 business days. Your order is only confirmed once
         Razorpay verifies a successful payment — if you were charged but didn&apos;t get an order confirmation,
-        contact us at <a href="mailto:support@arviik.com">support@arviik.com</a>{' '}with your payment reference
+        contact us at <a href="mailto:info@arviik.in">info@arviik.in</a>{' '}with your payment reference
         and we&apos;ll sort it out.
       </p>
     ),
@@ -99,7 +99,7 @@ const SECTIONS: LegalSection[] = [
     title: 'Payment Issues?',
     body: (
       <p>
-        Email <a href="mailto:support@arviik.com">support@arviik.com</a>{' '}with your order number and payment
+        Email <a href="mailto:info@arviik.in">info@arviik.in</a>{' '}with your order number and payment
         reference, or reach us through our <a href="/contact">Contact page</a>.
       </p>
     ),

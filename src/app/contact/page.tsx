@@ -118,8 +118,8 @@ export default function ContactPage() {
           <Mail className="h-5 w-5 text-stone-700 flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-[9px] text-stone-400 font-extrabold uppercase tracking-wider">Email</p>
-            <a href="mailto:support@arviik.com" className="text-xs sm:text-sm font-bold text-stone-900 hover:underline">
-              support@arviik.com
+            <a href="mailto:info@arviik.in" className="text-xs sm:text-sm font-bold text-stone-900 hover:underline">
+              info@arviik.in
             </a>
           </div>
         </div>

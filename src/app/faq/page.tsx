@@ -38,7 +38,7 @@ const FAQ_SECTIONS: FaqSection[] = [
       },
       {
         q: 'Can I change or cancel my order after placing it?',
-        a: 'Orders can be changed or cancelled within 2 hours of placing them, before they’re handed off for packing. Contact us immediately at support@arviik.com with your order number.',
+        a: 'Orders can be changed or cancelled within 2 hours of placing them, before they’re handed off for packing. Contact us immediately at info@arviik.in with your order number.',
       },
       {
         q: 'I didn’t get an order confirmation. What do I do?',

@@ -14,7 +14,7 @@ const SELLER = {
   businessName: 'ARVIIK APPARELS PRIVATE LIMITED',
   addressLine1: 'Ahmedabad, Gujarat',
   gstin: '', // e.g. '24AAAAA0000A1Z5'
-  supportEmail: 'support@arviik.com',
+  supportEmail: 'info@arviik.in',
   domain: 'arviik.in',
 };
 
