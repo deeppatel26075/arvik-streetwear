@@ -56,9 +56,15 @@ export default function AdminDashboard() {
           
           const pending = allOrders.filter(o => o.status === 'pending').length;
 
-          const todayStr = new Date().toISOString().split('T')[0];
+          // Compare against the local (store timezone) start-of-day, not the
+          // UTC calendar date. created_at is stored in UTC, so a string-prefix
+          // match on toISOString() would define "today" by the UTC midnight
+          // boundary (5:30 AM IST) and drop early-morning orders. Parsing to a
+          // real timestamp and comparing to local midnight fixes that.
+          const now = new Date();
+          const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
           const todayRevenue = allOrders
-            .filter(o => o.created_at && o.created_at.startsWith(todayStr) && o.status !== 'cancelled')
+            .filter(o => o.status !== 'cancelled' && o.created_at && new Date(o.created_at).getTime() >= startOfToday)
             .reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
 
           setMetrics({
