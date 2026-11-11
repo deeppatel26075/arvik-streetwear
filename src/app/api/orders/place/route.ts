@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 import { checkServiceability, estimatePackage, NimbusPostError } from '@/lib/nimbuspost';
 import { FLAT_COD_FEE_RUPEES, getShippingFeeRupees } from '@/lib/shippingConfig';
+import { notifyAdminNewOrder } from '@/lib/orderNotifications';
 
 interface PlaceOrderItem {
   productId: string;
@@ -145,6 +146,25 @@ export async function POST(request: Request) {
     }
 
     const orderId: string = orderResult.order_id;
+
+    // Send instant notification to admin (free WhatsApp / Telegram / console)
+    notifyAdminNewOrder({
+      orderId,
+      total: orderResult.total,
+      paymentMethod,
+      shipping: {
+        name: shipping.name,
+        phone: shipping.phone,
+        city: shipping.city,
+        state: shipping.state,
+        pincode: shipping.pincode,
+      },
+      items: items.map((item) => ({
+        name: item.name,
+        size: item.size,
+        quantity: item.quantity,
+      })),
+    }).catch((err) => console.error('Admin order notification failed:', err));
 
     return NextResponse.json({
       orderId,
