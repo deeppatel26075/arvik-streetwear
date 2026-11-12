@@ -738,7 +738,6 @@ export default function AdminProducts() {
                           <input
                             type="file"
                             accept="image/*"
-                            capture="environment"
                             disabled={uploadingIdx === idx}
                             onChange={(e) => handleSingleImageUpload(idx, e)}
                             className="sr-only"
@@ -803,7 +802,6 @@ export default function AdminProducts() {
                           <input
                             type="file"
                             accept="image/*"
-                            capture="environment"
                             disabled={uploadingStoryIdx === idx}
                             onChange={(e) => handleStoryImageUpload(idx, e)}
                             className="sr-only"
