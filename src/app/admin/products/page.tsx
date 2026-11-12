@@ -397,11 +397,11 @@ export default function AdminProducts() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-stone-200 pb-5 gap-4">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-stone-200 pb-5 gap-3">
         <div>
-          <h1 className="font-syne font-extrabold text-2xl uppercase tracking-wider text-stone-900">
+          <h1 className="font-syne font-extrabold text-xl sm:text-2xl uppercase tracking-wider text-stone-900">
             Catalog Manager
           </h1>
           <p className="text-xs text-stone-500 font-light mt-0.5">Add, edit, toggle visibility and manage stocks.</p>
@@ -409,106 +409,176 @@ export default function AdminProducts() {
 
         <button
           onClick={openAddForm}
-          className="inline-flex items-center space-x-1.5 bg-stone-950 text-white px-5 py-3 text-xs font-bold uppercase tracking-widest hover:opacity-90 rounded-sm shadow-md"
+          className="inline-flex items-center justify-center space-x-1.5 bg-stone-950 text-white px-5 py-3 text-xs font-bold uppercase tracking-widest hover:opacity-90 rounded-sm shadow-md w-full sm:w-auto"
         >
-          <Plus className="h-4.5 w-4.5" />
+          <Plus className="h-4 w-4" />
           <span>Add T-Shirt</span>
         </button>
       </div>
 
-      {/* Products list table */}
-      <div className="bg-white border border-stone-200/60 rounded-xs p-6 shadow-xs">
+      {/* Products list — table on desktop, cards on mobile */}
+      <div className="bg-white border border-stone-200/60 rounded-xs shadow-xs">
         {loading ? (
           <div className="flex items-center justify-center py-10 text-stone-400 text-xs font-bold uppercase tracking-widest space-x-2">
             <RefreshCw className="h-4 w-4 animate-spin text-stone-600" />
             <span>Loading database products...</span>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-stone-600">
-              <thead>
-                <tr className="border-b border-stone-100 text-[10px] text-stone-400 font-bold uppercase tracking-wider">
-                  <th className="pb-3">Product Name</th>
-                  <th className="pb-3">Category</th>
-                  <th className="pb-3">Price</th>
-                  <th className="pb-3">Stock S/M/L/XL/2XL</th>
-                  <th className="pb-3">Featured</th>
-                  <th className="pb-3">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-stone-50">
-                {products.map((prod) => {
-                  const getSzStock = (sz: string) => {
-                    const item = prod.sizes?.find((s: any) => s.size === sz);
-                    return item ? item.quantity : 0;
-                  };
-                  return (
-                    <tr key={prod.id} className="hover:bg-stone-50/50">
-                      <td className="py-4 font-semibold text-stone-900 uppercase tracking-wide">
-                        {prod.name}
-                      </td>
-                      <td className="py-4 uppercase tracking-wider text-[10px] font-semibold text-stone-500">
-                        {categoryDisplayName(prod.categoryName)}
-                      </td>
-                      <td className="py-4 font-mono font-semibold text-stone-900">
+          <>
+            {/* Desktop table */}
+            <div className="hidden sm:block overflow-x-auto p-6">
+              <table className="w-full text-left text-xs text-stone-600">
+                <thead>
+                  <tr className="border-b border-stone-100 text-[10px] text-stone-400 font-bold uppercase tracking-wider">
+                    <th className="pb-3">Product Name</th>
+                    <th className="pb-3">Category</th>
+                    <th className="pb-3">Price</th>
+                    <th className="pb-3">Stock S/M/L/XL/2XL</th>
+                    <th className="pb-3">Featured</th>
+                    <th className="pb-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-50">
+                  {products.map((prod) => {
+                    const getSzStock = (sz: string) => {
+                      const item = prod.sizes?.find((s: any) => s.size === sz);
+                      return item ? item.quantity : 0;
+                    };
+                    return (
+                      <tr key={prod.id} className="hover:bg-stone-50/50">
+                        <td className="py-4 font-semibold text-stone-900 uppercase tracking-wide pr-4">
+                          {prod.name}
+                        </td>
+                        <td className="py-4 uppercase tracking-wider text-[10px] font-semibold text-stone-500 pr-4">
+                          {categoryDisplayName(prod.categoryName)}
+                        </td>
+                        <td className="py-4 font-mono font-semibold text-stone-900 pr-4">
+                          {formatPrice(prod.discount_price || prod.price)}
+                        </td>
+                        <td className="py-4 font-semibold text-stone-700 pr-4">
+                          {getSzStock('S')}/{getSzStock('M')}/{getSzStock('L')}/{getSzStock('XL')}/{getSzStock('XXL')}
+                        </td>
+                        <td className="py-4 pr-4">
+                          <button
+                            onClick={() => toggleFeatured(prod.id, prod.is_featured)}
+                            className={`p-1 rounded-sm border ${
+                              prod.is_featured ? 'bg-amber-50 border-amber-100 text-amber-800' : 'text-stone-300'
+                            }`}
+                          >
+                            <Star className="h-4 w-4 fill-current" />
+                          </button>
+                        </td>
+                        <td className="py-4 flex items-center space-x-2.5">
+                          <button
+                            onClick={() => toggleHide(prod.id, prod.is_hidden)}
+                            className={`p-1 hover:opacity-80 ${prod.is_hidden ? 'text-amber-800' : 'text-stone-500'}`}
+                          >
+                            {prod.is_hidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
+                          <button
+                            onClick={() => openEditForm(prod)}
+                            className="p-1 text-stone-500 hover:text-stone-900"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(prod.id)}
+                            className="p-1 text-stone-400 hover:text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile cards */}
+            <div className="sm:hidden divide-y divide-stone-100">
+              {products.map((prod) => {
+                const getSzStock = (sz: string) => {
+                  const item = prod.sizes?.find((s: any) => s.size === sz);
+                  return item ? item.quantity : 0;
+                };
+                return (
+                  <div key={prod.id} className="p-4 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-syne font-bold text-sm text-stone-900 uppercase tracking-wide leading-tight">
+                          {prod.name}
+                        </p>
+                        <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-wider mt-0.5">
+                          {categoryDisplayName(prod.categoryName)}
+                        </p>
+                      </div>
+                      <p className="font-mono font-bold text-stone-900 text-sm flex-shrink-0">
                         {formatPrice(prod.discount_price || prod.price)}
-                      </td>
-                      <td className="py-4 font-semibold text-stone-700">
-                        {getSzStock('S')}/{getSzStock('M')}/{getSzStock('L')}/{getSzStock('XL')}/{getSzStock('XXL')}
-                      </td>
-                      <td className="py-4">
-                        <button
-                          onClick={() => toggleFeatured(prod.id, prod.is_featured)}
-                          className={`p-1 rounded-sm border ${
-                            prod.is_featured ? 'bg-amber-50 border-amber-100 text-amber-800' : 'text-stone-300'
-                          }`}
-                        >
-                          <Star className="h-4 w-4 fill-current" />
-                        </button>
-                      </td>
-                      <td className="py-4 flex items-center space-x-2.5">
-                        <button
-                          onClick={() => toggleHide(prod.id, prod.is_hidden)}
-                          className={`p-1 hover:opacity-80 ${prod.is_hidden ? 'text-amber-800' : 'text-stone-500'}`}
-                        >
-                          {prod.is_hidden ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
-                        </button>
-                        <button
-                          onClick={() => openEditForm(prod)}
-                          className="p-1 text-stone-500 hover:text-stone-900"
-                        >
-                          <Edit2 className="h-4.5 w-4.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(prod.id)}
-                          className="p-1 text-stone-400 hover:text-red-750"
-                        >
-                          <Trash2 className="h-4.5 w-4.5" />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                      </p>
+                    </div>
+                    <p className="text-[11px] text-stone-500 font-semibold">
+                      Stock — S:{getSzStock('S')} M:{getSzStock('M')} L:{getSzStock('L')} XL:{getSzStock('XL')} XXL:{getSzStock('XXL')}
+                    </p>
+                    <div className="flex items-center gap-3 pt-1">
+                      <button
+                        onClick={() => toggleFeatured(prod.id, prod.is_featured)}
+                        className={`p-2 rounded-sm border ${
+                          prod.is_featured ? 'bg-amber-50 border-amber-100 text-amber-800' : 'text-stone-300 border-stone-200'
+                        }`}
+                      >
+                        <Star className="h-4 w-4 fill-current" />
+                      </button>
+                      <button
+                        onClick={() => toggleHide(prod.id, prod.is_hidden)}
+                        className={`p-2 rounded-sm border border-stone-200 ${prod.is_hidden ? 'text-amber-800' : 'text-stone-500'}`}
+                      >
+                        {prod.is_hidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                      <button
+                        onClick={() => openEditForm(prod)}
+                        className="flex-1 py-2 text-[11px] font-bold uppercase tracking-widest border border-stone-200 text-stone-700 rounded-sm flex items-center justify-center gap-1.5"
+                      >
+                        <Edit2 className="h-3.5 w-3.5" /> Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(prod.id)}
+                        className="p-2 rounded-sm border border-red-100 text-red-500"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
 
       {/* Add / Edit Drawer Modal overlay */}
       {formOpen && (
-        <div className="fixed inset-0 bg-stone-950/45 backdrop-blur-xs z-50 flex justify-end">
-          <div className="bg-white w-full max-w-xl p-6 shadow-2xl flex flex-col h-full overflow-y-auto">
-            <div className="flex justify-between items-center border-b border-stone-200 pb-3.5 mb-5">
+        <div className="fixed inset-0 bg-stone-950/45 backdrop-blur-xs z-50 flex items-end sm:items-stretch sm:justify-end">
+          {/* On mobile: bottom sheet. On desktop: right-side panel */}
+          <div className="bg-white w-full sm:max-w-xl shadow-2xl flex flex-col max-h-[92vh] sm:max-h-full sm:h-full overflow-y-auto rounded-t-2xl sm:rounded-none">
+            {/* Drag handle (mobile only) */}
+            <div className="sm:hidden flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 bg-stone-300 rounded-full" />
+            </div>
+
+            <div className="flex justify-between items-center border-b border-stone-200 px-5 py-4 sticky top-0 bg-white z-10">
               <h3 className="font-syne font-bold uppercase text-stone-900 text-sm tracking-wider">
-                {editingId ? 'Edit product details' : 'Add new product'}
+                {editingId ? 'Edit product' : 'Add new product'}
               </h3>
-              <button onClick={() => setFormOpen(false)} className="text-stone-500 hover:text-stone-900">
+              <button
+                onClick={() => setFormOpen(false)}
+                className="text-stone-500 hover:text-stone-900 p-2 -mr-2 touch-manipulation"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-4 text-xs font-semibold text-stone-850">
+            <form onSubmit={handleSave} className="space-y-4 text-xs font-semibold text-stone-850 p-5 pb-8">
               
               <div className="space-y-1">
                 <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Product Name</label>
@@ -518,7 +588,7 @@ export default function AdminProducts() {
                   placeholder="ARCHIVE-01 GRAPHIC TEE"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
+                  className="w-full bg-stone-50 border border-stone-200 px-3 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
                 />
               </div>
 
@@ -530,41 +600,43 @@ export default function AdminProducts() {
                   placeholder="Detailed description of fit and design..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
+                  className="w-full bg-stone-50 border border-stone-200 px-3 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Price (INR)</label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     required
                     placeholder="1499"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
+                    className="w-full bg-stone-50 border border-stone-200 px-3 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Discount Price (Optional)</label>
+                  <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Discount Price</label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     placeholder="1299"
                     value={discountPrice}
                     onChange={(e) => setDiscountPrice(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
+                    className="w-full bg-stone-50 border border-stone-200 px-3 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Category</label>
                   <select
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
+                    className="w-full bg-stone-50 border border-stone-200 px-3 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -579,19 +651,19 @@ export default function AdminProducts() {
                     type="text"
                     value={fitType}
                     onChange={(e) => setFitType(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
+                    className="w-full bg-stone-50 border border-stone-200 px-3 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Fabric Specs</label>
                   <input
                     type="text"
                     value={fabric}
                     onChange={(e) => setFabric(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
+                    className="w-full bg-stone-50 border border-stone-200 px-3 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
                   />
                 </div>
                 <div className="space-y-1">
@@ -600,7 +672,7 @@ export default function AdminProducts() {
                     type="text"
                     value={gsm}
                     onChange={(e) => setGsm(e.target.value)}
-                    className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
+                    className="w-full bg-stone-50 border border-stone-200 px-3 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
                   />
                 </div>
               </div>
@@ -611,60 +683,74 @@ export default function AdminProducts() {
                   type="text"
                   value={washInstructions}
                   onChange={(e) => setWashInstructions(e.target.value)}
-                  className="w-full bg-stone-50 border border-stone-200 px-3 py-2 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
+                  className="w-full bg-stone-50 border border-stone-200 px-3 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
                 />
               </div>
 
               {/* Image Upload / Links (Up to 5 Photos) */}
-              <div className="space-y-4 p-4 bg-stone-50 rounded-sm border border-stone-200/60">
-                <div className="flex justify-between items-center border-b pb-1.5 mb-2">
-                  <span className="text-[10px] text-stone-600 font-extrabold uppercase tracking-wider">Product Gallery Photos (Upload up to 5 photos)</span>
-                  <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">{productImages.filter(Boolean).length} / 5 Uploaded</span>
+              <div className="space-y-3 p-3.5 bg-stone-50 rounded-sm border border-stone-200/60">
+                <div className="flex justify-between items-center border-b pb-1.5">
+                  <span className="text-[10px] text-stone-600 font-extrabold uppercase tracking-wider">Gallery Photos (up to 5)</span>
+                  <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest">{productImages.filter(Boolean).length} / 5</span>
                 </div>
                 
                 {[
-                  'Photo 1: Main / Front View (Primary)',
-                  'Photo 2: Back View',
-                  'Photo 3: Detail / Fabric Close-up',
-                  'Photo 4: Fit / Side View',
-                  'Photo 5: Studio / On-Model View'
+                  'Main / Front View',
+                  'Back View',
+                  'Detail / Fabric Close-up',
+                  'Fit / Side View',
+                  'Studio / On-Model'
                 ].map((label, idx) => (
-                  <div key={idx} className="space-y-1.5 p-2.5 bg-white border border-stone-200 rounded-sm">
-                    <label className="text-[9px] text-stone-700 font-bold uppercase tracking-wider block">{label}</label>
-                    <div className="flex items-center space-x-3">
+                  <div key={idx} className="p-2.5 bg-white border border-stone-200 rounded-sm">
+                    <label className="text-[9px] text-stone-700 font-bold uppercase tracking-wider block mb-2">
+                      Photo {idx + 1}: {label}
+                    </label>
+                    <div className="flex gap-3">
+                      {/* Thumbnail */}
                       {productImages[idx] ? (
-                        <div className="relative w-14 h-16 bg-stone-100 border border-stone-200 rounded-sm overflow-hidden flex-shrink-0 shadow-xs">
+                        <div className="relative w-16 h-20 bg-stone-100 border border-stone-200 rounded-sm overflow-hidden flex-shrink-0">
                           <img src={productImages[idx]} alt={`Photo ${idx + 1}`} className="object-cover w-full h-full" />
                           <button
                             type="button"
                             onClick={() => handleRemoveImage(idx)}
-                            className="absolute top-0.5 right-0.5 bg-red-650 text-white rounded-full p-0.5 shadow-sm hover:opacity-90 transition-opacity"
+                            className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full p-0.5"
                           >
                             <X className="h-3 w-3" />
                           </button>
                         </div>
                       ) : (
-                        <div className="w-14 h-16 border border-dashed border-stone-300 rounded-sm flex flex-col items-center justify-center text-stone-400 flex-shrink-0 text-[9px] font-bold">
+                        <div className="w-16 h-20 border-2 border-dashed border-stone-300 rounded-sm flex flex-col items-center justify-center text-stone-400 flex-shrink-0 text-[9px] font-bold">
                           <span>Slot {idx + 1}</span>
                         </div>
                       )}
-                      <div className="flex-grow space-y-1">
+                      {/* Upload + URL inputs stacked */}
+                      <div className="flex-1 flex flex-col gap-2 justify-center min-w-0">
+                        <label className={`flex items-center justify-center gap-1.5 cursor-pointer border border-stone-300 rounded-sm py-2 text-[10px] font-bold uppercase tracking-wider text-stone-700 bg-white active:bg-stone-50 ${uploadingIdx === idx ? 'opacity-50 pointer-events-none' : ''}`}>
+                          {uploadingIdx === idx ? (
+                            <>
+                              <RefreshCw className="h-3 w-3 animate-spin" /> Uploading…
+                            </>
+                          ) : (
+                            <>
+                              <Plus className="h-3 w-3" /> Upload Photo
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            capture="environment"
+                            disabled={uploadingIdx === idx}
+                            onChange={(e) => handleSingleImageUpload(idx, e)}
+                            className="sr-only"
+                          />
+                        </label>
                         <input
-                          type="file"
-                          accept="image/*"
-                          disabled={uploadingIdx === idx}
-                          onChange={(e) => handleSingleImageUpload(idx, e)}
-                          className="w-full text-[11px] text-stone-500 file:mr-2 file:py-0.5 file:px-2 file:rounded-sm file:border-0 file:text-[9px] file:font-bold file:uppercase file:bg-stone-950 file:text-white hover:file:opacity-90 disabled:opacity-50"
-                        />
-                        {uploadingIdx === idx && (
-                          <span className="text-[9px] text-stone-500 font-bold uppercase tracking-wider">Uploading…</span>
-                        )}
-                        <input
-                          type="text"
-                          placeholder={`Or paste photo ${idx + 1} URL...`}
+                          type="url"
+                          inputMode="url"
+                          placeholder="Or paste URL…"
                           value={productImages[idx]?.startsWith('data:') ? '' : productImages[idx] || ''}
                           onChange={(e) => handleImageUrlChange(idx, e.target.value)}
-                          className="w-full bg-stone-50 border border-stone-200 px-2.5 py-1 text-[11px] focus:outline-none focus:border-stone-900 rounded-sm"
+                          className="w-full bg-stone-50 border border-stone-200 px-2.5 py-2 text-[11px] focus:outline-none focus:border-stone-900 rounded-sm min-w-0"
                         />
                       </div>
                     </div>
@@ -673,51 +759,62 @@ export default function AdminProducts() {
               </div>
 
               {/* Product Story Photos & Captions (Up to 5) */}
-              <div className="space-y-4 p-4 bg-stone-50 rounded-sm border border-stone-200/60">
-                <div className="border-b pb-1.5 mb-2">
-                  <span className="text-[10px] text-stone-600 font-extrabold uppercase tracking-wider block">Product Story Photos &amp; Captions (Optional, up to 5)</span>
+              <div className="space-y-3 p-3.5 bg-stone-50 rounded-sm border border-stone-200/60">
+                <div className="border-b pb-1.5">
+                  <span className="text-[10px] text-stone-600 font-extrabold uppercase tracking-wider block">Story Photos &amp; Captions (Optional)</span>
                   <span className="text-[9px] text-stone-400 font-medium block mt-0.5">
-                    Shown in the &quot;Product Story&quot; strip on the product page. Leave blank to fall back to the gallery photos above with generic captions.
+                    Shown in the &quot;Product Story&quot; strip. Leave blank to use gallery photos.
                   </span>
                 </div>
 
                 {[0, 1, 2, 3, 4].map((idx) => (
-                  <div key={idx} className="space-y-1.5 p-2.5 bg-white border border-stone-200 rounded-sm">
-                    <label className="text-[9px] text-stone-700 font-bold uppercase tracking-wider block">Story Photo {idx + 1}</label>
-                    <div className="flex items-center space-x-3">
+                  <div key={idx} className="p-2.5 bg-white border border-stone-200 rounded-sm">
+                    <label className="text-[9px] text-stone-700 font-bold uppercase tracking-wider block mb-2">
+                      Story Photo {idx + 1}
+                    </label>
+                    <div className="flex gap-3">
                       {storyImages[idx] ? (
-                        <div className="relative w-14 h-16 bg-stone-100 border border-stone-200 rounded-sm overflow-hidden flex-shrink-0 shadow-xs">
+                        <div className="relative w-16 h-20 bg-stone-100 border border-stone-200 rounded-sm overflow-hidden flex-shrink-0">
                           <img src={storyImages[idx]} alt={`Story photo ${idx + 1}`} className="object-cover w-full h-full" />
                           <button
                             type="button"
                             onClick={() => handleRemoveStoryImage(idx)}
-                            className="absolute top-0.5 right-0.5 bg-red-650 text-white rounded-full p-0.5 shadow-sm hover:opacity-90 transition-opacity"
+                            className="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full p-0.5"
                           >
                             <X className="h-3 w-3" />
                           </button>
                         </div>
                       ) : (
-                        <div className="w-14 h-16 border border-dashed border-stone-300 rounded-sm flex flex-col items-center justify-center text-stone-400 flex-shrink-0 text-[9px] font-bold">
+                        <div className="w-16 h-20 border-2 border-dashed border-stone-300 rounded-sm flex flex-col items-center justify-center text-stone-400 flex-shrink-0 text-[9px] font-bold">
                           <span>Slot {idx + 1}</span>
                         </div>
                       )}
-                      <div className="flex-grow space-y-1">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          disabled={uploadingStoryIdx === idx}
-                          onChange={(e) => handleStoryImageUpload(idx, e)}
-                          className="w-full text-[11px] text-stone-500 file:mr-2 file:py-0.5 file:px-2 file:rounded-sm file:border-0 file:text-[9px] file:font-bold file:uppercase file:bg-stone-950 file:text-white hover:file:opacity-90 disabled:opacity-50"
-                        />
-                        {uploadingStoryIdx === idx && (
-                          <span className="text-[9px] text-stone-500 font-bold uppercase tracking-wider">Uploading…</span>
-                        )}
+                      <div className="flex-1 flex flex-col gap-2 justify-center min-w-0">
+                        <label className={`flex items-center justify-center gap-1.5 cursor-pointer border border-stone-300 rounded-sm py-2 text-[10px] font-bold uppercase tracking-wider text-stone-700 bg-white active:bg-stone-50 ${uploadingStoryIdx === idx ? 'opacity-50 pointer-events-none' : ''}`}>
+                          {uploadingStoryIdx === idx ? (
+                            <>
+                              <RefreshCw className="h-3 w-3 animate-spin" /> Uploading…
+                            </>
+                          ) : (
+                            <>
+                              <Plus className="h-3 w-3" /> Upload Photo
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            capture="environment"
+                            disabled={uploadingStoryIdx === idx}
+                            onChange={(e) => handleStoryImageUpload(idx, e)}
+                            className="sr-only"
+                          />
+                        </label>
                         <input
                           type="text"
-                          placeholder={`Caption for story photo ${idx + 1}...`}
+                          placeholder={`Caption…`}
                           value={storyCaptions[idx] || ''}
                           onChange={(e) => handleStoryCaptionChange(idx, e.target.value)}
-                          className="w-full bg-stone-50 border border-stone-200 px-2.5 py-1 text-[11px] focus:outline-none focus:border-stone-900 rounded-sm"
+                          className="w-full bg-stone-50 border border-stone-200 px-2.5 py-2 text-[11px] focus:outline-none focus:border-stone-900 rounded-sm min-w-0"
                         />
                       </div>
                     </div>
@@ -725,65 +822,40 @@ export default function AdminProducts() {
                 ))}
               </div>
 
-              {/* Inventory Sizes */}
-              <div className="bg-stone-50 p-3 rounded-sm border border-stone-200/60">
-                <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider block border-b pb-1 mb-2">Inventory Stock levels</span>
-                <div className="grid grid-cols-5 gap-2.5">
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-center block">S</label>
-                    <input
-                      type="number"
-                      value={stockS}
-                      onChange={(e) => setStockS(e.target.value)}
-                      className="w-full bg-white border border-stone-200 px-2 py-1 text-center focus:outline-none focus:border-stone-950 rounded-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-center block">M</label>
-                    <input
-                      type="number"
-                      value={stockM}
-                      onChange={(e) => setStockM(e.target.value)}
-                      className="w-full bg-white border border-stone-200 px-2 py-1 text-center focus:outline-none focus:border-stone-950 rounded-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-center block">L</label>
-                    <input
-                      type="number"
-                      value={stockL}
-                      onChange={(e) => setStockL(e.target.value)}
-                      className="w-full bg-white border border-stone-200 px-2 py-1 text-center focus:outline-none focus:border-stone-950 rounded-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-center block">XL</label>
-                    <input
-                      type="number"
-                      value={stockXL}
-                      onChange={(e) => setStockXL(e.target.value)}
-                      className="w-full bg-white border border-stone-200 px-2 py-1 text-center focus:outline-none focus:border-stone-950 rounded-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-center block">XXL</label>
-                    <input
-                      type="number"
-                      value={stockXXL}
-                      onChange={(e) => setStockXXL(e.target.value)}
-                      className="w-full bg-white border border-stone-200 px-2 py-1 text-center focus:outline-none focus:border-stone-950 rounded-sm"
-                    />
-                  </div>
+              {/* Inventory Sizes — 3+2 on mobile, 5 on bigger screens */}
+              <div className="bg-stone-50 p-3.5 rounded-sm border border-stone-200/60">
+                <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider block border-b pb-1 mb-3">Inventory Stock Levels</span>
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2.5">
+                  {[
+                    { label: 'S', val: stockS, set: setStockS },
+                    { label: 'M', val: stockM, set: setStockM },
+                    { label: 'L', val: stockL, set: setStockL },
+                    { label: 'XL', val: stockXL, set: setStockXL },
+                    { label: 'XXL', val: stockXXL, set: setStockXXL },
+                  ].map(({ label, val, set }) => (
+                    <div key={label} className="space-y-1">
+                      <label className="text-[9px] font-bold text-center block text-stone-600">{label}</label>
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        value={val}
+                        onChange={(e) => set(e.target.value)}
+                        className="w-full bg-white border border-stone-200 px-1 py-2 text-center text-xs focus:outline-none focus:border-stone-950 rounded-sm"
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Submit CTA */}
-              <button
-                type="submit"
-                className="w-full bg-stone-950 text-white text-xs font-bold uppercase tracking-widest py-3.5 hover:opacity-90 transition-opacity rounded-xs shadow-sm"
-              >
-                {editingId ? 'Update Product' : 'Add Product'}
-              </button>
+              {/* Submit CTA — sticky on mobile */}
+              <div className="sticky bottom-0 pt-2 bg-white -mx-5 px-5 pb-2 border-t border-stone-100 sm:static sm:border-0 sm:p-0 sm:bg-transparent">
+                <button
+                  type="submit"
+                  className="w-full bg-stone-950 text-white text-xs font-bold uppercase tracking-widest py-4 hover:opacity-90 transition-opacity rounded-sm shadow-sm"
+                >
+                  {editingId ? 'Update Product' : 'Add Product'}
+                </button>
+              </div>
             </form>
           </div>
         </div>
