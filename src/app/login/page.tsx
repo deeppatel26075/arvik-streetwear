@@ -12,6 +12,7 @@ export default function LoginPage() {
 
   // Tab state
   const [isRegister, setIsRegister] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
 
   // Form inputs
   const [email, setEmail] = useState('');
@@ -45,6 +46,18 @@ export default function LoginPage() {
     const isAdminAccount = cleanEmail === 'rishipatel1610@gmail.com';
 
     try {
+      if (isForgotPassword) {
+        const redirectUrl = `${window.location.origin}/reset-password`;
+        const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+          redirectTo: redirectUrl,
+        });
+
+        if (error) throw error;
+
+        setSuccessMsg(`Password reset link sent to ${cleanEmail}. Please check your email inbox!`);
+        return;
+      }
+
       if (isRegister) {
         // Real user registration
         const { data, error } = await supabase.auth.signUp({
@@ -139,35 +152,45 @@ export default function LoginPage() {
             ARVIIK
           </span>
           <h2 className="text-xs font-bold uppercase tracking-widest text-stone-400">
-            {isRegister ? 'Create Account' : 'Customer Login'}
+            {isForgotPassword ? 'Reset Password' : isRegister ? 'Create Account' : 'Customer Login'}
           </h2>
         </div>
 
         {/* Tab switch */}
-        <div className="flex border-b border-stone-100 text-xs font-bold uppercase tracking-wider">
-          <button
-            onClick={() => {
-              setIsRegister(false);
-              setErrorMsg(null);
-            }}
-            className={`flex-1 text-center pb-3 ${
-              !isRegister ? 'text-stone-900 border-b border-stone-900' : 'text-stone-400'
-            }`}
-          >
-            Sign In
-          </button>
-          <button
-            onClick={() => {
-              setIsRegister(true);
-              setErrorMsg(null);
-            }}
-            className={`flex-1 text-center pb-3 ${
-              isRegister ? 'text-stone-900 border-b border-stone-900' : 'text-stone-400'
-            }`}
-          >
-            Register
-          </button>
-        </div>
+        {!isForgotPassword && (
+          <div className="flex border-b border-stone-100 text-xs font-bold uppercase tracking-wider">
+            <button
+              onClick={() => {
+                setIsRegister(false);
+                setIsForgotPassword(false);
+                setErrorMsg(null);
+              }}
+              className={`flex-1 text-center pb-3 ${
+                !isRegister ? 'text-stone-900 border-b border-stone-900' : 'text-stone-400'
+              }`}
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => {
+                setIsRegister(true);
+                setIsForgotPassword(false);
+                setErrorMsg(null);
+              }}
+              className={`flex-1 text-center pb-3 ${
+                isRegister ? 'text-stone-900 border-b border-stone-900' : 'text-stone-400'
+              }`}
+            >
+              Register
+            </button>
+          </div>
+        )}
+
+        {isForgotPassword && (
+          <p className="text-[11px] text-stone-500 font-medium text-center">
+            Enter your registered email address and we&apos;ll send you a password reset link.
+          </p>
+        )}
 
         {/* Alerts */}
         {errorMsg && (
@@ -241,30 +264,40 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Password */}
-          <div className="space-y-1">
-            <div className="flex justify-between items-baseline">
-              <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">
-                Password
-              </label>
-              {!isRegister && (
-                <a href="#" className="text-[10px] text-stone-400 hover:text-stone-900 underline font-semibold uppercase tracking-wider">
-                  Forgot Password?
-                </a>
-              )}
+          {/* Password (hidden in forgot password mode) */}
+          {!isForgotPassword && (
+            <div className="space-y-1">
+              <div className="flex justify-between items-baseline">
+                <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">
+                  Password
+                </label>
+                {!isRegister && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsForgotPassword(true);
+                      setErrorMsg(null);
+                      setSuccessMsg(null);
+                    }}
+                    className="text-[10px] text-stone-400 hover:text-stone-900 underline font-semibold uppercase tracking-wider"
+                  >
+                    Forgot Password?
+                  </button>
+                )}
+              </div>
+              <div className="relative">
+                <input
+                  type="password"
+                  required
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-stone-50 border border-stone-200 px-4 py-3 pl-10 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
+                />
+                <Lock className="absolute left-3.5 top-3.5 h-3.5 w-3.5 text-stone-400" />
+              </div>
             </div>
-            <div className="relative">
-              <input
-                type="password"
-                required
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-stone-50 border border-stone-200 px-4 py-3 pl-10 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
-              />
-              <Lock className="absolute left-3.5 top-3.5 h-3.5 w-3.5 text-stone-400" />
-            </div>
-          </div>
+          )}
 
           {/* Submit */}
           <button
@@ -272,9 +305,33 @@ export default function LoginPage() {
             disabled={authLoading}
             className="w-full bg-stone-950 text-white text-xs font-bold uppercase tracking-widest py-3.5 hover:opacity-90 transition-opacity rounded-xs flex items-center justify-center space-x-2 shadow-sm"
           >
-            <span>{authLoading ? 'Verifying...' : isRegister ? 'Register Account' : 'Sign In'}</span>
+            <span>
+              {authLoading
+                ? 'Processing...'
+                : isForgotPassword
+                ? 'Send Reset Link'
+                : isRegister
+                ? 'Register Account'
+                : 'Sign In'}
+            </span>
             <ArrowRight className="h-4 w-4" />
           </button>
+
+          {isForgotPassword && (
+            <div className="text-center pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsForgotPassword(false);
+                  setErrorMsg(null);
+                  setSuccessMsg(null);
+                }}
+                className="text-[10px] text-stone-500 hover:text-stone-900 font-bold uppercase tracking-wider underline"
+              >
+                ← Back to Sign In
+              </button>
+            </div>
+          )}
         </form>
 
       </div>
