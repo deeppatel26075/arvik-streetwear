@@ -122,6 +122,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    // Check if recovery link landed anywhere on the site with a recovery hash or search query
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash || '';
+      const search = window.location.search || '';
+      if (hash.includes('type=recovery') || search.includes('type=recovery')) {
+        if (!window.location.pathname.startsWith('/reset-password')) {
+          window.location.replace(`/reset-password${hash || search}`);
+          return;
+        }
+      }
+    }
+
     const getInitialSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -148,6 +160,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/reset-password')) {
+            window.location.replace('/reset-password' + window.location.hash);
+            return;
+          }
+        }
         setLoading(true);
         if (session?.user) {
           setUser(session.user);
