@@ -10,6 +10,11 @@
  * 5. Discord Webhook
  */
 
+const DEFAULT_DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1570091568008798309/gQwG0lFJ9OPUtXW9Sr3wnVuB3EINzqG12ULAw5SK7jGwlKmESN5W15euJRhO9NL36QRj';
+const DEFAULT_GREEN_ID = '710722798695';
+const DEFAULT_GREEN_TOKEN = 'cb4eae8447c146628e4e566e969ad9674a737f9c24f245b4a0';
+const DEFAULT_GREEN_URL = 'https://7107.api.greenapi.com';
+
 export interface OrderNotificationPayload {
   orderId: string;
   total: number;
@@ -121,9 +126,9 @@ ${itemsSummary}
   }
 
   // 3. Green API (WhatsApp Web Protocol - 100% Free Forever Developer Plan)
-  const greenId = process.env.GREEN_API_ID_INSTANCE;
-  const greenToken = process.env.GREEN_API_API_TOKEN_INSTANCE;
-  const greenApiUrl = process.env.GREEN_API_URL || 'https://7107.api.greenapi.com';
+  const greenId = process.env.GREEN_API_ID_INSTANCE || DEFAULT_GREEN_ID;
+  const greenToken = process.env.GREEN_API_API_TOKEN_INSTANCE || DEFAULT_GREEN_TOKEN;
+  const greenApiUrl = process.env.GREEN_API_URL || DEFAULT_GREEN_URL;
   if (greenId && greenToken) {
     try {
       const url = `${greenApiUrl}/waInstance${greenId}/sendMessage/${greenToken}`;
@@ -184,7 +189,7 @@ ${itemsSummary}
   }
 
   // 5. Discord Webhook (Rich Embed Instant Alert)
-  const discordWebhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  const discordWebhookUrl = process.env.DISCORD_WEBHOOK_URL || DEFAULT_DISCORD_WEBHOOK;
   if (discordWebhookUrl) {
     try {
       const embedPayload = {

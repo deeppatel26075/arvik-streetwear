@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { formatPrice } from '@/lib/utils';
-import { RefreshCw, ClipboardList, Info } from 'lucide-react';
+import { RefreshCw, ClipboardList, Info, X } from 'lucide-react';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -33,7 +33,12 @@ export default function AdminOrders() {
           .order('created_at', { ascending: false });
 
         if (error) {
-          console.error(error);
+          console.error('Error fetching orders with items, trying fallback:', error);
+          const { data: fallbackData } = await supabase
+            .from('orders')
+            .select('*')
+            .order('created_at', { ascending: false });
+          if (fallbackData) dbOrders = fallbackData;
         } else if (data) {
           dbOrders = data;
         }
@@ -123,49 +128,83 @@ export default function AdminOrders() {
               <span>Loading orders...</span>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-stone-600">
-                <thead>
-                  <tr className="border-b border-stone-100 text-[10px] text-stone-400 font-bold uppercase tracking-wider">
-                    <th className="pb-3">Order ID</th>
-                    <th className="pb-3">Customer</th>
-                    <th className="pb-3">Total Amount</th>
-                    <th className="pb-3">Status</th>
-                    <th className="pb-3">Details</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-50">
-                  {orders.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="py-12 text-center text-stone-400 text-xs font-semibold uppercase tracking-wider">
-                        No orders placed yet. Customer orders will appear here automatically.
-                      </td>
+            <>
+              {/* Desktop table */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-left text-xs text-stone-600">
+                  <thead>
+                    <tr className="border-b border-stone-100 text-[10px] text-stone-400 font-bold uppercase tracking-wider">
+                      <th className="pb-3">Order ID</th>
+                      <th className="pb-3">Customer</th>
+                      <th className="pb-3">Total Amount</th>
+                      <th className="pb-3">Status</th>
+                      <th className="pb-3">Details</th>
                     </tr>
-                  ) : (
-                    orders.map((order) => (
-                      <tr key={order.id} className="hover:bg-stone-50/50">
-                        <td className="py-4 font-mono font-semibold text-stone-900">{order.id}</td>
-                        <td className="py-4 font-medium text-stone-850">{order.shipping_name}</td>
-                        <td className="py-4 font-semibold text-stone-900">{formatPrice(order.total_amount)}</td>
-                        <td className="py-4">
-                          <span className={`px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-wider border ${getStatusColor(order.status)}`}>
-                            {order.status}
-                          </span>
-                        </td>
-                        <td className="py-4">
-                          <button
-                            onClick={() => setSelectedOrder(order)}
-                            className="text-stone-400 hover:text-stone-900 p-1 transition-colors"
-                          >
-                            <Info className="h-4.5 w-4.5" />
-                          </button>
+                  </thead>
+                  <tbody className="divide-y divide-stone-50">
+                    {orders.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="py-12 text-center text-stone-400 text-xs font-semibold uppercase tracking-wider">
+                          No orders placed yet. Customer orders will appear here automatically.
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    ) : (
+                      orders.map((order) => (
+                        <tr key={order.id} className="hover:bg-stone-50/50">
+                          <td className="py-4 font-mono font-semibold text-stone-900">{order.id}</td>
+                          <td className="py-4 font-medium text-stone-850">{order.shipping_name}</td>
+                          <td className="py-4 font-semibold text-stone-900">{formatPrice(order.total_amount)}</td>
+                          <td className="py-4">
+                            <span className={`px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-wider border ${getStatusColor(order.status)}`}>
+                              {order.status}
+                            </span>
+                          </td>
+                          <td className="py-4">
+                            <button
+                              onClick={() => setSelectedOrder(order)}
+                              className="text-stone-400 hover:text-stone-900 p-1 transition-colors"
+                            >
+                              <Info className="h-4.5 w-4.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile card list */}
+              <div className="sm:hidden divide-y divide-stone-100">
+                {orders.length === 0 ? (
+                  <div className="py-10 text-center text-stone-400 text-xs font-semibold uppercase tracking-wider">
+                    No orders placed yet.
+                  </div>
+                ) : (
+                  orders.map((order) => (
+                    <div
+                      key={order.id}
+                      onClick={() => setSelectedOrder(order)}
+                      className="py-3.5 space-y-2 cursor-pointer active:bg-stone-50 rounded-sm p-2 transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[11px] font-bold text-stone-900">{order.id}</span>
+                        <span className={`px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-wider border ${getStatusColor(order.status)}`}>
+                          {order.status}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-medium text-stone-850">{order.shipping_name}</span>
+                        <span className="font-semibold text-stone-900 font-mono">{formatPrice(order.total_amount)}</span>
+                      </div>
+                      <p className="text-[10px] text-stone-400 font-medium">
+                        Tap to view details & update status →
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </>
           )}
         </div>
 
@@ -177,9 +216,18 @@ export default function AdminOrders() {
                 <span className="font-syne font-bold uppercase text-stone-900 text-sm tracking-wider">
                   Order Details
                 </span>
-                <span className={`px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-wider border ${getStatusColor(selectedOrder.status)}`}>
-                  {selectedOrder.status}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-wider border ${getStatusColor(selectedOrder.status)}`}>
+                    {selectedOrder.status}
+                  </span>
+                  <button
+                    onClick={() => setSelectedOrder(null)}
+                    className="p-1 text-stone-400 hover:text-stone-900 rounded-sm"
+                    title="Close details"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
 
               {/* Customer Info */}

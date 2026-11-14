@@ -147,24 +147,28 @@ export async function POST(request: Request) {
 
     const orderId: string = orderResult.order_id;
 
-    // Send instant notification to admin (free WhatsApp / Telegram / console)
-    notifyAdminNewOrder({
-      orderId,
-      total: orderResult.total,
-      paymentMethod,
-      shipping: {
-        name: shipping.name,
-        phone: shipping.phone,
-        city: shipping.city,
-        state: shipping.state,
-        pincode: shipping.pincode,
-      },
-      items: items.map((item) => ({
-        name: item.name,
-        size: item.size,
-        quantity: item.quantity,
-      })),
-    }).catch((err) => console.error('Admin order notification failed:', err));
+    // Send instant notification to admin (WhatsApp + Discord)
+    try {
+      await notifyAdminNewOrder({
+        orderId,
+        total: orderResult.total,
+        paymentMethod,
+        shipping: {
+          name: shipping.name,
+          phone: shipping.phone,
+          city: shipping.city,
+          state: shipping.state,
+          pincode: shipping.pincode,
+        },
+        items: items.map((item) => ({
+          name: item.name,
+          size: item.size,
+          quantity: item.quantity,
+        })),
+      });
+    } catch (notifyErr) {
+      console.error('Admin order notification failed:', notifyErr);
+    }
 
     return NextResponse.json({
       orderId,

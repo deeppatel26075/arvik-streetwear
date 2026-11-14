@@ -32,9 +32,14 @@ export default function AdminDashboard() {
         } catch (e) {}
 
         // 1. Fetch metrics from Supabase
-        const { data: orders } = await supabase
+        const { data: orders, error: ordersErr } = await supabase
           .from('orders')
-          .select('*, profiles(full_name)');
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (ordersErr) {
+          console.error('Failed to load orders from Supabase:', ordersErr);
+        }
         
         const { data: inventory } = await supabase
           .from('inventory')
@@ -158,7 +163,8 @@ export default function AdminDashboard() {
           Recent Orders
         </h3>
 
-        <div className="overflow-x-auto">
+        {/* Desktop table */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left text-xs text-stone-600">
             <thead>
               <tr className="border-b border-stone-100 text-[10px] text-stone-400 font-bold uppercase tracking-wider">
@@ -197,6 +203,35 @@ export default function AdminDashboard() {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile card list */}
+        <div className="sm:hidden divide-y divide-stone-100">
+          {recentOrders.length === 0 ? (
+            <div className="py-6 text-center text-stone-400 text-xs font-semibold uppercase tracking-wider">
+              No orders recorded yet.
+            </div>
+          ) : (
+            recentOrders.map((order, index) => (
+              <div key={index} className="py-3 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[11px] font-bold text-stone-900">{order.id}</span>
+                  <span className={`px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-wider border ${
+                    order.status === 'delivered' ? 'bg-emerald-50 text-emerald-800 border-emerald-100' :
+                    order.status === 'pending' ? 'bg-amber-50 text-amber-800 border-amber-100' :
+                    'bg-stone-100 text-stone-850 border-stone-200'
+                  }`}>
+                    {order.status}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium text-stone-850">{order.name}</span>
+                  <span className="font-semibold text-stone-900 font-mono">{formatPrice(order.total)}</span>
+                </div>
+                <p className="text-[10px] text-stone-400">{order.date}</p>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

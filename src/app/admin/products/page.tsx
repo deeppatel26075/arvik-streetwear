@@ -279,13 +279,24 @@ export default function AdminProducts() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Guard: price must be a valid number
+    const parsedPrice = parseFloat(price);
+    if (!price || isNaN(parsedPrice)) {
+      alert('Please enter a valid price.');
+      return;
+    }
+
+    // Build a unique slug — append a short timestamp suffix to prevent collisions
+    const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const slug = editingId ? baseSlug : `${baseSlug}-${Date.now().toString(36)}`;
+
     const productPayload = {
       name,
-      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      slug,
       description,
-      price: parseFloat(price),
+      price: parsedPrice,
       discount_price: discountPrice ? parseFloat(discountPrice) : null,
-      category_id: categoryId || null,
+      category_id: categoryId && categoryId.trim() !== '' ? categoryId : null,
       fabric,
       gsm,
       fit_type: fitType,
@@ -359,9 +370,10 @@ export default function AdminProducts() {
       if (!storyPanelsSaved && validStoryPanels.length > 0) {
         alert('Product saved, but the Product Story photos/captions could not be saved — the product_story_panels migration may not be run yet.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to save product to Supabase:', err);
-      alert('Failed to save this product to the database. Nothing was changed — please try again.');
+      const msg = err?.message || err?.details || err?.hint || JSON.stringify(err);
+      alert(`Save failed: ${msg}`);
     }
   };
 

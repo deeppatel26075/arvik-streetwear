@@ -87,24 +87,28 @@ export async function POST(request: Request) {
     }
 
     // ── 5. Return real database order ID ─────────────────────────────────────
-    // Send instant notification to admin (free WhatsApp / Telegram / console)
-    notifyAdminNewOrder({
-      orderId: orderResult.order_id,
-      total: orderResult.total,
-      paymentMethod: 'cod',
-      shipping: {
-        name: shipping.name,
-        phone: shipping.phone,
-        city: shipping.city,
-        state: shipping.state,
-        pincode: shipping.pincode,
-      },
-      items: items.map((item: any) => ({
-        name: item.name || 'Product',
-        size: item.size || 'M',
-        quantity: item.quantity || 1,
-      })),
-    }).catch((err) => console.error('Admin order notification failed:', err));
+    // Send instant notification to admin (WhatsApp + Discord)
+    try {
+      await notifyAdminNewOrder({
+        orderId: orderResult.order_id,
+        total: orderResult.total,
+        paymentMethod: 'cod',
+        shipping: {
+          name: shipping.name,
+          phone: shipping.phone,
+          city: shipping.city,
+          state: shipping.state,
+          pincode: shipping.pincode,
+        },
+        items: items.map((item: any) => ({
+          name: item.name || 'Product',
+          size: item.size || 'M',
+          quantity: item.quantity || 1,
+        })),
+      });
+    } catch (notifyErr) {
+      console.error('Admin order notification failed:', notifyErr);
+    }
 
     // NEVER return a fake/generated order ID
     return NextResponse.json({
