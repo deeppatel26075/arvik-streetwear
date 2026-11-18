@@ -74,16 +74,16 @@ export default function AboutPage() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           <div className="relative col-span-1 row-span-2 aspect-3/5 md:aspect-auto rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80">
-            <Image src="/products/farebi-olive.jpg" alt="ARVIIK craft" fill className="object-cover" />
+            <Image src="/products/farebi-olive.jpg" alt="ARVIIK craft" fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover" />
           </div>
           <div className="relative aspect-square rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80">
-            <Image src="/products/polarize-navy.jpg" alt="ARVIIK craft" fill className="object-cover" />
+            <Image src="/products/polarize-navy.jpg" alt="ARVIIK craft" fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover" />
           </div>
           <div className="relative aspect-square rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80">
-            <Image src="/products/polarize-cream.jpg" alt="ARVIIK craft" fill className="object-cover" />
+            <Image src="/products/polarize-cream.jpg" alt="ARVIIK craft" fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover" />
           </div>
           <div className="relative col-span-2 md:col-span-1 md:row-span-2 aspect-3/2 md:aspect-auto rounded-xl overflow-hidden bg-stone-100 border border-stone-200/80">
-            <Image src="/products/mard-paisa-maroon.jpg" alt="ARVIIK craft" fill className="object-cover" />
+            <Image src="/products/mard-paisa-maroon.jpg" alt="ARVIIK craft" fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover" />
           </div>
         </div>
       </section>

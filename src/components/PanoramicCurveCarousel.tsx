@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export interface PanoramicPanel {
@@ -40,12 +41,16 @@ function PanelImage({ src, fallbackIndex, alt, loading }: { src: string; fallbac
     ? FALLBACK_IMAGES[((fallbackIndex % FALLBACK_IMAGES.length) + FALLBACK_IMAGES.length) % FALLBACK_IMAGES.length]
     : src;
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    // next/image serves a resized WebP/AVIF instead of the original
+    // multi-MB PNG upload. Panels are full-width below 640px, otherwise
+    // a fraction of the content column.
+    <Image
       src={resolvedSrc}
       alt={alt}
+      fill
+      sizes="(max-width: 640px) 100vw, 50vw"
       draggable={false}
-      className="absolute inset-0 w-full h-full object-cover"
+      className="object-cover"
       loading={loading}
       onError={() => setErrored(true)}
     />

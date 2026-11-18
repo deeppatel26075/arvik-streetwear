@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { refreshStorefront } from '@/app/actions/refreshStorefront';
 import { Save, Check, RefreshCw, Eye, EyeOff, Flame, Shirt, Truck, Wallet, Star, Tag, Percent, Gift } from 'lucide-react';
 
 const ICON_OPTIONS = [
@@ -88,6 +89,7 @@ export default function AdminHeroBanner() {
         is_hidden: slide.is_hidden,
       });
       if (error) throw error;
+      refreshStorefront().catch(() => {});
       setSavedId(slide.id);
       setTimeout(() => setSavedId(null), 2000);
     } catch (err) {
@@ -106,6 +108,8 @@ export default function AdminHeroBanner() {
       console.error('Failed to update slide visibility:', error);
       alert('Failed to update visibility in the database.');
       updateField(slide.id, 'is_hidden', slide.is_hidden);
+    } else {
+      refreshStorefront().catch(() => {});
     }
   };
 

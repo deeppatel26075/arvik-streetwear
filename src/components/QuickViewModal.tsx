@@ -101,6 +101,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
               src={images[activeImgIdx] || images[0]}
               alt={product.name}
               fill
+              sizes="(max-width: 768px) 100vw, 400px"
               className="object-cover"
             />
             {images.length > 1 && (

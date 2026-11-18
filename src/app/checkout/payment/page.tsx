@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Script from 'next/script';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { supabase } from '@/lib/supabase';
@@ -271,6 +272,9 @@ export default function CheckoutPaymentPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Preload the Razorpay SDK here (it used to load on every page from the
+          root layout) so the Pay button opens checkout without a delay. */}
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
       {/* Return & Encrypted Banner */}
       <div className="flex justify-between items-center pb-2 border-b border-stone-200">
         <Link

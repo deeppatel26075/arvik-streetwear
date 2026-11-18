@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { formatPrice, categoryDisplayName } from '@/lib/utils';
 import { extractProductColor, COLOR_PALETTE } from '@/lib/colorVariants';
+import { refreshStorefront } from '@/app/actions/refreshStorefront';
 import { Plus, Edit2, Trash2, Check, Eye, EyeOff, Star, X, RefreshCw, Palette } from 'lucide-react';
 
 export default function AdminProducts() {
@@ -388,6 +389,7 @@ export default function AdminProducts() {
       }
 
       setFormOpen(false);
+      refreshStorefront().catch(() => {});
       await loadData();
       if (!storyPanelsSaved && validStoryPanels.length > 0) {
         alert('Product saved, but the Product Story photos/captions could not be saved — the product_story_panels migration may not be run yet.');
@@ -406,6 +408,7 @@ export default function AdminProducts() {
       alert('Failed to update visibility in the database.');
       return;
     }
+    refreshStorefront().catch(() => {});
     await loadData();
   };
 
@@ -416,6 +419,7 @@ export default function AdminProducts() {
       alert('Failed to update the featured flag in the database.');
       return;
     }
+    refreshStorefront().catch(() => {});
     await loadData();
   };
 
@@ -427,6 +431,7 @@ export default function AdminProducts() {
       alert('Failed to delete this product from the database.');
       return;
     }
+    refreshStorefront().catch(() => {});
     await loadData();
   };
 

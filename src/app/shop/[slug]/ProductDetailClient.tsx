@@ -736,10 +736,12 @@ export default function ProductDetailClient({ product, relatedProducts = [], col
                       {/* Thumbnail preview if available */}
                       {variant.thumbnail && (
                         <span className="relative hidden sm:block w-6 h-7 rounded-xs overflow-hidden border border-stone-200 flex-shrink-0 bg-stone-100">
-                          <img
+                          <Image
                             src={variant.thumbnail}
                             alt={variant.colorName}
-                            className="w-full h-full object-cover"
+                            fill
+                            sizes="24px"
+                            className="object-cover"
                           />
                         </span>
                       )}

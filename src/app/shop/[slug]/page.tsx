@@ -2,10 +2,17 @@ import { supabase, withTimeout } from '@/lib/supabase';
 import ProductDetailClient from './ProductDetailClient';
 import ProductDetailFallback from './ProductDetailFallback';
 import { findColorVariants } from '@/lib/colorVariants';
-import { notFound } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// ISR: each product page is rendered on its first visit, then served from
+// cache and rebuilt in the background at most once a minute. Admin edits
+// call refreshStorefront() so changes still show up immediately.
+export const revalidate = 60;
+
+// Empty list = prerender nothing at build time, but still cache every
+// product page on demand (required for ISR on a dynamic route).
+export async function generateStaticParams() {
+  return [];
+}
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -13,53 +20,47 @@ interface ProductDetailPageProps {
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
   const { slug } = await params;
-  let dbProduct = null;
 
-  try {
-    const res: any = await withTimeout(
+  // All three queries are keyed off the slug, so they go out in parallel —
+  // one Supabase round trip for the page instead of five sequential ones.
+  const [res, storyRes, allProdRes]: any[] = await Promise.all([
+    withTimeout(
       supabase
         .from('products')
         .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
         .eq('slug', slug)
         .eq('is_hidden', false)
         .single()
-    );
+    ),
+    // Fetched separately (not embedded above) so that a missing/pending
+    // product_story_panels migration degrades to the frontend's own
+    // gallery-photo fallback instead of taking down the whole product page.
+    withTimeout(
+      supabase
+        .from('product_story_panels')
+        .select('image_url, caption, display_order, products!inner(slug)')
+        .eq('products.slug', slug)
+        .order('display_order')
+    ),
+    // Every visible product: used both for sibling color variants and for
+    // the "related products" row, so it replaces two extra queries.
+    withTimeout(
+      supabase
+        .from('products')
+        .select('id, name, slug, description, price, discount_price, is_hidden, category_id, category:categories(name), product_images(image_url), inventory(size, quantity)')
+        .eq('is_hidden', false)
+    ),
+  ]);
 
-    const data = res?.data;
-    if (data) {
-      dbProduct = {
-        ...data,
-        category: data.category ? { name: (data.category as any).name } : undefined,
-        product_images: data.product_images || [],
-        inventory: data.inventory || [],
-        product_story_panels: [] as any[]
-      };
-    }
-  } catch (err) {
-    console.error(`Error loading product details for ${slug}:`, err);
+  // A timeout or a real DB error (anything other than ".single() found no
+  // row") must not be cached as "product not found" — throw so ISR keeps
+  // serving the last good version instead.
+  if (!res || (res.error && res.error.code !== 'PGRST116')) {
+    throw new Error(`Product ${slug}: failed to load (${res?.error?.message ?? 'timeout'})`);
   }
 
-  // Fetched separately (not embedded above) so that a missing/pending
-  // product_story_panels migration degrades to the frontend's own
-  // gallery-photo fallback instead of taking down the whole product page.
-  if (dbProduct) {
-    try {
-      const storyRes: any = await withTimeout(
-        supabase
-          .from('product_story_panels')
-          .select('image_url, caption, display_order')
-          .eq('product_id', dbProduct.id)
-          .order('display_order')
-      );
-      dbProduct.product_story_panels = storyRes?.data || [];
-    } catch (err) {
-      console.error(`Error loading story panels for ${slug}:`, err);
-    }
-  }
-
-  const product = dbProduct;
-
-  if (!product) {
+  const data = res.data;
+  if (!data) {
     return (
       <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
         <ProductDetailFallback slug={slug} />
@@ -67,61 +68,36 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     );
   }
 
-  // Fetch all active products to detect sibling color variants
+  const product = {
+    ...data,
+    category: data.category ? { name: (data.category as any).name } : undefined,
+    product_images: data.product_images || [],
+    inventory: data.inventory || [],
+    product_story_panels: (storyRes?.data || []).map(({ products: _p, ...panel }: any) => panel),
+  };
+
+  const allProds: any[] = allProdRes?.data || [];
+
   let colorVariants: any[] = [];
   try {
-    const allProdRes: any = await withTimeout(
-      supabase
-        .from('products')
-        .select('id, name, slug, description, price, discount_price, is_hidden, product_images(image_url), inventory(size, quantity)')
-        .eq('is_hidden', false)
-    );
-    const allProds = allProdRes?.data || [];
     colorVariants = findColorVariants(product, allProds);
   } catch (err) {
     console.error('Error finding color variants:', err);
   }
 
-  let relatedProducts: any[] = [];
-  try {
-    const relSelect = 'id, name, slug, price, discount_price, category:categories(name), product_images(image_url), inventory(size, quantity)';
-
-    const relRes: any = await withTimeout(
-      supabase
-        .from('products')
-        .select(relSelect)
-        .eq('is_hidden', false)
-        .eq('category_id', product.category_id)
-        .neq('id', product.id)
-        .limit(4)
-    );
-    let relData = relRes?.data || [];
-
-    // Not enough other products in the same category yet (e.g. an early
-    // catalog with only one product per category) — fall back to any
-    // other products so the section still has something to show, rather
-    // than sitting invisible until the catalog fills out.
-    if (relData.length === 0) {
-      const fallbackRes: any = await withTimeout(
-        supabase
-          .from('products')
-          .select(relSelect)
-          .eq('is_hidden', false)
-          .neq('id', product.id)
-          .limit(4)
-      );
-      relData = fallbackRes?.data || [];
-    }
-
-    relatedProducts = relData.map((p: any) => ({
+  // Prefer other products from the same category; if the catalog doesn't
+  // have any yet, fall back to any other products so the section still
+  // has something to show.
+  const others = allProds.filter((p) => p.id !== product.id);
+  const sameCategory = others.filter((p) => p.category_id === product.category_id);
+  const relatedProducts = (sameCategory.length > 0 ? sameCategory : others)
+    .slice(0, 4)
+    .map((p: any) => ({
       ...p,
       category: p.category ? { name: p.category.name } : undefined,
       product_images: p.product_images || [],
       inventory: p.inventory || []
     }));
-  } catch (err) {
-    console.error(`Error loading related products for ${slug}:`, err);
-  }
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">

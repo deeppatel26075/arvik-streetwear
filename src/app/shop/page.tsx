@@ -3,40 +3,35 @@ import ShopClient from './ShopClient';
 import PageLoader from '@/components/PageLoader';
 import { Suspense } from 'react';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// Served from the ISR cache and rebuilt in the background at most once a
+// minute. Admin edits call refreshStorefront() to update it immediately.
+export const revalidate = 60;
 
 export default async function ShopPage() {
-  let dbProducts = [];
-  let dbCategories = [];
-
-  try {
-    // 1. Fetch categories
-    const catRes: any = await withTimeout(
-      supabase.from('categories').select('*')
-    );
-    if (catRes?.data) dbCategories = catRes.data;
-
-    // 2. Fetch products with 1s timeout safeguard
-    const prodRes: any = await withTimeout(
+  // Independent queries — run in parallel.
+  const [catRes, prodRes]: any[] = await Promise.all([
+    withTimeout(supabase.from('categories').select('*')),
+    withTimeout(
       supabase
         .from('products')
         .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
         .eq('is_hidden', false)
-    );
-    
-    const prodData = prodRes?.data;
-    if (prodData && prodData.length > 0) {
-      dbProducts = prodData.map((prod: any) => ({
-        ...prod,
-        category: prod.category ? { name: (prod.category as any).name } : undefined,
-        product_images: prod.product_images || [],
-        inventory: prod.inventory || []
-      }));
-    }
-  } catch (err) {
-    console.error('Error fetching shop data from Supabase:', err);
+    ),
+  ]);
+
+  // Don't let ISR cache an empty shop during a brief Supabase outage —
+  // throwing keeps the last good version being served.
+  if (!prodRes || prodRes.error) {
+    throw new Error(`Shop: failed to load products (${prodRes?.error?.message ?? 'timeout'})`);
   }
+
+  const dbCategories: any[] = catRes?.data || [];
+  const dbProducts = (prodRes.data || []).map((prod: any) => ({
+    ...prod,
+    category: prod.category ? { name: (prod.category as any).name } : undefined,
+    product_images: prod.product_images || [],
+    inventory: prod.inventory || []
+  }));
 
   const finalProducts = dbProducts;
 

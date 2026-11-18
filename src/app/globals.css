@@ -177,3 +177,9 @@ input:disabled {
   }
 }
 
+
+/* Route loading bar (src/app/loading.tsx) */
+@keyframes arviik-progress {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
