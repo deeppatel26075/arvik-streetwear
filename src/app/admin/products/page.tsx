@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { formatPrice, categoryDisplayName } from '@/lib/utils';
-import { Plus, Edit2, Trash2, Check, Eye, EyeOff, Star, X, RefreshCw } from 'lucide-react';
+import { extractProductColor, COLOR_PALETTE } from '@/lib/colorVariants';
+import { Plus, Edit2, Trash2, Check, Eye, EyeOff, Star, X, RefreshCw, Palette } from 'lucide-react';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<any[]>([]);
@@ -23,6 +24,9 @@ export default function AdminProducts() {
   const [gsm, setGsm] = useState('240 GSM');
   const [fitType, setFitType] = useState('Oversized Fit');
   const [washInstructions, setWashInstructions] = useState('Cold wash inside out');
+  const [colorName, setColorName] = useState('');
+  const [colorHex, setColorHex] = useState('#111111');
+  const [designGroup, setDesignGroup] = useState('');
   const [productImages, setProductImages] = useState<string[]>(['', '', '', '', '']);
   const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
 
@@ -187,6 +191,9 @@ export default function AdminProducts() {
     setEditingId(null);
     setName('');
     setDescription('');
+    setColorName('');
+    setColorHex('#111111');
+    setDesignGroup('');
     setPrice('');
     setDiscountPrice('');
     setCategoryId(categories[0]?.id || '');
@@ -208,7 +215,15 @@ export default function AdminProducts() {
   const openEditForm = (prod: any) => {
     setEditingId(prod.id);
     setName(prod.name);
-    setDescription(prod.description || '');
+
+    // Extract color metadata and clean description
+    const colorInfo = extractProductColor(prod);
+    const cleanDesc = (prod.description || '').replace(/<!--\s*color:.*?-->/gi, '').trim();
+    setDescription(cleanDesc);
+    setColorName(colorInfo.colorName || '');
+    setColorHex(colorInfo.colorHex || '#111111');
+    setDesignGroup(colorInfo.designBase !== prod.name ? colorInfo.designBase : '');
+
     setPrice(prod.price.toString());
     setDiscountPrice(prod.discount_price ? prod.discount_price.toString() : '');
     setCategoryId(prod.category_id || categories[0]?.id || '');
@@ -290,10 +305,17 @@ export default function AdminProducts() {
     const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const slug = editingId ? baseSlug : `${baseSlug}-${Date.now().toString(36)}`;
 
+    // Embed color metadata into description
+    let finalDescription = description.replace(/<!--\s*color:.*?-->/gi, '').trim();
+    if (colorName && colorName.trim()) {
+      const group = designGroup.trim() || name.split(/[-–—(|]/)[0].trim();
+      finalDescription += `\n<!--color:${colorName.trim()}|${colorHex}|group:${group}-->`;
+    }
+
     const productPayload = {
       name,
       slug,
-      description,
+      description: finalDescription,
       price: parsedPrice,
       discount_price: discountPrice ? parseFloat(discountPrice) : null,
       category_id: categoryId && categoryId.trim() !== '' ? categoryId : null,
@@ -456,10 +478,15 @@ export default function AdminProducts() {
                       const item = prod.sizes?.find((s: any) => s.size === sz);
                       return item ? item.quantity : 0;
                     };
+                    const prodColor = extractProductColor(prod);
                     return (
                       <tr key={prod.id} className="hover:bg-stone-50/50">
                         <td className="py-4 font-semibold text-stone-900 uppercase tracking-wide pr-4">
-                          {prod.name}
+                          <div>{prod.name}</div>
+                          <div className="flex items-center space-x-1.5 mt-0.5">
+                            <span className="w-2 h-2 rounded-full border border-stone-300 flex-shrink-0" style={{ backgroundColor: prodColor.colorHex }} />
+                            <span className="text-[10px] text-stone-500 font-semibold">{prodColor.colorName}</span>
+                          </div>
                         </td>
                         <td className="py-4 uppercase tracking-wider text-[10px] font-semibold text-stone-500 pr-4">
                           {categoryDisplayName(prod.categoryName)}
@@ -507,24 +534,32 @@ export default function AdminProducts() {
               </table>
             </div>
 
-            {/* Mobile cards */}
-            <div className="sm:hidden divide-y divide-stone-100">
-              {products.map((prod) => {
-                const getSzStock = (sz: string) => {
-                  const item = prod.sizes?.find((s: any) => s.size === sz);
-                  return item ? item.quantity : 0;
-                };
-                return (
-                  <div key={prod.id} className="p-4 space-y-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="font-syne font-bold text-sm text-stone-900 uppercase tracking-wide leading-tight">
-                          {prod.name}
-                        </p>
-                        <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-wider mt-0.5">
-                          {categoryDisplayName(prod.categoryName)}
-                        </p>
-                      </div>
+              {/* Mobile cards */}
+              <div className="sm:hidden divide-y divide-stone-100">
+                {products.map((prod) => {
+                  const getSzStock = (sz: string) => {
+                    const item = prod.sizes?.find((s: any) => s.size === sz);
+                    return item ? item.quantity : 0;
+                  };
+                  const prodColor = extractProductColor(prod);
+                  return (
+                    <div key={prod.id} className="p-4 space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="font-syne font-bold text-sm text-stone-900 uppercase tracking-wide leading-tight">
+                            {prod.name}
+                          </p>
+                          <div className="flex items-center space-x-2 mt-0.5">
+                            <span className="text-[10px] text-stone-400 font-semibold uppercase tracking-wider">
+                              {categoryDisplayName(prod.categoryName)}
+                            </span>
+                            <span className="text-stone-300">•</span>
+                            <div className="flex items-center space-x-1">
+                              <span className="w-2 h-2 rounded-full border border-stone-300" style={{ backgroundColor: prodColor.colorHex }} />
+                              <span className="text-[10px] text-stone-600 font-medium">{prodColor.colorName}</span>
+                            </div>
+                          </div>
+                        </div>
                       <p className="font-mono font-bold text-stone-900 text-sm flex-shrink-0">
                         {formatPrice(prod.discount_price || prod.price)}
                       </p>
@@ -614,6 +649,60 @@ export default function AdminProducts() {
                   onChange={(e) => setDescription(e.target.value)}
                   className="w-full bg-stone-50 border border-stone-200 px-3 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
                 />
+              </div>
+
+              {/* Color Variant Section */}
+              <div className="space-y-3 p-3.5 bg-stone-50 rounded-sm border border-stone-200/60">
+                <div className="border-b pb-1.5 flex items-center gap-2">
+                  <Palette className="h-3.5 w-3.5 text-stone-500" />
+                  <span className="text-[10px] text-stone-600 font-extrabold uppercase tracking-wider">
+                    Color Variant (Optional)
+                  </span>
+                </div>
+                <p className="text-[9px] text-stone-400 font-medium">
+                  If this design comes in multiple colors, fill these in so customers can switch between colorways on the product page.
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Color Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Washed Olive"
+                      value={colorName}
+                      onChange={(e) => setColorName(e.target.value)}
+                      className="w-full bg-white border border-stone-200 px-3 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Color Swatch</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={colorHex}
+                        onChange={(e) => setColorHex(e.target.value)}
+                        className="h-9 w-12 cursor-pointer rounded-sm border border-stone-200 bg-white p-0.5"
+                      />
+                      <input
+                        type="text"
+                        value={colorHex}
+                        onChange={(e) => setColorHex(e.target.value)}
+                        placeholder="#111111"
+                        className="flex-1 bg-white border border-stone-200 px-3 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Design Group Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Farebi (the shared design name, without color)"
+                    value={designGroup}
+                    onChange={(e) => setDesignGroup(e.target.value)}
+                    className="w-full bg-white border border-stone-200 px-3 py-2.5 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
+                  />
+                  <p className="text-[9px] text-stone-400">Products with the same Design Group will be shown together as color options.</p>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

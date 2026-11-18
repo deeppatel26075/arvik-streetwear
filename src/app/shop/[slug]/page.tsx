@@ -1,6 +1,7 @@
 import { supabase, withTimeout } from '@/lib/supabase';
 import ProductDetailClient from './ProductDetailClient';
 import ProductDetailFallback from './ProductDetailFallback';
+import { findColorVariants } from '@/lib/colorVariants';
 import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -66,6 +67,21 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     );
   }
 
+  // Fetch all active products to detect sibling color variants
+  let colorVariants: any[] = [];
+  try {
+    const allProdRes: any = await withTimeout(
+      supabase
+        .from('products')
+        .select('id, name, slug, description, price, discount_price, is_hidden, product_images(image_url), inventory(size, quantity)')
+        .eq('is_hidden', false)
+    );
+    const allProds = allProdRes?.data || [];
+    colorVariants = findColorVariants(product, allProds);
+  } catch (err) {
+    console.error('Error finding color variants:', err);
+  }
+
   let relatedProducts: any[] = [];
   try {
     const relSelect = 'id, name, slug, price, discount_price, category:categories(name), product_images(image_url), inventory(size, quantity)';
@@ -109,7 +125,11 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-      <ProductDetailClient product={product as any} relatedProducts={relatedProducts as any} />
+      <ProductDetailClient
+        product={product as any}
+        relatedProducts={relatedProducts as any}
+        colorVariants={colorVariants}
+      />
     </div>
   );
 }

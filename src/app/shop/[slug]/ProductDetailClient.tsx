@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useCart, WishlistItem } from '@/context/CartContext';
 import { useTheme } from '@/context/ThemeContext';
 import { formatPrice } from '@/lib/utils';
+import { ColorVariant, extractProductColor } from '@/lib/colorVariants';
 import ProductCard from '@/components/ProductCard';
 import PanoramicCurveCarousel from '@/components/PanoramicCurveCarousel';
 import {
@@ -68,6 +69,7 @@ interface ProductDetailClientProps {
     product_images?: ProductImage[];
     inventory?: InventoryItem[];
   }[];
+  colorVariants?: ColorVariant[];
 }
 
 const REVIEWS = [
@@ -127,7 +129,7 @@ function SafeImage({
   );
 }
 
-export default function ProductDetailClient({ product, relatedProducts = [] }: ProductDetailClientProps) {
+export default function ProductDetailClient({ product, relatedProducts = [], colorVariants = [] }: ProductDetailClientProps) {
   const router = useRouter();
   const { addToCart, toggleWishlist, isInWishlist } = useCart();
   const { setThemePreset } = useTheme();
@@ -136,6 +138,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: P
   // "Psychology Edition" is the real category name in the database — shown
   // to customers as "Hidden Patterns" everywhere, matching the shop listing.
   const categoryName = rawCategoryName?.toLowerCase() === 'psychology edition' ? 'Hidden Patterns' : rawCategoryName;
+  const currentColorInfo = extractProductColor(product);
 
   // Psychology Edition (like On Fire) only repaints the shop listing tab.
   // Individual product pages always stay on the default theme.
@@ -695,6 +698,59 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: P
             </p>
           </div>
 
+          {/* Color Selector (when product has multiple colorways in the design portfolio) */}
+          {colorVariants && colorVariants.length > 1 && (
+            <div className="space-y-3 p-4 bg-stone-50/80 border border-stone-200/80 rounded-xl">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs font-extrabold text-stone-900 uppercase tracking-wider">
+                    Available Colors:
+                  </span>
+                  <span className="text-xs text-stone-950 font-extrabold uppercase bg-white border border-stone-200/80 px-2.5 py-0.5 rounded-md shadow-xs">
+                    {currentColorInfo.colorName}
+                  </span>
+                </div>
+                <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">
+                  {colorVariants.length} Colors in Portfolio
+                </span>
+              </div>
+
+              <div className="flex flex-wrap gap-2.5">
+                {colorVariants.map((variant) => {
+                  const isSelected = variant.id === product.id || variant.slug === product.slug;
+                  return (
+                    <Link
+                      key={variant.id}
+                      href={`/shop/${variant.slug}`}
+                      className={`group relative flex items-center space-x-2.5 px-3 py-2 rounded-xl border text-xs font-bold uppercase transition-all ${
+                        isSelected
+                          ? 'bg-stone-950 text-white border-stone-950 shadow-md ring-2 ring-stone-950'
+                          : 'bg-white text-stone-850 border-stone-200/90 hover:border-stone-900 hover:bg-stone-50'
+                      }`}
+                    >
+                      {/* Swatch circle */}
+                      <span
+                        className="w-3.5 h-3.5 rounded-full border border-stone-300 shadow-xs flex-shrink-0"
+                        style={{ backgroundColor: variant.colorHex }}
+                      />
+                      {/* Thumbnail preview if available */}
+                      {variant.thumbnail && (
+                        <span className="relative w-6 h-7 rounded-xs overflow-hidden border border-stone-200 flex-shrink-0 bg-stone-100">
+                          <img
+                            src={variant.thumbnail}
+                            alt={variant.colorName}
+                            className="w-full h-full object-cover"
+                          />
+                        </span>
+                      )}
+                      <span>{variant.colorName}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Size Selector Grid (Comet Style) */}
           <div className="space-y-3 pt-1">
             <div className="flex justify-between items-center">
@@ -871,7 +927,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: P
 
         <div className="text-center max-w-2xl mx-auto">
           <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-medium">
-            {product.description ||
+            {(product.description || '').replace(/<!--\s*color:.*?-->/gi, '').trim() ||
               `Every piece in the ARVIIK collection is born from a desire to merge luxury street aesthetics with raw, uncompromised quality. Engineered with heavy 240 GSM combed cotton, custom boxy cuts, and bold concept artwork, this shirt is designed to be worn as a statement of identity.`}
           </p>
         </div>
