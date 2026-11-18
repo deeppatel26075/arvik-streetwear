@@ -65,7 +65,7 @@ export function extractProductColor(product: {
   description?: string | null;
   color_name?: string | null;
   color_hex?: string | null;
-}): { colorName: string; colorHex: string; designBase: string } {
+}): { colorName: string; colorHex: string; designBase: string; detected?: boolean } {
   // 1. Check explicit color_name / color_hex columns if present
   if (product.color_name && product.color_name.trim()) {
     const name = product.color_name.trim();
@@ -123,6 +123,7 @@ export function extractProductColor(product: {
     colorName: 'Vintage Black',
     colorHex: '#111111',
     designBase: productName,
+    detected: false,
   };
 }
 
@@ -189,4 +190,46 @@ export function findColorVariants(
       isCurrent: p.id === currentProduct.id,
     };
   });
+}
+
+export interface CatalogColor {
+  name: string;
+  hex: string;
+  count: number;
+}
+
+const normalizeColorName = (name: string) => name.trim().toLowerCase().replace(/\s+/g, ' ');
+
+/**
+ * Distinct colors actually present in the catalog (from each product's saved
+ * color), most common first. Products with no color set are skipped rather
+ * than counted under the "Vintage Black" fallback.
+ */
+export function getCatalogColors(products: any[]): CatalogColor[] {
+  const byName = new Map<string, CatalogColor>();
+  for (const p of products || []) {
+    if (!p || p.is_hidden) continue;
+    const info = extractProductColor(p);
+    if (info.detected === false) continue;
+    const key = normalizeColorName(info.colorName);
+    const existing = byName.get(key);
+    if (existing) existing.count += 1;
+    else byName.set(key, { name: info.colorName.trim(), hex: info.colorHex, count: 1 });
+  }
+  return [...byName.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+}
+
+/** True when the product's saved color matches `colorName` (case-insensitive). */
+export function productMatchesColor(product: any, colorName: string): boolean {
+  const info = extractProductColor(product);
+  if (info.detected === false) return false;
+  return normalizeColorName(info.colorName) === normalizeColorName(colorName);
+}
+
+/** Very light swatches (cream, white…) need an outline to be visible on white. */
+export function isLightColor(hex: string): boolean {
+  const m = hex.replace('#', '').match(/^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+  if (!m) return false;
+  const [r, g, b] = m.slice(1).map((x) => parseInt(x, 16));
+  return 0.299 * r + 0.587 * g + 0.114 * b > 200;
 }

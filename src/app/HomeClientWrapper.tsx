@@ -4,18 +4,12 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
+import { getCatalogColors, isLightColor } from '@/lib/colorVariants';
 import { ArrowRight, Star, Flame, Shirt, Truck, Wallet, Tag, Percent, Gift, ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
 
 // Maps the icon name stored in the `hero_slides` table (edited from the
 // admin panel) back to the lucide component actually rendered.
 const HERO_ICON_MAP: Record<string, any> = { Flame, Shirt, Truck, Wallet, Star, Tag, Percent, Gift };
-
-const COLOR_FILTERS = [
-  { name: 'Olive Green', hex: '#3f6212' },
-  { name: 'Vintage Cream', hex: '#fafaf9', border: true },
-  { name: 'Burgundy Maroon', hex: '#881337' },
-  { name: 'Midnight Navy', hex: '#1e3a5f' },
-];
 
 const HERO_SLIDES = [
   {
@@ -186,6 +180,11 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
   };
 
   const displayProducts = products || [];
+
+  // Color chips come from the colors actually saved on products (admin
+  // panel), so the filter only ever offers colors that exist in the shop.
+  const MAX_COLOR_CHIPS = 6;
+  const catalogColors = React.useMemo(() => getCatalogColors(displayProducts), [displayProducts]);
 
   const activeSlide = slides[bannerIndex % (slides.length || 1)];
   const ActiveSlideIcon = activeSlide?.icon;
@@ -438,6 +437,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
       </section>
 
       {/* 4. FILTER BY COLOR SECTION */}
+      {catalogColors.length > 0 && (
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-2">
         <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-5 sm:p-6 space-y-4">
           <div className="flex items-center gap-2">
@@ -447,28 +447,31 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
             </h2>
           </div>
           <div className="flex flex-wrap gap-2.5">
-            {COLOR_FILTERS.map((c) => (
+            {catalogColors.slice(0, MAX_COLOR_CHIPS).map((c) => (
               <Link
                 key={c.name}
                 href={`/shop?color=${encodeURIComponent(c.name)}`}
                 className="inline-flex items-center gap-2 bg-white border border-stone-200/80 hover:border-stone-900 rounded-full pl-2 pr-4 py-2 transition-colors"
               >
                 <span
-                  className={`h-5 w-5 rounded-full flex-shrink-0 ${c.border ? 'border border-stone-300' : ''}`}
+                  className={`h-5 w-5 rounded-full flex-shrink-0 ${isLightColor(c.hex) ? 'border border-stone-300' : 'border border-black/5'}`}
                   style={{ backgroundColor: c.hex }}
                 />
-                <span className="text-xs font-bold text-stone-800">{c.name}</span>
+                <span className="text-xs font-bold text-stone-800 capitalize">{c.name}</span>
               </Link>
             ))}
             <Link
               href="/shop"
               className="inline-flex items-center gap-1.5 border border-stone-200/80 hover:border-stone-900 rounded-full px-4 py-2 text-xs font-bold text-stone-800 transition-colors"
             >
-              + More
+              {catalogColors.length > MAX_COLOR_CHIPS
+                ? `+ ${catalogColors.length - MAX_COLOR_CHIPS} More`
+                : 'View All'}
             </Link>
           </div>
         </div>
       </section>
+      )}
 
       {/* 5. COMMUNITY REVIEWS SECTION - SINGLE CARD CAROUSEL */}
       <section className="bg-stone-50 py-12 sm:py-16 border-b border-stone-200/50">

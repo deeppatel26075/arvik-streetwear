@@ -8,6 +8,7 @@ import { useTheme } from '@/context/ThemeContext';
 import PsychologyBackdrop from '@/components/PsychologyBackdrop';
 import OnFireBackdrop from '@/components/OnFireBackdrop';
 import { categoryDisplayName } from '@/lib/utils';
+import { productMatchesColor, getCatalogColors, isLightColor } from '@/lib/colorVariants';
 import { SlidersHorizontal, ArrowUpDown, ChevronDown, X, Check } from 'lucide-react';
 
 interface Category {
@@ -57,6 +58,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCat);
   const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>(searchParams?.get('color') || '');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
   const [priceSort, setPriceSort] = useState<string>('');
@@ -93,6 +95,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
     const query = searchParams?.get('query') || searchParams?.get('search') || '';
     setSelectedCategory(cat);
     setSearchQuery(query);
+    setSelectedColor(searchParams?.get('color') || '');
   }, [searchParams]);
 
   const categorySlug = (() => {
@@ -112,31 +115,19 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
   }, [isPsychology, isOnFire, setThemePreset]);
 
   useEffect(() => {
+    // Always filter the fresh server data. Reading back a browser snapshot
+    // (as this used to whenever the product IDs matched) served stale
+    // descriptions, prices and stock after any admin edit — e.g. a color
+    // added to a product never reached the color filter, so it showed
+    // "no items match" for that color.
+    setLocalProducts(initialProducts);
+
+    // Still refresh the snapshot: ProductDetailFallback reads it to render
+    // a product when the server lookup fails.
     try {
-      const stored = localStorage.getItem('arviik_custom_products');
-      const parsed = stored ? JSON.parse(stored) : [];
-
-      // The cache is only trustworthy if it reflects the exact same set of
-      // products the server just fetched from Supabase, with a shape the
-      // filters can actually use — otherwise an old/corrupt snapshot (e.g.
-      // saved before inventory rows existed) silently zeroes out every
-      // filter without any visible error. When in doubt, prefer the fresh
-      // server data over the cache.
-      const freshIds = initialProducts.map((p) => p.id).sort().join(',');
-      const cachedIds = Array.isArray(parsed) ? parsed.map((p: any) => p.id).sort().join(',') : '';
-      const hasValidShape =
-        Array.isArray(parsed) &&
-        parsed.every((p: any) => typeof p.price === 'number' && Array.isArray(p.inventory));
-
-      if (!stored || parsed.length === 0 || cachedIds !== freshIds || !hasValidShape) {
-        localStorage.setItem('arviik_custom_products', JSON.stringify(initialProducts));
-        setLocalProducts(initialProducts);
-      } else {
-        setLocalProducts(parsed.filter((p: any) => !p.is_hidden));
-      }
-    } catch (e) {
-      console.error('Failed to load custom products in shop:', e);
-      setLocalProducts(initialProducts);
+      localStorage.setItem('arviik_custom_products', JSON.stringify(initialProducts));
+    } catch {
+      // Storage full / disabled (private mode) — nothing depends on it here.
     }
   }, [initialProducts]);
 
@@ -174,6 +165,10 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
       });
     }
 
+    if (selectedColor) {
+      filtered = filtered.filter((p) => productMatchesColor(p, selectedColor));
+    }
+
     if (selectedSize) {
       filtered = filtered.filter((p) => {
         // No inventory data means we have no evidence this size exists for
@@ -202,13 +197,23 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
     }
 
     setProducts(filtered);
-  }, [searchQuery, selectedCategory, selectedSize, priceRange, priceSort, localProducts, initialFilter]);
+  }, [searchQuery, selectedCategory, selectedSize, selectedColor, priceRange, priceSort, localProducts, initialFilter]);
+
+  // Swatch for the active ?color= chip, taken from the products' own saved hex.
+  const activeColorHex = useMemo(() => {
+    if (!selectedColor) return '#111111';
+    const match = getCatalogColors(localProducts).find(
+      (c) => c.name.toLowerCase() === selectedColor.toLowerCase().trim()
+    );
+    return match?.hex || '#111111';
+  }, [selectedColor, localProducts]);
 
   const clearFilters = () => {
     setSearchQuery('');
     setSelectedCategory('');
     setSelectedSize('');
     setPriceRange(null);
+    setSelectedColor('');
     setPriceSort('');
     router.push('/shop');
   };
@@ -286,7 +291,26 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
                 <span className="inline-flex items-center h-5 sm:h-6 px-2.5 sm:px-3 rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] text-[10px] font-bold uppercase tracking-wider">
                   {products.length} {products.length === 1 ? 'Item' : 'Items'}
                 </span>
-                {(selectedCategory || selectedSize || searchQuery || priceRange || priceSort) && (
+                {selectedColor && (
+                  <span className="inline-flex items-center gap-1.5 h-5 sm:h-6 pl-1.5 pr-1 rounded-full border border-[var(--color-border)] bg-[var(--color-bg)] text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-primary)]">
+                    <span
+                      className={`h-3 w-3 rounded-full flex-shrink-0 ${isLightColor(activeColorHex) ? 'border border-stone-300' : ''}`}
+                      style={{ backgroundColor: activeColorHex }}
+                    />
+                    {selectedColor}
+                    <button
+                      onClick={() => {
+                        setSelectedColor('');
+                        router.replace('/shop', { scroll: false });
+                      }}
+                      className="p-0.5 hover:text-[var(--color-text-secondary)]"
+                      aria-label="Remove color filter"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                )}
+                {(selectedCategory || selectedSize || selectedColor || searchQuery || priceRange || priceSort) && (
                   <button
                     onClick={clearFilters}
                     className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)] underline underline-offset-4 hover:text-[var(--color-text-primary)] transition-colors"
@@ -497,7 +521,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
             </div>
 
             {/* Clear Filters Button */}
-            {(selectedCategory || selectedSize || searchQuery || priceRange || priceSort) && (
+            {(selectedCategory || selectedSize || selectedColor || searchQuery || priceRange || priceSort) && (
               <button
                 onClick={clearFilters}
                 className="w-full bg-transparent border border-[var(--color-border)] hover:bg-[var(--color-accent)] hover:text-[var(--color-on-accent)] text-[var(--color-text-primary)] text-[10px] font-bold uppercase tracking-widest py-3 rounded-[10px] transition-colors"
@@ -638,7 +662,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
               >
                 View {products.length} {products.length === 1 ? 'Item' : 'Items'}
               </button>
-              {(selectedCategory || selectedSize || searchQuery || priceRange || priceSort) && (
+              {(selectedCategory || selectedSize || selectedColor || searchQuery || priceRange || priceSort) && (
                 <button
                   onClick={() => {
                     clearFilters();
