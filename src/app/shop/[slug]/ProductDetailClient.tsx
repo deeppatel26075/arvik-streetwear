@@ -699,7 +699,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], col
           </div>
 
           {/* Color Selector (when product has multiple colorways in the design portfolio) */}
-          {colorVariants && colorVariants.length > 1 && (
+          {colorVariants && colorVariants.length > 0 && (
             <div className="space-y-3 p-4 bg-stone-50/80 border border-stone-200/80 rounded-xl">
               <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
                 <div className="flex items-center gap-2 min-w-0">
@@ -711,7 +711,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], col
                   </span>
                 </div>
                 <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider whitespace-nowrap">
-                  {colorVariants.length} Colors
+                  {colorVariants.length} {colorVariants.length === 1 ? 'Color' : 'Colors'}
                 </span>
               </div>
 

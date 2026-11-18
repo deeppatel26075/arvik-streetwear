@@ -160,8 +160,10 @@ export function findColorVariants(
     return false;
   });
 
-  // Only consider it a variant group if there are at least 2 distinct products
-  if (matchingProducts.length < 2) {
+  // A single-colorway design still returns its one entry, so the product
+  // page can show which color it comes in (same selector as multi-color
+  // designs, just with one option).
+  if (matchingProducts.length === 0) {
     return [];
   }
 
