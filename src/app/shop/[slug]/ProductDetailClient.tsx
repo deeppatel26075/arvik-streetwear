@@ -701,30 +701,30 @@ export default function ProductDetailClient({ product, relatedProducts = [], col
           {/* Color Selector (when product has multiple colorways in the design portfolio) */}
           {colorVariants && colorVariants.length > 1 && (
             <div className="space-y-3 p-4 bg-stone-50/80 border border-stone-200/80 rounded-xl">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-2">
-                  <span className="text-xs font-extrabold text-stone-900 uppercase tracking-wider">
-                    Available Colors:
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-xs font-extrabold text-stone-900 uppercase tracking-wider whitespace-nowrap">
+                    Color:
                   </span>
-                  <span className="text-xs text-stone-950 font-extrabold uppercase bg-white border border-stone-200/80 px-2.5 py-0.5 rounded-md shadow-xs">
+                  <span className="text-xs text-stone-950 font-extrabold uppercase bg-white border border-stone-200/80 px-2.5 py-0.5 rounded-md shadow-xs whitespace-nowrap truncate">
                     {currentColorInfo.colorName}
                   </span>
                 </div>
-                <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider">
-                  {colorVariants.length} Colors in Portfolio
+                <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider whitespace-nowrap">
+                  {colorVariants.length} Colors
                 </span>
               </div>
 
-              <div className="flex flex-wrap gap-2.5">
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-2.5">
                 {colorVariants.map((variant) => {
                   const isSelected = variant.id === product.id || variant.slug === product.slug;
                   return (
                     <Link
                       key={variant.id}
                       href={`/shop/${variant.slug}`}
-                      className={`group relative flex items-center space-x-2.5 px-3 py-2 rounded-xl border text-xs font-bold uppercase transition-all ${
+                      className={`group relative flex items-center gap-2.5 min-w-0 h-12 px-3 rounded-xl border text-xs font-bold uppercase transition-all ${
                         isSelected
-                          ? 'bg-stone-950 text-white border-stone-950 shadow-md ring-2 ring-stone-950'
+                          ? 'bg-stone-950 text-white border-stone-950 shadow-md'
                           : 'bg-white text-stone-850 border-stone-200/90 hover:border-stone-900 hover:bg-stone-50'
                       }`}
                     >
@@ -735,7 +735,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], col
                       />
                       {/* Thumbnail preview if available */}
                       {variant.thumbnail && (
-                        <span className="relative w-6 h-7 rounded-xs overflow-hidden border border-stone-200 flex-shrink-0 bg-stone-100">
+                        <span className="relative hidden sm:block w-6 h-7 rounded-xs overflow-hidden border border-stone-200 flex-shrink-0 bg-stone-100">
                           <img
                             src={variant.thumbnail}
                             alt={variant.colorName}
@@ -743,7 +743,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], col
                           />
                         </span>
                       )}
-                      <span>{variant.colorName}</span>
+                      <span className="truncate">{variant.colorName}</span>
                     </Link>
                   );
                 })}
