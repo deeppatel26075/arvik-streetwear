@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
 import { getCatalogColors, isLightColor } from '@/lib/colorVariants';
+import { startColorTransition } from '@/components/ColorTransition';
 import { ArrowRight, Star, Flame, Shirt, Truck, Wallet, Tag, Percent, Gift, ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
 
 // Maps the icon name stored in the `hero_slides` table (edited from the
@@ -451,6 +452,11 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
               <Link
                 key={c.name}
                 href={`/shop?color=${encodeURIComponent(c.name)}`}
+                onClick={(e) => {
+                  // Let ctrl/cmd-click open a new tab without the overlay.
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                  startColorTransition({ name: c.name, hex: c.hex, target: '/shop' });
+                }}
                 className="inline-flex items-center gap-2 bg-white border border-stone-200/80 hover:border-stone-900 rounded-full pl-2 pr-4 py-2 transition-colors"
               >
                 <span

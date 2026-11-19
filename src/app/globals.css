@@ -183,3 +183,16 @@ input:disabled {
   0%   { transform: translateX(-100%); }
   100% { transform: translateX(300%); }
 }
+
+/* Color filter page transition (src/components/ColorTransition.tsx) */
+@keyframes arviik-ct-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes arviik-ct-out { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(1.04); } }
+@keyframes arviik-ct-letter { from { opacity: 0; transform: translateY(110%); } to { opacity: 1; transform: translateY(0); } }
+@keyframes arviik-ct-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes arviik-ct-name { from { opacity: 0; letter-spacing: 0.8em; } to { opacity: 0.8; letter-spacing: 0.45em; } }
+
+.arviik-ct-enter { animation: arviik-ct-in 160ms ease-out both; }
+.arviik-ct-leave { animation: arviik-ct-out 450ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+.arviik-ct-letter { opacity: 0; animation: arviik-ct-letter 520ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.arviik-ct-line { transform-origin: center; transform: scaleX(0); animation: arviik-ct-line 600ms cubic-bezier(0.22, 1, 0.36, 1) 300ms both; }
+.arviik-ct-name { opacity: 0; animation: arviik-ct-name 600ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both; }

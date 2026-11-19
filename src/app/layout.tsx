@@ -41,6 +41,7 @@ export const metadata: Metadata = {
 
 import ArviikPageAnimation from '@/components/ArviikPageAnimation';
 import IosZoomLock from '@/components/IosZoomLock';
+import ColorTransition from '@/components/ColorTransition';
 
 export default function RootLayout({
   children,
@@ -48,10 +49,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${syne.variable} ${bebasNeue.variable} h-full antialiased`}>
+    // data-scroll-behavior="smooth": globals.css enables smooth scrolling for
+    // in-page jumps, but on page navigation Next.js 16 only switches it off
+    // (so the new page opens instantly at the top) when this attribute is
+    // set. Without it, every navigation visibly glided up from the old
+    // scroll position and stopped short with the page header cut off.
+    <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} ${syne.variable} ${bebasNeue.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-white text-stone-900 antialiased overflow-x-hidden max-w-full">
         <IosZoomLock />
         <ArviikPageAnimation />
+        <ColorTransition />
         <ThemeProvider>
           <AuthProvider>
             <CartProvider>
