@@ -196,3 +196,23 @@ input:disabled {
 .arviik-ct-letter { opacity: 0; animation: arviik-ct-letter 520ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 .arviik-ct-line { transform-origin: center; transform: scaleX(0); animation: arviik-ct-line 600ms cubic-bezier(0.22, 1, 0.36, 1) 300ms both; }
 .arviik-ct-name { opacity: 0; animation: arviik-ct-name 600ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both; }
+
+/* SPECTRUM — View All transition (src/components/ColorTransition.tsx) */
+@keyframes arviik-sp-orb-in { from { opacity: 0; transform: scale(0.7); } to { opacity: 0.95; transform: scale(1); } }
+@keyframes arviik-sp-drift { 0% { translate: 0 0; } 50% { translate: 4vmax -3vmax; } 100% { translate: -3vmax 2vmax; } }
+@keyframes arviik-sp-letter { from { opacity: 0; filter: blur(14px); transform: translateY(18px) scale(1.06); } to { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); } }
+@keyframes arviik-sp-sheen { from { background-position: 160% 0; } to { background-position: -60% 0; } }
+@keyframes arviik-sp-line { from { transform: scaleX(0); opacity: 0; } to { transform: scaleX(1); opacity: 1; } }
+@keyframes arviik-sp-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes arviik-sp-frame { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: scale(1); } }
+@keyframes arviik-sp-wipe { from { clip-path: inset(0 0 0 0); } to { clip-path: inset(0 0 100% 0); } }
+@keyframes arviik-sp-content-out { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-28px); } }
+
+.arviik-sp-orb { opacity: 0; will-change: transform, opacity; animation: arviik-sp-orb-in 900ms cubic-bezier(0.22, 1, 0.36, 1) both, arviik-sp-drift 6s ease-in-out infinite alternate; }
+.arviik-sp-letter { opacity: 0; color: rgba(255, 255, 255, 0.9); animation: arviik-sp-letter 700ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.arviik-sp-sheen { color: transparent; background: linear-gradient(110deg, transparent 40%, rgba(255, 255, 255, 0.95) 50%, transparent 60%); background-size: 250% 100%; background-position: 160% 0; -webkit-background-clip: text; background-clip: text; animation: arviik-sp-sheen 1100ms cubic-bezier(0.45, 0, 0.2, 1) 820ms both; }
+.arviik-sp-line { transform-origin: center; transform: scaleX(0); animation: arviik-sp-line 700ms cubic-bezier(0.22, 1, 0.36, 1) 700ms both; }
+.arviik-sp-fade { opacity: 0; animation: arviik-sp-fade 600ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.arviik-sp-frame { opacity: 0; animation: arviik-sp-frame 800ms cubic-bezier(0.22, 1, 0.36, 1) 150ms both; }
+.arviik-sp-wipe { animation: arviik-sp-wipe 700ms cubic-bezier(0.76, 0, 0.24, 1) both; }
+.arviik-sp-content-out { animation: arviik-sp-content-out 450ms cubic-bezier(0.55, 0, 0.45, 1) both; }

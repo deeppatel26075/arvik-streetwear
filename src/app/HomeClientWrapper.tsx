@@ -468,8 +468,26 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
             ))}
             <Link
               href="/shop"
-              className="inline-flex items-center gap-1.5 border border-stone-200/80 hover:border-stone-900 rounded-full px-4 py-2 text-xs font-bold text-stone-800 transition-colors"
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                startColorTransition({
+                  name: 'All Colors',
+                  hex: '#0c0a09',
+                  target: '/shop',
+                  stripes: catalogColors.map((c) => c.hex),
+                });
+              }}
+              className="inline-flex items-center gap-2 bg-white border border-stone-200/80 hover:border-stone-900 rounded-full pl-2 pr-4 py-2 text-xs font-bold text-stone-800 transition-colors"
             >
+              {/* Split swatch: one slice per catalog color */}
+              <span
+                className="h-5 w-5 rounded-full flex-shrink-0 border border-black/5"
+                style={{
+                  background: `conic-gradient(${catalogColors
+                    .map((c, i, all) => `${c.hex} ${(i / all.length) * 360}deg ${((i + 1) / all.length) * 360}deg`)
+                    .join(', ')})`,
+                }}
+              />
               {catalogColors.length > MAX_COLOR_CHIPS
                 ? `+ ${catalogColors.length - MAX_COLOR_CHIPS} More`
                 : 'View All'}
