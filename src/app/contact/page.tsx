@@ -153,7 +153,7 @@ export default function ContactPage() {
 
       {/* Social row */}
       <div className="flex items-center justify-center gap-3">
-        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-stone-200 flex items-center justify-center text-stone-500 hover:text-stone-950 hover:border-stone-950 transition-colors">
+        <a href="https://www.instagram.com/arviik.in" aria-label="ARVIIK on Instagram" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-stone-200 flex items-center justify-center text-stone-500 hover:text-stone-950 hover:border-stone-950 transition-colors">
           <InstagramIcon className="h-4.5 w-4.5" />
         </a>
         <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-stone-200 flex items-center justify-center text-stone-500 hover:text-stone-950 hover:border-stone-950 transition-colors">

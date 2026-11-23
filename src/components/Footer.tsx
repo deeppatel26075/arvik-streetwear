@@ -33,7 +33,7 @@ export default function Footer() {
             Premium oversized streetwear crafted from 240 GSM cotton. Designed for creators, dreamers, and those who wear their identity with confidence.
           </p>
           <div className="flex items-center justify-center space-x-4">
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full border border-stone-700 flex items-center justify-center text-stone-400 hover:text-white hover:border-white transition-all">
+            <a href="https://www.instagram.com/arviik.in" aria-label="ARVIIK on Instagram" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full border border-stone-700 flex items-center justify-center text-stone-400 hover:text-white hover:border-white transition-all">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" /><circle cx="12" cy="12" r="5" /><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none" /></svg>
             </a>
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full border border-stone-700 flex items-center justify-center text-stone-400 hover:text-white hover:border-white transition-all">
