@@ -129,7 +129,7 @@ const FAQ_SECTIONS: FaqSection[] = [
       },
       {
         q: 'Do you offer any payment discounts?',
-        a: 'Prepaid orders get 10% off automatically at checkout — COD orders don’t carry this discount.',
+        a: 'There’s no payment-method discount right now. Paying online does save you the ₹50 COD fee, and any active offer is shown at checkout before you pay.',
       },
     ],
   },

@@ -21,16 +21,6 @@ const SECTIONS: LegalSection[] = [
     ),
   },
   {
-    id: 'prepaid-discount',
-    title: 'Prepaid Discount',
-    body: (
-      <p>
-        Orders paid online at checkout via Razorpay automatically get <strong>10% off</strong>{' '}— this discount
-        doesn&apos;t apply to Cash on Delivery orders. It&apos;s applied at checkout, no code needed.
-      </p>
-    ),
-  },
-  {
     id: 'security',
     title: 'Payment Security',
     body: (
@@ -111,7 +101,7 @@ export default function PaymentPolicyPage() {
     <LegalPageLayout
       eyebrow="How You Pay"
       title="Payment Policy"
-      intro="Secure checkout via Razorpay, Cash on Delivery where available, and a 10% discount for paying online."
+      intro="Secure checkout via Razorpay, and Cash on Delivery where available."
       lastUpdated="September 5, 2026"
       sections={SECTIONS}
     />

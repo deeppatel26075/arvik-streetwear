@@ -53,9 +53,6 @@ export default function CategoryProductCard({ product }: CategoryProductCardProp
   const price = product.discount_price && product.discount_price > 0 ? product.discount_price : product.price;
   const mrp = product.mrp || product.price;
   const discountPercent = mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
-  // Mirrors the site's real "10% off prepaid orders" promo shown in the
-  // top marquee — the extra price a shopper actually lands on at checkout.
-  const bestPrice = Math.round((price * 0.9) / 10) * 10;
 
   const rawCategoryName = typeof product.category === 'string' ? product.category : product.category?.name || 'Oversized Tees';
   // "Psychology Edition" is the real category name in the database — shown
@@ -242,11 +239,6 @@ export default function CategoryProductCard({ product }: CategoryProductCardProp
           )}
         </div>
 
-        {bestPrice < price && (
-          <div className="mt-0.5 text-[10px] font-semibold text-[var(--color-text-secondary)]">
-            Best price <span className="font-bold text-[var(--color-text-primary)]">₹{bestPrice.toLocaleString('en-IN')}</span>
-          </div>
-        )}
 
         <div className="mt-auto pt-2.5">
           <button

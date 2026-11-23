@@ -33,7 +33,7 @@ const TRENDING_SEARCHES = ['Oversized Tees', 'New Arrivals', 'On Fire', 'Limited
 const RECENT_SEARCHES_KEY = 'arviik_recent_searches';
 const PROMO_MESSAGES = [
   'FREE SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹1499',
-  '10% OFF ON ALL PREPAID ORDERS',
+  'PREMIUM 240 GSM HEAVYWEIGHT COTTON',
 ];
 // The marquee track is two of these back-to-back, translated by exactly
 // -50% on an infinite loop — that's only seamless if each half is at
