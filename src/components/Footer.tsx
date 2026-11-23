@@ -191,7 +191,7 @@ export default function Footer() {
         {/* Copyright & Bottom Links */}
         <div className="text-center space-y-2 pb-2">
           <p className="text-[10px] tracking-widest uppercase text-stone-500">
-            © {new Date().getFullYear()} ARVIIK. All Rights Reserved.
+            ARVIIK
           </p>
           <p className="text-[10px] tracking-widest uppercase text-stone-500">
             Wear Your Identity.

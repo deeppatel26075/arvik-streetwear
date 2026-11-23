@@ -1,7 +1,7 @@
 import type { Order } from '@/lib/orders';
 import { orderDisplayId } from '@/lib/orders';
 import { formatPrice } from '@/lib/utils';
-import { FLAT_COD_FEE_RUPEES } from '@/lib/shippingConfig';
+import { FLAT_COD_FEE_RUPEES, FLAT_SHIPPING_FEE_RUPEES, FREE_SHIPPING_THRESHOLD_RUPEES } from '@/lib/shippingConfig';
 
 // Fill these in once the business is GST-registered. Leaving `gstin` empty
 // keeps the invoice honest with how the storefront actually prices things
@@ -11,7 +11,7 @@ import { FLAT_COD_FEE_RUPEES } from '@/lib/shippingConfig';
 // a breakup. Fill in `gstin` (and adjust the rates below if needed) once
 // there's a real GST registration to invoice against.
 const SELLER = {
-  businessName: 'ARVIIK APPARELS PRIVATE LIMITED',
+  businessName: 'ARVIIK',
   addressLine1: 'Ahmedabad, Gujarat',
   gstin: '', // e.g. '24AAAAA0000A1Z5'
   supportEmail: 'info@arviik.in',
@@ -164,6 +164,22 @@ export function buildInvoiceHtml(order: Order, options: BuildInvoiceOptions = {}
   const shippingFee = totalShippingFee - codFee;
   const discountAmt = Math.max(0, Math.round((itemsSubtotal + totalShippingFee - order.total_amount) * 100) / 100);
 
+  // Bill details, Zomato/Blinkit style: every rupee accounted for.
+  // MRP comes from the product's listed price; only shown when it's
+  // genuinely higher than what the customer paid for that line.
+  const unitMrp = (item: Order['order_items'][number]) => {
+    const listed = item.products?.price || 0;
+    return listed > item.price ? listed : item.price;
+  };
+  const itemCount = order.order_items.reduce((n, item) => n + item.quantity, 0);
+  const itemsMrp = order.order_items.reduce((sum, item) => sum + unitMrp(item) * item.quantity, 0);
+  const productDiscount = Math.max(0, itemsMrp - itemsSubtotal);
+  const isCod = payment.methodLabel === 'Cash on Delivery';
+  const freeDelivery = shippingFee === 0 && itemsSubtotal >= FREE_SHIPPING_THRESHOLD_RUPEES;
+  const deliverySaved = freeDelivery ? FLAT_SHIPPING_FEE_RUPEES : 0;
+  const codSaved = isCod ? 0 : FLAT_COD_FEE_RUPEES;
+  const totalSaved = productDiscount + deliverySaved + discountAmt + codSaved;
+
   const s = {
     // A4 is 210mm wide; with html2pdf's default 10mm margin on each side,
     // the printable area is ~718px at 96dpi — 700px (including its own
@@ -209,6 +225,20 @@ export function buildInvoiceHtml(order: Order, options: BuildInvoiceOptions = {}
     qrCaption: 'font-size:7.5px;color:#999999;letter-spacing:0.5px;text-transform:uppercase;margin-top:5px;text-align:center;width:76px;',
     footerBrand: 'text-align:right;font-size:9px;color:#666666;',
     footerBrandName: 'font-weight:700;letter-spacing:2px;color:#111111;margin:0 0 2px;',
+    bill: 'box-sizing:border-box;width:340px;border:1px solid #e5e5e5;border-radius:10px;overflow:hidden;',
+    billHead: 'font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:12px 16px;border-bottom:1px solid #eeeeee;background:#fafafa;',
+    billBody: 'padding:8px 16px 4px;',
+    billRow: 'display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;font-size:11px;',
+    billLabel: 'color:#333333;',
+    billHint: 'display:block;font-size:9px;color:#999999;margin-top:1px;',
+    billValue: 'text-align:right;white-space:nowrap;color:#111111;',
+    strike: 'text-decoration:line-through;color:#aaaaaa;margin-right:6px;',
+    green: 'color:#15803d;font-weight:700;',
+    billDivider: 'border-top:1px dashed #dddddd;margin:6px 0;',
+    billTotal: 'display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid #111111;font-size:14px;font-weight:700;',
+    saved: 'background:#ecfdf3;color:#15803d;font-size:11px;font-weight:700;text-align:center;padding:9px 16px;border-top:1px solid #d1fadf;',
+    payBox: 'box-sizing:border-box;width:340px;margin-top:10px;border:1px solid #e5e5e5;border-radius:10px;padding:8px 16px;',
+    unitMrp: 'display:block;font-size:9px;color:#aaaaaa;text-decoration:line-through;',
     legal: 'font-size:8.5px;color:#999999;text-align:center;margin-top:18px;line-height:1.6;',
   };
   const center = 'text-align:center;';
@@ -221,6 +251,10 @@ export function buildInvoiceHtml(order: Order, options: BuildInvoiceOptions = {}
       const size = escapeHtml(item.size || '-');
       const lineTotal = item.price * item.quantity;
       const imageUrl = item.products?.product_images?.[0]?.image_url;
+      const mrp = unitMrp(item);
+      const unitPriceCell = mrp > item.price
+        ? `<span style="${s.unitMrp}">${formatPrice(mrp)}</span>${formatPrice(item.price)}`
+        : formatPrice(item.price);
 
       const productCell = `
         <div style="${s.productCell}">
@@ -240,7 +274,7 @@ export function buildInvoiceHtml(order: Order, options: BuildInvoiceOptions = {}
             <td style="${s.td}">${productCell}</td>
             <td style="${s.td}${center}">${size}</td>
             <td style="${s.td}${center}">${item.quantity}</td>
-            <td style="${s.td}${right}">${formatPrice(item.price)}</td>
+            <td style="${s.td}${right}">${unitPriceCell}</td>
             <td style="${s.td}${right}">${formatPrice(itemTaxable)}</td>
             <td style="${s.td}${right}">${formatPrice(cgst)}</td>
             <td style="${s.td}${right}">${formatPrice(sgst)}</td>
@@ -253,7 +287,7 @@ export function buildInvoiceHtml(order: Order, options: BuildInvoiceOptions = {}
           <td style="${s.td}">${productCell}</td>
           <td style="${s.td}${center}">${size}</td>
           <td style="${s.td}${center}">${item.quantity}</td>
-          <td style="${s.td}${right}">${formatPrice(item.price)}</td>
+          <td style="${s.td}${right}">${unitPriceCell}</td>
           <td style="${s.td}${right}${strong}">${formatPrice(lineTotal)}</td>
         </tr>`;
     })
@@ -262,26 +296,6 @@ export function buildInvoiceHtml(order: Order, options: BuildInvoiceOptions = {}
   const tableHeadCells = hasGst
     ? `<th style="${s.th}">Product</th><th style="${s.th}${center}">Size</th><th style="${s.th}${center}">Qty</th><th style="${s.th}${right}">Unit Price</th><th style="${s.th}${right}">Taxable Value</th><th style="${s.th}${right}">CGST</th><th style="${s.th}${right}">SGST</th><th style="${s.th}${right}">Total</th>`
     : `<th style="${s.th}">Product</th><th style="${s.th}${center}">Size</th><th style="${s.th}${center}">Qty</th><th style="${s.th}${right}">Unit Price</th><th style="${s.th}${right}">Total</th>`;
-
-  const pricingRows = hasGst
-    ? `
-        <tr>
-          <td style="${s.totalsTd}${s.totalsLabel}">Taxable Value</td>
-          <td style="${s.totalsTd}${s.totalsValue}">${formatPrice(taxableValue)}</td>
-        </tr>
-        <tr>
-          <td style="${s.totalsTd}${s.totalsLabel}">CGST @ ${CGST_RATE}%</td>
-          <td style="${s.totalsTd}${s.totalsValue}">${formatPrice(totalCgst)}</td>
-        </tr>
-        <tr>
-          <td style="${s.totalsTd}${s.totalsLabel}">SGST @ ${SGST_RATE}%</td>
-          <td style="${s.totalsTd}${s.totalsValue}">${formatPrice(totalSgst)}</td>
-        </tr>`
-    : `
-        <tr>
-          <td style="${s.totalsTd}${s.totalsLabel}">Subtotal</td>
-          <td style="${s.totalsTd}${s.totalsValue}">${formatPrice(itemsSubtotal)}</td>
-        </tr>`;
 
   const qrBlock = options.qrDataUrl
     ? `
@@ -333,25 +347,63 @@ export function buildInvoiceHtml(order: Order, options: BuildInvoiceOptions = {}
         <thead><tr>${tableHeadCells}</tr></thead>
         <tbody>${itemRows}</tbody>
       </table>
-      ${!hasGst ? `<p style="${s.taxNote}">Inclusive of all taxes</p>` : ''}
+      <div style="height:16px;"></div>
 
       <div style="${s.totalsWrap}">
-        <table style="${s.totalsTable}">
-          ${pricingRows}
-          <tr>
-            <td style="${s.totalsTd}${s.totalsLabel}">Shipping</td>
-            <td style="${s.totalsTd}${s.totalsValue}">${formatPrice(shippingFee)}</td>
-          </tr>
-          ${codFee > 0 ? `<tr><td style="${s.totalsTd}${s.totalsLabel}">COD Fee</td><td style="${s.totalsTd}${s.totalsValue}">${formatPrice(codFee)}</td></tr>` : ''}
-          ${discountAmt > 0 ? `<tr><td style="${s.totalsTd}${s.totalsLabel}">Discount</td><td style="${s.totalsTd}${s.totalsValue}">-${formatPrice(discountAmt)}</td></tr>` : ''}
-          <tr>
-            <td style="${s.totalsTd}${s.totalsLabel}${s.grandTd}">Grand Total</td>
-            <td style="${s.totalsTd}${s.totalsValue}${s.grandTd}">${formatPrice(order.total_amount)}</td>
-          </tr>
-          <tr>
-            <td style="${s.totalsTd}${s.totalsLabel}${s.grandTdBottom}"></td>
-            <td style="${s.totalsTd}${s.totalsValue}${s.grandTdBottom}"></td>
-          </tr>
+        <div>
+        <div style="${s.bill}">
+          <div style="${s.billHead}">Bill Details</div>
+          <div style="${s.billBody}">
+            <div style="${s.billRow}">
+              <span style="${s.billLabel}">Items total (MRP)<span style="${s.billHint}">${itemCount} ${itemCount === 1 ? 'item' : 'items'}</span></span>
+              <span style="${s.billValue}">${formatPrice(itemsMrp)}</span>
+            </div>
+            ${productDiscount > 0 ? `
+            <div style="${s.billRow}">
+              <span style="${s.billLabel}">Product discount</span>
+              <span style="${s.billValue}${s.green}">-${formatPrice(productDiscount)}</span>
+            </div>` : ''}
+            ${discountAmt > 0 ? `
+            <div style="${s.billRow}">
+              <span style="${s.billLabel}">Coupon discount</span>
+              <span style="${s.billValue}${s.green}">-${formatPrice(discountAmt)}</span>
+            </div>` : ''}
+            <div style="${s.billDivider}"></div>
+            <div style="${s.billRow}">
+              <span style="${s.billLabel}">Item subtotal</span>
+              <span style="${s.billValue}">${formatPrice(itemsSubtotal - discountAmt)}</span>
+            </div>
+            <div style="${s.billRow}">
+              <span style="${s.billLabel}">Delivery charge<span style="${s.billHint}">Free on orders above ${formatPrice(FREE_SHIPPING_THRESHOLD_RUPEES)}</span></span>
+              <span style="${s.billValue}">${freeDelivery ? `<span style="${s.strike}">${formatPrice(FLAT_SHIPPING_FEE_RUPEES)}</span><span style="${s.green}">FREE</span>` : formatPrice(shippingFee)}</span>
+            </div>
+            <div style="${s.billRow}">
+              <span style="${s.billLabel}">Cash on Delivery fee<span style="${s.billHint}">${isCod ? 'Charged on COD orders' : 'Waived, paid online'}</span></span>
+              <span style="${s.billValue}">${isCod ? formatPrice(codFee) : `<span style="${s.strike}">${formatPrice(FLAT_COD_FEE_RUPEES)}</span><span style="${s.green}">FREE</span>`}</span>
+            </div>
+            ${hasGst ? `
+            <div style="${s.billRow}">
+              <span style="${s.billLabel}">Taxable value</span>
+              <span style="${s.billValue}">${formatPrice(taxableValue)}</span>
+            </div>
+            <div style="${s.billRow}">
+              <span style="${s.billLabel}">CGST @ ${CGST_RATE}% + SGST @ ${SGST_RATE}%</span>
+              <span style="${s.billValue}">${formatPrice(totalCgst + totalSgst)}</span>
+            </div>` : `
+            <div style="${s.billRow}">
+              <span style="${s.billLabel}">Taxes &amp; GST</span>
+              <span style="${s.billValue}">Included</span>
+            </div>`}
+          </div>
+          <div style="${s.billTotal}">
+            <span>Grand Total</span>
+            <span>${formatPrice(order.total_amount)}</span>
+          </div>
+          ${totalSaved > 0 ? `<div style="${s.saved}">You saved ${formatPrice(totalSaved)} on this order</div>` : ''}
+        </div>
+
+        <div style="${s.payBox}">
+        <table style="border-collapse:collapse;width:100%;">
           <tr>
             <td style="${s.totalsTd}${s.totalsLabel}">Amount Paid</td>
             <td style="${s.totalsTd}${s.totalsValue}">${formatPrice(payment.paidAmount)}</td>
@@ -369,6 +421,8 @@ export function buildInvoiceHtml(order: Order, options: BuildInvoiceOptions = {}
             <td style="${s.totalsTd}${s.totalsValue}${strong}">${escapeHtml(payment.statusLabel)}</td>
           </tr>
         </table>
+        </div>
+        </div>
       </div>
 
       <div style="${s.brandMoment}">
@@ -381,14 +435,14 @@ export function buildInvoiceHtml(order: Order, options: BuildInvoiceOptions = {}
         <div style="${s.footerBrand}">
           <p style="${s.footerBrandName}">ARVIIK</p>
           <p style="margin:0 0 2px;">Wear Your Identity.</p>
-          <p style="margin:0 0 2px;">${escapeHtml(SELLER.domain)}</p>
-          <p style="margin:0;">© ${new Date().getFullYear()} ${escapeHtml(SELLER.businessName)}</p>
+          <p style="margin:0;">${escapeHtml(SELLER.domain)}</p>
         </div>
       </div>
 
       <p style="${s.legal}">
         This is a computer-generated invoice and does not require a signature.<br />
-        Returns and exchanges are accepted within 14 days of delivery — see our Returns &amp; Exchanges policy for details.<br />
+        We don&#39;t offer refunds or returns. Size exchanges are accepted within 7 days of delivery on unworn, unwashed items with original tags and packaging, and damaged or defective items are replaced.<br />
+        See our Exchange Policy at ${escapeHtml(SELLER.domain)}/refund-policy for full details.<br />
         For any questions about this order, write to us at ${escapeHtml(SELLER.supportEmail)}
       </p>
       </div>
