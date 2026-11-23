@@ -170,7 +170,7 @@ const SECTIONS: LegalSection[] = [
         <ul>
           <li><strong>Name:</strong> Grievance Officer, ARVIIK</li>
           <li><strong>Email:</strong> <a href="mailto:info@arviik.in">info@arviik.in</a></li>
-          <li><strong>Address:</strong> ARVIIK HQ, Ahmedabad, Gujarat, India</li>
+          <li><strong>Address:</strong> Ahmedabad, Gujarat, India</li>
           <li><strong>Response Time:</strong> We will acknowledge your complaint within 48 hours and endeavour to redress it within one month of receipt.</li>
         </ul>
       </>

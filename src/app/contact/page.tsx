@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Mail, Phone, MapPin, Clock, HelpCircle, ArrowRight } from 'lucide-react';
-import { WHATSAPP_NUMBER } from '@/lib/contact';
+import { WHATSAPP_NUMBER, PHONE_DISPLAY, PHONE_TEL } from '@/lib/contact';
 
 // Lucide has no brand-specific marks — these mirror the same inline SVGs
 // already used for the site's social icons in Footer.tsx, plus WhatsApp.
@@ -87,7 +87,7 @@ export default function ContactPage() {
           Get In Touch
         </h1>
         <p className="text-xs sm:text-sm text-stone-500 font-medium">
-          Questions about an order, sizing, or anything else — drop us a message and we&apos;ll get back to you.
+          Questions about an order, sizing, or anything else? Drop us a message and we&apos;ll get back to you.
         </p>
       </div>
 
@@ -106,7 +106,7 @@ export default function ContactPage() {
             Chat With Us on WhatsApp
           </p>
           <p className="text-[11px] sm:text-xs text-stone-400 font-medium mt-0.5">
-            Fastest way to reach us — send &quot;Hi&quot; and we usually reply within a few hours.
+            The fastest way to reach us. Send &quot;Hi&quot; and we usually reply within a few hours.
           </p>
         </div>
         <ArrowRight className="h-5 w-5 text-white flex-shrink-0 group-hover:translate-x-1 transition-transform" />
@@ -128,7 +128,9 @@ export default function ContactPage() {
           <Phone className="h-5 w-5 text-stone-700 flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-[9px] text-stone-400 font-extrabold uppercase tracking-wider">Phone</p>
-            <p className="text-xs sm:text-sm font-bold text-stone-900">+91 98765 43210</p>
+            <a href={PHONE_TEL} className="text-xs sm:text-sm font-bold text-stone-900 hover:underline underline-offset-4">
+              {PHONE_DISPLAY}
+            </a>
           </div>
         </div>
 
@@ -144,7 +146,7 @@ export default function ContactPage() {
           <MapPin className="h-5 w-5 text-stone-700 flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-[9px] text-stone-400 font-extrabold uppercase tracking-wider">Address</p>
-            <p className="text-xs sm:text-sm font-bold text-stone-900">ARVIIK HQ, Ahmedabad, Gujarat, India</p>
+            <p className="text-xs sm:text-sm font-bold text-stone-900">Ahmedabad, Gujarat, India</p>
           </div>
         </div>
       </div>
@@ -171,7 +173,7 @@ export default function ContactPage() {
           <HelpCircle className="h-5 w-5 text-stone-700 flex-shrink-0" />
           <div>
             <p className="text-xs font-extrabold uppercase tracking-wider text-stone-900">Looking for a quick answer?</p>
-            <p className="text-[11px] text-stone-500 font-medium">Orders, shipping, returns and more — check our FAQ first.</p>
+            <p className="text-[11px] text-stone-500 font-medium">Orders, shipping, exchanges and more. Check our FAQ first.</p>
           </div>
         </div>
         <ArrowRight className="h-4.5 w-4.5 text-stone-400 flex-shrink-0" />
@@ -190,7 +192,7 @@ export default function ContactPage() {
 
         {success && (
           <p className="bg-emerald-50 text-emerald-700 text-[11px] font-bold p-3 border border-emerald-200 rounded-lg uppercase tracking-wider">
-            Message sent — we&apos;ll get back to you soon.
+            Message sent. We&apos;ll get back to you soon.
           </p>
         )}
         {error && (

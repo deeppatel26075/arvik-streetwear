@@ -54,13 +54,14 @@ export default function LegalPageLayout({ eyebrow, title, intro, lastUpdated, se
         </button>
         {mobileNavOpen && (
           <div className="mt-1.5 border border-stone-200/80 rounded-xl overflow-hidden bg-white divide-y divide-stone-100">
-            {sections.map((s, i) => (
+            {sections.map((s) => (
               <button
                 key={s.id}
                 onClick={() => scrollToSection(s.id)}
-                className="w-full text-left px-4 py-2.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition-colors"
+                className="w-full flex items-center gap-2.5 text-left px-4 py-2.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition-colors"
               >
-                {i + 1}. {s.title}
+                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-stone-400 flex-shrink-0" />
+                {s.title}
               </button>
             ))}
           </div>
@@ -74,13 +75,13 @@ export default function LegalPageLayout({ eyebrow, title, intro, lastUpdated, se
             <span className="text-[10px] text-stone-400 font-extrabold tracking-[0.3em] uppercase block mb-2 px-2">
               On this page
             </span>
-            {sections.map((s, i) => (
+            {sections.map((s) => (
               <button
                 key={s.id}
                 onClick={() => scrollToSection(s.id)}
                 className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-stone-600 hover:text-stone-950 hover:bg-stone-50 transition-colors"
               >
-                <span className="text-stone-400 font-mono mr-1.5">{String(i + 1).padStart(2, '0')}</span>
+                <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-stone-400 mr-2 align-middle" />
                 {s.title}
               </button>
             ))}
@@ -89,10 +90,10 @@ export default function LegalPageLayout({ eyebrow, title, intro, lastUpdated, se
 
         {/* Sections */}
         <div className="space-y-10">
-          {sections.map((s, i) => (
+          {sections.map((s) => (
             <section key={s.id} id={s.id} className="scroll-mt-24 space-y-3">
-              <h2 className="font-syne font-extrabold text-base sm:text-lg uppercase tracking-wider text-stone-950 flex items-baseline gap-2.5 pb-2 border-b border-stone-200">
-                <span className="text-stone-300 font-mono text-sm">{String(i + 1).padStart(2, '0')}</span>
+              <h2 className="font-syne font-extrabold text-base sm:text-lg uppercase tracking-wider text-stone-950 flex items-center gap-3 pb-2 border-b border-stone-200">
+                <span aria-hidden="true" className="h-2 w-2 rounded-full bg-lime-400 flex-shrink-0" />
                 {s.title}
               </h2>
               <div className="text-xs sm:text-sm text-stone-600 leading-relaxed font-medium space-y-3 [&_strong]:text-stone-900 [&_strong]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_a]:text-stone-900 [&_a]:font-bold [&_a]:underline [&_a]:underline-offset-2">
