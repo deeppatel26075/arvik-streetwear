@@ -59,9 +59,9 @@ export default function Footer() {
             <ul className="space-y-2.5 text-xs">
               <li><Link href="/shop" className="hover:text-white transition-colors">Shop All</Link></li>
               <li><Link href="/shop?filter=new" className="hover:text-white transition-colors">New Arrivals</Link></li>
-              <li><Link href="/shop" className="hover:text-white transition-colors">Collections</Link></li>
+              <li><Link href="/#collections" className="hover:text-white transition-colors">Collections</Link></li>
               <li><Link href="/shop?filter=bestseller" className="hover:text-white transition-colors">Best Sellers</Link></li>
-              <li><Link href="/shop" className="hover:text-white transition-colors">Lookbook</Link></li>
+              <li><Link href="/lookbook" className="hover:text-white transition-colors">Lookbook</Link></li>
             </ul>
           </div>
 
@@ -71,7 +71,7 @@ export default function Footer() {
             <ul className="space-y-2.5 text-xs">
               <li><Link href="/about" className="hover:text-white transition-colors">Our Story</Link></li>
               <li><Link href="/sustainability" className="hover:text-white transition-colors">Sustainability</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">Journal</Link></li>
+              <li><Link href="/about" className="hover:text-white transition-colors">Journal</Link></li>
               <li><Link href="/careers" className="hover:text-white transition-colors">Careers</Link></li>
               <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
             </ul>

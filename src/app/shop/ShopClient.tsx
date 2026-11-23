@@ -37,6 +37,7 @@ interface Product {
   product_images?: ProductImage[];
   inventory?: InventoryItem[];
   is_featured?: boolean;
+  created_at?: string;
 }
 
 interface ShopClientProps {
@@ -50,7 +51,6 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
   const { setThemePreset } = useTheme();
 
   const initialSearch = searchParams?.get('search') || '';
-  const initialFilter = searchParams?.get('filter') || '';
   const initialCat = searchParams?.get('category') || '';
 
   const [localProducts, setLocalProducts] = useState<Product[]>(initialProducts);
@@ -148,7 +148,16 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
     if (filterParam === 'featured') {
       filtered = filtered.filter((p) => p.is_featured);
     } else if (filterParam === 'bestseller') {
-      filtered = filtered.filter((p) => p.is_featured || (p.discount_price && p.discount_price < 1300));
+      // Best sellers = the pieces that have sold through the most, i.e. the
+      // least stock left. Sold-out pieces drop off; the top four make the cut.
+      const stockLeft = (p: Product) => (p.inventory || []).reduce((n, i) => n + (i.quantity || 0), 0);
+      filtered = filtered
+        .filter((p) => stockLeft(p) > 0)
+        .sort((a, b) => stockLeft(a) - stockLeft(b))
+        .slice(0, 4);
+    } else if (filterParam === 'new') {
+      // Newest drops first.
+      filtered.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
     }
 
     if (priceParam === 'under999') {
@@ -197,7 +206,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
     }
 
     setProducts(filtered);
-  }, [searchQuery, selectedCategory, selectedSize, selectedColor, priceRange, priceSort, localProducts, initialFilter]);
+  }, [searchQuery, selectedCategory, selectedSize, selectedColor, priceRange, priceSort, localProducts, searchParams]);
 
   // Swatch for the active ?color= chip, taken from the products' own saved hex.
   const activeColorHex = useMemo(() => {
@@ -207,6 +216,14 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
     );
     return match?.hex || '#111111';
   }, [selectedColor, localProducts]);
+
+  // Footer / menu links like ?filter=bestseller get their own heading.
+  const FILTER_VIEWS: Record<string, { eyebrow: string; title: string }> = {
+    bestseller: { eyebrow: 'Most Loved', title: 'Best Sellers' },
+    new: { eyebrow: 'Just Dropped', title: 'New Arrivals' },
+    featured: { eyebrow: 'Handpicked', title: 'Featured' },
+  };
+  const activeFilter = FILTER_VIEWS[searchParams?.get('filter') || ''] || null;
 
   const clearFilters = () => {
     setSearchQuery('');
@@ -282,10 +299,10 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 sm:gap-7">
             <div className="space-y-1 sm:space-y-3">
               <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-[0.25em] sm:tracking-[0.35em] text-[var(--color-text-secondary)]">
-                Arviik Catalog
+                {activeFilter ? activeFilter.eyebrow : 'Arviik Catalog'}
               </span>
               <h1 className="font-syne font-extrabold text-[22px] sm:text-4xl lg:text-5xl uppercase tracking-tight sm:tracking-wide text-[var(--color-text-primary)] leading-[1.02] sm:leading-[0.95] break-words">
-                {selectedCategory ? categoryDisplayName(selectedCategory) : 'Streetwear Drops'}
+                {selectedCategory ? categoryDisplayName(selectedCategory) : activeFilter ? activeFilter.title : 'Streetwear Drops'}
               </h1>
               <div className="flex flex-wrap items-center gap-3 pt-0.5">
                 <span className="inline-flex items-center h-5 sm:h-6 px-2.5 sm:px-3 rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] text-[10px] font-bold uppercase tracking-wider">
@@ -310,7 +327,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
                     </button>
                   </span>
                 )}
-                {(selectedCategory || selectedSize || selectedColor || searchQuery || priceRange || priceSort) && (
+                {(selectedCategory || selectedSize || selectedColor || searchQuery || priceRange || priceSort || activeFilter) && (
                   <button
                     onClick={clearFilters}
                     className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)] underline underline-offset-4 hover:text-[var(--color-text-primary)] transition-colors"
@@ -521,7 +538,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
             </div>
 
             {/* Clear Filters Button */}
-            {(selectedCategory || selectedSize || selectedColor || searchQuery || priceRange || priceSort) && (
+            {(selectedCategory || selectedSize || selectedColor || searchQuery || priceRange || priceSort || activeFilter) && (
               <button
                 onClick={clearFilters}
                 className="w-full bg-transparent border border-[var(--color-border)] hover:bg-[var(--color-accent)] hover:text-[var(--color-on-accent)] text-[var(--color-text-primary)] text-[10px] font-bold uppercase tracking-widest py-3 rounded-[10px] transition-colors"
@@ -662,7 +679,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
               >
                 View {products.length} {products.length === 1 ? 'Item' : 'Items'}
               </button>
-              {(selectedCategory || selectedSize || selectedColor || searchQuery || priceRange || priceSort) && (
+              {(selectedCategory || selectedSize || selectedColor || searchQuery || priceRange || priceSort || activeFilter) && (
                 <button
                   onClick={() => {
                     clearFilters();

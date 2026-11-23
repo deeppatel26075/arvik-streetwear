@@ -305,7 +305,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
       )}
 
       {/* 2. CATEGORIES SECTION — compact editorial collection grid */}
-      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-0">
+      <section id="collections" className="scroll-mt-24 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-0">
         {/* Inner wrapper narrower than the hero banner above, so this section
             tapers inward from the banner's edges (a deliberate "pyramid" look)
             instead of sharing the exact same left/right bounds. */}
