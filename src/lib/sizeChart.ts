@@ -18,3 +18,22 @@ export const SIZE_CHART: SizeRow[] = [
 ];
 
 export const inchesToCm = (inches: number) => Math.round(inches * 2.54);
+
+/**
+ * Size suggestion from body weight, used by the product page "Find Size"
+ * tool and by Aris. Oversized is the house fit; "regular" sizes down one.
+ */
+export function recommendSize(weightKg: number, fit: 'oversized' | 'regular' = 'oversized'): SizeRow['size'] {
+  let size: SizeRow['size'];
+  if (weightKg < 58) size = 'S';
+  else if (weightKg < 72) size = 'M';
+  else if (weightKg < 84) size = 'L';
+  else if (weightKg < 96) size = 'XL';
+  else size = 'XXL';
+
+  if (fit === 'regular' && size !== 'S') {
+    const down: Record<string, SizeRow['size']> = { M: 'S', L: 'M', XL: 'L', XXL: 'XL' };
+    size = down[size];
+  }
+  return size;
+}

@@ -9,7 +9,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { formatPrice } from '@/lib/utils';
 import { ColorVariant, extractProductColor } from '@/lib/colorVariants';
 import ProductCard from '@/components/ProductCard';
-import { SIZE_CHART } from '@/lib/sizeChart';
+import { SIZE_CHART, recommendSize } from '@/lib/sizeChart';
 import PanoramicCurveCarousel from '@/components/PanoramicCurveCarousel';
 import {
   Heart,
@@ -315,18 +315,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], col
 
   const calculateSize = () => {
     const w = parseFloat(userWeight) || 68;
-    let recommendedSize: 'S' | 'M' | 'L' | 'XL' | 'XXL' = 'M';
-    if (w < 58) recommendedSize = 'S';
-    else if (w >= 58 && w < 72) recommendedSize = 'M';
-    else if (w >= 72 && w < 84) recommendedSize = 'L';
-    else if (w >= 84 && w < 96) recommendedSize = 'XL';
-    else recommendedSize = 'XXL';
-
-    if (fitPreference === 'regular' && recommendedSize !== 'S') {
-      const map: any = { M: 'S', L: 'M', XL: 'L', XXL: 'XL' };
-      recommendedSize = map[recommendedSize] || recommendedSize;
-    }
-
+    const recommendedSize = recommendSize(w, fitPreference);
     setCalcResult(recommendedSize);
     setSelectedSize(recommendedSize);
   };
@@ -695,7 +684,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], col
               )}
             </div>
             <p className="text-[10px] text-stone-500 font-medium">
-              Inclusive of all taxes. Free shipping on all prepaid orders.
+              Inclusive of all taxes. Free shipping on orders above ₹1,499.
             </p>
           </div>
 

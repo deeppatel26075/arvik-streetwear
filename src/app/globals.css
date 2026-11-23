@@ -240,3 +240,48 @@ input:disabled {
 @media (prefers-reduced-motion: reduce) {
   .arviik-ark-dim, .arviik-ark-lift, .arviik-ark-underline { animation: none; }
 }
+
+/* Aris chat button hides while the mobile menu drawer is open (src/components/aris) */
+html[data-menu-open] .aris-launcher { display: none; }
+
+/* Aris open / close animation (src/components/aris) */
+/* Panel: circular reveal from the button's corner, and back. */
+@keyframes aris-panel-in {
+  from { clip-path: circle(0% at calc(100% - 3.5rem) calc(100% - 2.25rem)); }
+  to   { clip-path: circle(150% at calc(100% - 3.5rem) calc(100% - 2.25rem)); }
+}
+@keyframes aris-panel-out {
+  from { clip-path: circle(150% at calc(100% - 3.5rem) calc(100% - 2.25rem)); }
+  to   { clip-path: circle(0% at calc(100% - 3.5rem) calc(100% - 2.25rem)); }
+}
+.aris-panel-in  { animation: aris-panel-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.aris-panel-out { animation: aris-panel-out 320ms cubic-bezier(0.55, 0, 0.75, 0.2) both; pointer-events: none; }
+
+/* Panel content settles in after the reveal. */
+@keyframes aris-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.aris-rise { animation: aris-rise 420ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* Launcher: tap feedback, and pop back in after the panel closes. */
+@keyframes aris-ripple { from { transform: scale(1); opacity: 0.9; } to { transform: scale(2.4); opacity: 0; } }
+.aris-ripple { animation: aris-ripple 520ms cubic-bezier(0.22, 1, 0.36, 1) both; pointer-events: none; }
+@keyframes aris-mark-spin {
+  0%   { transform: rotate(0deg) scale(1); }
+  60%  { transform: rotate(300deg) scale(1.18); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.aris-mark-spin { animation: aris-mark-spin 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes aris-launcher-press { 0% { transform: scale(1); } 40% { transform: scale(0.94); } 100% { transform: scale(1.03); } }
+.aris-launcher-press { animation: aris-launcher-press 260ms ease-out both; }
+@keyframes aris-launcher-in { from { opacity: 0; transform: translateY(12px) scale(0.85); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.aris-launcher-in { animation: aris-launcher-in 360ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .aris-panel-in, .aris-panel-out, .aris-rise, .aris-ripple, .aris-mark-spin, .aris-launcher-press, .aris-launcher-in { animation: none !important; }
+}
+
+/* Aris chat: message entrance + typing wave (src/components/aris/ArisPanel.tsx) */
+@keyframes aris-msg { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.aris-msg { animation: aris-msg 320ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes aris-dot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.35; } 30% { transform: translateY(-4px); opacity: 1; background-color: #84cc16; } }
+.aris-dot { animation: aris-dot 1.1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .aris-msg, .aris-dot { animation: none !important; } }

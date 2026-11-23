@@ -42,6 +42,7 @@ export const metadata: Metadata = {
 import ArviikPageAnimation from '@/components/ArviikPageAnimation';
 import IosZoomLock from '@/components/IosZoomLock';
 import ColorTransition from '@/components/ColorTransition';
+import ArisLauncher from '@/components/aris/ArisLauncher';
 
 export default function RootLayout({
   children,
@@ -66,6 +67,8 @@ export default function RootLayout({
               <CartDrawer />
               <main className="flex-grow flex flex-col overflow-x-hidden max-w-full">{children}</main>
               <Footer />
+              {/* Aris — AI shopping assistant (chat panel loads on first open) */}
+              <ArisLauncher />
             </CartProvider>
           </AuthProvider>
         </ThemeProvider>
