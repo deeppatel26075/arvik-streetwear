@@ -17,7 +17,7 @@ const SECTIONS: LegalSection[] = [
           to be bound by the following terms and conditions (&quot;Terms of Service&quot;, &quot;Terms&quot;), including
           those additional terms and conditions and policies referenced herein and/or available by
           hyperlink — our <a href="/privacy-policy">Privacy Policy</a>,{' '}
-          <a href="/refund-policy">Refund Policy</a>, and <a href="/payment-policy">Payment Policy</a>. These
+          <a href="/refund-policy">Exchange Policy</a>, and <a href="/payment-policy">Payment Policy</a>. These
           Terms apply to all users of the Site, including without limitation users who are browsers, vendors,
           customers, and contributors of content.
         </p>
@@ -80,8 +80,8 @@ const SECTIONS: LegalSection[] = [
       <>
         <p>
           Certain products or services may be available exclusively online through the Site. These products
-          or services may have limited quantities and are subject to return or exchange only according to
-          our <a href="/refund-policy">Refund Policy</a>.
+          or services may have limited quantities and are subject to exchange only according to
+          our <a href="/refund-policy">Exchange Policy</a>.
         </p>
         <p>
           We have made every effort to display as accurately as possible the colours and images of our
@@ -144,6 +144,7 @@ const SECTIONS: LegalSection[] = [
             Once an order is placed, you can cancel it within 2 hours of order confirmation by contacting us
             at <a href="mailto:info@arviik.in">info@arviik.in</a>{' '}with your order number.
           </li>
+          <li>Prepaid orders cancelled within this 2-hour window are refunded in full to the original payment method.</li>
           <li>After 2 hours, the order cannot be cancelled or refunded.</li>
         </ul>
         <p className="pt-1"><strong>Exchange Policy</strong></p>

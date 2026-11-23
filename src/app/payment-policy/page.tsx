@@ -87,10 +87,10 @@ const SECTIONS: LegalSection[] = [
     title: 'Refunds',
     body: (
       <p>
-        Refunds for returned or cancelled orders are covered in detail in our{' '}
-        <a href="/refund-policy">Refund Policy</a> — in short, prepaid refunds go back to your original
-        payment method within 5–7 business days of approval, and COD refunds are sent via bank transfer or
-        UPI.
+        ARVIIK does not offer refunds on delivered orders; eligible items can be exchanged instead, as set out
+        in our <a href="/refund-policy">Exchange Policy</a>. The only exception is a prepaid order cancelled
+        within 2 hours of confirmation, which is refunded in full to your original payment method within 5–7
+        business days.
       </p>
     ),
   },

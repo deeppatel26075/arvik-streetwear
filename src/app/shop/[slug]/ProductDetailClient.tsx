@@ -9,6 +9,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { formatPrice } from '@/lib/utils';
 import { ColorVariant, extractProductColor } from '@/lib/colorVariants';
 import ProductCard from '@/components/ProductCard';
+import { SIZE_CHART } from '@/lib/sizeChart';
 import PanoramicCurveCarousel from '@/components/PanoramicCurveCarousel';
 import {
   Heart,
@@ -1154,11 +1155,14 @@ export default function ProductDetailClient({ product, relatedProducts = [], col
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-200 font-medium text-stone-700">
-                <tr><td className="p-2.5 border-r font-bold text-stone-900">S</td><td className="p-2.5 border-r">42"</td><td className="p-2.5 border-r">28"</td><td className="p-2.5">21"</td></tr>
-                <tr><td className="p-2.5 border-r font-bold text-stone-900">M</td><td className="p-2.5 border-r">44"</td><td className="p-2.5 border-r">29"</td><td className="p-2.5">22"</td></tr>
-                <tr><td className="p-2.5 border-r font-bold text-stone-900">L</td><td className="p-2.5 border-r">46"</td><td className="p-2.5 border-r">30"</td><td className="p-2.5">23"</td></tr>
-                <tr><td className="p-2.5 border-r font-bold text-stone-900">XL</td><td className="p-2.5 border-r">48"</td><td className="p-2.5 border-r">31"</td><td className="p-2.5">24"</td></tr>
-                <tr><td className="p-2.5 border-r font-bold text-stone-900">XXL</td><td className="p-2.5 border-r">50"</td><td className="p-2.5 border-r">32"</td><td className="p-2.5">25"</td></tr>
+                {SIZE_CHART.map((r) => (
+                  <tr key={r.size}>
+                    <td className="p-2.5 border-r font-bold text-stone-900">{r.size}</td>
+                    <td className="p-2.5 border-r">{r.chest}&quot;</td>
+                    <td className="p-2.5 border-r">{r.length}&quot;</td>
+                    <td className="p-2.5">{r.shoulder}&quot;</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
 

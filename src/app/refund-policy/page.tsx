@@ -1,104 +1,93 @@
+import type { Metadata } from 'next';
 import LegalPageLayout, { LegalSection } from '@/components/LegalPageLayout';
+
+export const metadata: Metadata = {
+  title: 'Exchange Policy | ARVIIK',
+  description:
+    'ARVIIK offers size exchanges, not refunds. How exchanges, cancellations and damaged or wrong items are handled.',
+};
+
+// Served at /refund-policy (kept so existing links keep working).
+// Policy in short: exchanges only, no refunds — except a full refund when a
+// prepaid order is cancelled within 2 hours of confirmation, before it ships.
 
 const SECTIONS: LegalSection[] = [
   {
+    id: 'no-refunds',
+    title: 'No Refunds, Exchanges Only',
+    body: (
+      <>
+        <p>
+          ARVIIK does <strong>not offer refunds</strong> on delivered orders. Instead, eligible products can be{' '}
+          <strong>exchanged</strong> under the terms below.
+        </p>
+        <p>
+          The only time money is returned is when a prepaid order is cancelled within the 2-hour cancellation
+          window, explained under <a href="#cancellations">Order Cancellations</a>.
+        </p>
+      </>
+    ),
+  },
+  {
     id: 'window',
-    title: 'Return Window',
+    title: 'Exchange Window',
     body: (
       <p>
-        You can request a return within <strong>7 days of delivery</strong>. To be eligible, the item must be
-        unworn, unwashed, undamaged, and have its original tags still attached — exactly how it arrived.
-        Items returned outside this window, or that don&apos;t meet these conditions, won&apos;t be accepted.
+        You can request an exchange within <strong>7 days of delivery</strong>. To be eligible, the item must be
+        unworn, unwashed, undamaged, and have its original tags and packaging still attached, exactly how it
+        arrived. Requests made outside this window, or for items that don&apos;t meet these conditions, won&apos;t
+        be accepted.
       </p>
     ),
   },
   {
-    id: 'non-returnable',
-    title: "What Can't Be Returned",
+    id: 'what-can-be-exchanged',
+    title: 'What Can Be Exchanged',
     body: (
-      <ul>
-        <li>Items marked &quot;Final Sale&quot; or purchased during a clearance/liquidation drop.</li>
-        <li>Items showing signs of wear, washing, odour, or alteration.</li>
-        <li>Items missing their original tags or packaging.</li>
-        <li>Gift cards.</li>
-      </ul>
+      <>
+        <p>
+          Exchanges are for a <strong>different size of the same design</strong>, subject to stock availability
+          in the size you want. Since our fits run oversized, check the Size Guide on the product page before
+          ordering. It&apos;ll save you a round trip.
+        </p>
+        <p>The following can&apos;t be exchanged:</p>
+        <ul>
+          <li>Items marked &quot;Final Sale&quot; or purchased during a clearance/liquidation drop.</li>
+          <li>Items showing signs of wear, washing, odour, or alteration.</li>
+          <li>Items missing their original tags or packaging.</li>
+          <li>Gift cards.</li>
+        </ul>
+      </>
     ),
   },
   {
-    id: 'how-to-return',
+    id: 'how-to-exchange',
     title: 'How to Request an Exchange',
     body: (
       <>
         <p>
-          Go to <strong>Track Order</strong> or <strong>Profile → Orders</strong>, select the item, and choose{' '}
-          <strong>Exchange</strong>. Follow the instructions to submit your exchange request.
+          Contact us at <a href="mailto:info@arviik.in">info@arviik.in</a>{' '}or through our{' '}
+          <a href="/contact">Contact page</a>{' '}with your order number and the size you&apos;d like instead.
         </p>
         <p>
-          Once your request is approved, the item will be collected from your delivery address as per our
-          exchange process. You do not need to visit a courier office yourself.
+          Once your request is approved, the item will be collected from your delivery address. You
+          don&apos;t need to visit a courier office yourself.
         </p>
         <p>
-          The returned item will undergo a quality check at our warehouse. To be eligible for exchange, the
-          product must be unused, unwashed, undamaged, and in its original condition with all tags and
-          packaging intact.
-        </p>
-        <p>
-          Once the product passes the quality check, your replacement item will be processed and delivered
-          within 7–10 working days, subject to product availability and your delivery location.
-        </p>
-        <p>
-          Please note: ARVIIK does not offer refunds after the 2-hour cancellation period. Eligible orders
-          can only be exchanged in accordance with our <a href="/terms#orders">Exchange Policy</a>.
-        </p>
-      </>
-    ),
-  },
-  {
-    id: 'exchanges',
-    title: 'Size Exchanges',
-    body: (
-      <>
-        <p>
-          Size exchanges are <strong>free</strong>{' '}within the same 7-day window, subject to stock availability
-          in the size you want. Since our fits run oversized, check the Size Guide on the product page before
-          ordering — it&apos;ll save you a round trip.
-        </p>
-        <p>
-          Exchanges are currently limited to a different size of the <strong>same design</strong>. If you want a
-          different design entirely, return the original item for a refund and place a new order.
-        </p>
-      </>
-    ),
-  },
-  {
-    id: 'refund-timeline',
-    title: 'Refunds & Exchange Shipping',
-    body: (
-      <>
-        <p>We do not offer refunds after the 2-hour cancellation period.</p>
-        <p>
-          Orders can be cancelled within 2 hours of order confirmation by contacting{' '}
-          <a href="mailto:info@arviik.in">info@arviik.in</a> with your order number.
-        </p>
-        <p>
-          After the 2-hour cancellation period, the order cannot be cancelled or refunded. Eligible products
-          can only be exchanged according to our <a href="/terms#orders">Exchange Policy</a>.
-        </p>
-        <p>
-          For an approved exchange, the applicable exchange/return shipping process will be communicated by
-          our support team.
+          The item then goes through a quality check at our warehouse. Once it passes, your replacement is
+          processed and delivered within <strong>7–10 working days</strong>, subject to availability and your
+          delivery location.
         </p>
       </>
     ),
   },
   {
     id: 'shipping-fee',
-    title: 'Shipping Fees on Returns',
+    title: 'Shipping Fees on Exchanges',
     body: (
       <p>
-        The flat shipping fee charged at checkout (and the COD handling fee, where applicable) is
-        non-refundable, since it covers the cost of the original delivery attempt regardless of what happens
-        afterward. Reverse pickup for an eligible return is free — you won&apos;t be charged again for it.
+        Pickup of an approved exchange is free. The shipping fee and any Cash on Delivery handling fee paid on
+        the original order are not returned, since they cover the original delivery.
       </p>
     ),
   },
@@ -106,44 +95,62 @@ const SECTIONS: LegalSection[] = [
     id: 'damaged',
     title: 'Damaged, Defective, or Wrong Item',
     body: (
-      <p>
-        If your order arrives damaged, defective, or isn&apos;t what you ordered, contact us within{' '}
-        <strong>48 hours of delivery</strong> at <a href="mailto:info@arviik.in">info@arviik.in</a>{' '}with
-        your order number and a photo of the issue. We&apos;ll arrange a free replacement or full refund — this
-        doesn&apos;t count against the standard 7-day window.
-      </p>
+      <>
+        <p>
+          If your order arrives damaged, defective, or isn&apos;t what you ordered, contact us within{' '}
+          <strong>48 hours of delivery</strong> at <a href="mailto:info@arviik.in">info@arviik.in</a>{' '}with your
+          order number and a photo of the issue.
+        </p>
+        <p>
+          We&apos;ll send a <strong>free replacement</strong>. If the same item is out of stock, you can exchange it
+          for another product of equal value instead. This doesn&apos;t count against the standard 7-day
+          exchange window.
+        </p>
+      </>
     ),
   },
   {
     id: 'cancellations',
     title: 'Order Cancellations',
     body: (
-      <p>
-        Orders can be cancelled free of charge within 2 hours of placing them, before they&apos;re packed —
-        contact us immediately with your order number. Once an order has shipped, it can&apos;t be cancelled;
-        you&apos;re welcome to return it under the policy above once delivered.
-      </p>
+      <>
+        <p>
+          You can cancel an order within <strong>2 hours of order confirmation</strong>, before it&apos;s packed,
+          by contacting <a href="mailto:info@arviik.in">info@arviik.in</a>{' '}with your order number.
+        </p>
+        <ul>
+          <li>
+            <strong>Prepaid orders</strong> cancelled within this window are refunded in full to the original
+            payment method.
+          </li>
+          <li>
+            <strong>Cash on Delivery orders</strong> cancelled within this window are simply cancelled; nothing
+            has been charged.
+          </li>
+        </ul>
+        <p>After 2 hours, an order can&apos;t be cancelled or refunded. Once delivered, eligible items can be exchanged as described above.</p>
+      </>
     ),
   },
   {
     id: 'contact',
-    title: 'Need Help With a Return?',
+    title: 'Need Help With an Exchange?',
     body: (
       <p>
-        Email <a href="mailto:info@arviik.in">info@arviik.in</a>{' '}with your order number, or reach us
-        through our <a href="/contact">Contact page</a>{' '}— we&apos;re usually quick to respond.
+        Email <a href="mailto:info@arviik.in">info@arviik.in</a>{' '}with your order number, or reach us through
+        our <a href="/contact">Contact page</a>. We&apos;re usually quick to respond.
       </p>
     ),
   },
 ];
 
-export default function RefundPolicyPage() {
+export default function ExchangePolicyPage() {
   return (
     <LegalPageLayout
-      eyebrow="Returns, Exchanges & Refunds"
-      title="Refund Policy"
-      intro="Straightforward returns, free size exchanges, and refunds that don't take forever."
-      lastUpdated="September 5, 2026"
+      eyebrow="Exchanges & Cancellations"
+      title="Exchange Policy"
+      intro="We don't offer refunds. Here's exactly how size exchanges, cancellations and damaged items work."
+      lastUpdated="November 24, 2026"
       sections={SECTIONS}
     />
   );

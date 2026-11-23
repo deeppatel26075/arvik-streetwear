@@ -122,7 +122,7 @@ function SuccessContent() {
         </div>
         <div className="flex flex-col items-center space-y-1.5">
           <RotateCcw className="h-4.5 w-4.5 text-[#111111]" />
-          <span>Easy Returns<br/><span className="text-[#111111] font-bold">7 Days Return</span></span>
+          <span>Easy Exchanges<br/><span className="text-[#111111] font-bold">7-Day Size Exchange</span></span>
         </div>
       </div>
 

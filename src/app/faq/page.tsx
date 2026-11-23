@@ -67,20 +67,20 @@ const FAQ_SECTIONS: FaqSection[] = [
   },
   {
     key: 'returns',
-    title: 'Returns',
+    title: 'Refunds & Cancellations',
     icon: RotateCcw,
     items: [
       {
-        q: 'What is your return window?',
-        a: 'You can request a return within 7 days of delivery, as long as the piece is unworn, unwashed, and has its original tags attached.',
+        q: 'Do you offer refunds?',
+        a: 'No. We don\'t offer refunds on delivered orders, but eligible items can be exchanged for a different size within 7 days of delivery. See our Exchange Policy for details.',
       },
       {
-        q: 'How do I start a return?',
-        a: 'Go to Track Order or your Profile → Orders, select the item, and choose Return. A pickup will be scheduled from your delivery address at no extra cost.',
+        q: 'Can I cancel my order?',
+        a: 'Yes, within 2 hours of order confirmation, by emailing info@arviik.in with your order number. Prepaid orders cancelled in that window are refunded in full to the original payment method. After 2 hours, orders can\'t be cancelled.',
       },
       {
-        q: 'When will I get my refund?',
-        a: 'Refunds are processed within 5-7 business days after the returned item passes quality check at our warehouse, credited to your original payment method.',
+        q: 'What if my order arrives damaged or wrong?',
+        a: 'Contact us within 48 hours of delivery with your order number and a photo. We\'ll send a free replacement, or if it\'s out of stock, you can exchange it for another product of equal value.',
       },
     ],
   },
@@ -91,11 +91,11 @@ const FAQ_SECTIONS: FaqSection[] = [
     items: [
       {
         q: 'Can I exchange for a different size?',
-        a: 'Yes — size exchanges are free within 7 days of delivery, subject to stock availability in the size you want.',
+        a: 'Yes — request a size exchange within 7 days of delivery. The piece must be unworn, unwashed, and have its original tags attached. Subject to stock availability in the size you want.',
       },
       {
         q: 'Can I exchange for a different design?',
-        a: 'Currently exchanges are limited to size changes on the same design. For a different design, please return the item and place a new order.',
+        a: 'Currently exchanges are limited to size changes on the same design. Damaged or wrong items that can\'t be replaced can be exchanged for another product of equal value.',
       },
     ],
   },

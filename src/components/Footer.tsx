@@ -82,10 +82,10 @@ export default function Footer() {
             <h4 className="font-bold text-lime-400 uppercase text-[10px] tracking-[0.2em]">Customer Support</h4>
             <ul className="space-y-2.5 text-xs">
               <li><Link href="/track-order" className="hover:text-white transition-colors">Track Order</Link></li>
-              <li><Link href="/faq" className="hover:text-white transition-colors">Returns & Exchanges</Link></li>
-              <li><Link href="/faq" className="hover:text-white transition-colors">Shipping Policy</Link></li>
+              <li><Link href="/refund-policy" className="hover:text-white transition-colors">Exchanges</Link></li>
+              <li><Link href="/shipping-policy" className="hover:text-white transition-colors">Shipping Policy</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
-              <li><Link href="/faq" className="hover:text-white transition-colors">Size Guide</Link></li>
+              <li><Link href="/size-guide" className="hover:text-white transition-colors">Size Guide</Link></li>
             </ul>
           </div>
 
@@ -95,7 +95,7 @@ export default function Footer() {
             <ul className="space-y-2.5 text-xs">
               <li><Link href="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
               <li><Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link></li>
+              <li><Link href="/refund-policy" className="hover:text-white transition-colors">Exchange Policy</Link></li>
               <li><Link href="/payment-policy" className="hover:text-white transition-colors">Payment Policy</Link></li>
             </ul>
           </div>
@@ -150,8 +150,8 @@ export default function Footer() {
           <div className="flex items-center space-x-3">
             <RefreshCw className="w-5 h-5 text-stone-500 flex-shrink-0" />
             <div>
-              <p className="text-[10px] font-bold text-white uppercase tracking-wider">Easy Returns</p>
-              <p className="text-[9px] text-stone-500">14 days easy returns</p>
+              <p className="text-[10px] font-bold text-white uppercase tracking-wider">Easy Exchanges</p>
+              <p className="text-[9px] text-stone-500">7-day size exchange</p>
             </div>
           </div>
           <div className="flex items-center space-x-3">

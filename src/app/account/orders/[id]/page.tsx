@@ -230,12 +230,12 @@ export default function OrderDetailPage() {
 
         {isReturnable(order.status) && (
           <a
-            href={supportMessage('request a return / exchange')}
+            href={supportMessage('request an exchange')}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 py-3 px-5 text-[11px] font-bold uppercase tracking-wider border border-stone-300 text-stone-700 rounded-xs hover:bg-stone-50 transition-colors"
           >
-            <RotateCcw className="h-3.5 w-3.5" /> Return / Exchange
+            <RotateCcw className="h-3.5 w-3.5" /> Request Exchange
           </a>
         )}
 
