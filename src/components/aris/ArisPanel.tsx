@@ -10,6 +10,23 @@ type Turn = { role: 'user' | 'assistant'; content: string };
 
 const STORAGE_KEY = 'arviik_aris_chat';
 const MAX_CHARS = 1000;
+
+// Aris's replies can end with tap-to-ask follow-ups after this marker
+// (see src/lib/aris/brain.ts).
+const CHIPS_MARKER = '\n::chips::';
+function splitChips(content: string): { body: string; chips: string[] } {
+  const at = content.indexOf(CHIPS_MARKER);
+  if (at < 0) return { body: content, chips: [] };
+  const chips = content
+    .slice(at + CHIPS_MARKER.length)
+    .split('|')
+    .map((c) => c.trim())
+    .filter(Boolean)
+    .slice(0, 3);
+  return { body: content.slice(0, at), chips };
+}
+
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const QUICK_ACTIONS = [
   { icon: Ruler, label: 'Find my size', hint: 'Get a size from your weight', prompt: 'Which size should I get?' },
   { icon: Shirt, label: 'Shop the drop', hint: "See what's in stock now", prompt: "What's in the shop right now?" },
@@ -114,6 +131,7 @@ export default function ArisPanel({ open, onClose }: { open: boolean; onClose: (
       setInput('');
       setBusy(true);
 
+      const startedAt = Date.now();
       const controller = new AbortController();
       abortRef.current = controller;
       const setReply = (content: string) =>
@@ -142,16 +160,39 @@ export default function ArisPanel({ open, onClose }: { open: boolean; onClose: (
           return;
         }
 
+        // Read the reply while a typewriter reveals it word by word, so
+        // answers "type out" like a real chat instead of appearing at once.
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let reply = '';
+        let streamDone = false;
+        const instant = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const reveal = (async () => {
+          await wait(Math.max(0, 450 - (Date.now() - startedAt)));
+          let shown = 0;
+          for (;;) {
+            if (controller.signal.aborted) return;
+            const body = splitChips(reply).body;
+            if (instant) shown = body.length;
+            else if (shown < body.length) {
+              let next = Math.min(body.length, shown + Math.max(3, Math.ceil((body.length - shown) / 28)));
+              while (next < body.length && !/\s/.test(body[next])) next++;
+              shown = next;
+            }
+            if (shown > 0) setReply(body.slice(0, shown));
+            if (streamDone && shown >= body.length) return;
+            await wait(22);
+          }
+        })();
         for (;;) {
           const { done, value } = await reader.read();
           if (done) break;
           reply += decoder.decode(value, { stream: true });
-          setReply(reply);
         }
-        if (!reply.trim()) setReply('Sorry, I could not answer that. Please try asking another way.');
+        streamDone = true;
+        await reveal;
+        // Full text last, so the follow-up chips appear once typing ends.
+        setReply(reply.trim() ? reply : 'Sorry, I could not answer that. Please try asking another way.');
       } catch (err) {
         if ((err as Error)?.name !== 'AbortError') {
           setReply("I couldn't connect just now. Please check your connection and try again.");
@@ -267,10 +308,28 @@ export default function ArisPanel({ open, onClose }: { open: boolean; onClose: (
         ) : (
           turns.map((t, i) => {
             const firstOfRun = t.role === 'assistant' && turns[i - 1]?.role !== 'assistant';
-            return t.role === 'assistant' && !t.content && busy && i === turns.length - 1 ? (
-              <TypingDots key={i} />
-            ) : (
-              <Bubble key={i} role={t.role} content={t.content} showAvatar={firstOfRun} onLinkClick={onLinkClick} />
+            if (t.role === 'assistant' && !t.content && busy && i === turns.length - 1) return <TypingDots key={i} />;
+            const { body, chips } = t.role === 'assistant' ? splitChips(t.content) : { body: t.content, chips: [] };
+            const showChips = chips.length > 0 && !busy && i === turns.length - 1;
+            return (
+              <React.Fragment key={i}>
+                <Bubble role={t.role} content={body} showAvatar={firstOfRun} onLinkClick={onLinkClick} />
+                {showChips && (
+                  <div className="flex flex-wrap gap-2 pl-9" aria-label="Suggested questions">
+                    {chips.map((c, ci) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => send(c)}
+                        style={{ animationDelay: `${ci * 60}ms` }}
+                        className="aris-msg px-3 py-1.5 rounded-full bg-white text-[12px] font-semibold text-stone-800 ring-1 ring-black/10 shadow-[0_4px_12px_-8px_rgba(0,0,0,0.4)] hover:ring-lime-400 hover:bg-lime-50 active:scale-95 transition-all"
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </React.Fragment>
             );
           })
         )}

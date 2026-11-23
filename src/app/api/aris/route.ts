@@ -20,7 +20,9 @@ export const dynamic = 'force-dynamic';
 const MODEL = 'claude-opus-5-5';
 const MAX_TURNS = 16; // most recent messages kept per request
 const MAX_CHARS = 1000; // per customer message
-const RATE_LIMIT = { max: 20, windowMs: 10 * 60 * 1000 }; // 20 messages / 10 min / visitor
+// Free mode costs nothing per message, so allow a longer chat; Claude mode
+// (paid per message) keeps the tighter limit.
+const RATE_LIMIT = { max: process.env.ANTHROPIC_API_KEY ? 20 : 40, windowMs: 10 * 60 * 1000 }; // per visitor
 
 type ChatTurn = { role: 'user' | 'assistant'; content: string };
 
