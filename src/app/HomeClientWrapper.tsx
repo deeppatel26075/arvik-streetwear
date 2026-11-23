@@ -8,6 +8,14 @@ import { getCatalogColors, isLightColor } from '@/lib/colorVariants';
 import { startColorTransition } from '@/components/ColorTransition';
 import { ArrowRight, Star, Flame, Shirt, Truck, Wallet, Tag, Percent, Gift, ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
 
+// Auto-advancing sliders re-render the whole home page on every tick, so
+// skip ticks while nobody can see it: tab in the background, or the mobile
+// menu drawer covering the page (Navbar sets data-menu-open on <html>).
+// Re-rendering behind the open drawer was making its animations stutter.
+const isPageBackgrounded = () =>
+  typeof document !== 'undefined' &&
+  (document.hidden || document.documentElement.dataset.menuOpen === '1');
+
 // Maps the icon name stored in the `hero_slides` table (edited from the
 // admin panel) back to the lucide component actually rendered.
 const HERO_ICON_MAP: Record<string, any> = { Flame, Shirt, Truck, Wallet, Star, Tag, Percent, Gift };
@@ -82,6 +90,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
   // Auto-swipe every 2.5 seconds for faster transition
   React.useEffect(() => {
     const timer = setInterval(() => {
+      if (isPageBackgrounded()) return;
       setCurrentReview((prev) => (prev + 1) % REVIEWS.length);
     }, 2500);
     return () => clearInterval(timer);
@@ -144,6 +153,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
   React.useEffect(() => {
     if (slides.length === 0) return;
     const timer = setInterval(() => {
+      if (isPageBackgrounded()) return;
       setBannerIndex((prev) => (prev + 1) % slides.length);
     }, 3000);
     return () => clearInterval(timer);

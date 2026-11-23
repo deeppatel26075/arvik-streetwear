@@ -7,6 +7,7 @@ import { useCart } from '@/context/CartContext';
 import WaveWordmark from '@/components/WaveWordmark';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { WHATSAPP_NUMBER } from '@/lib/contact';
 import {
   Menu,
   X,
@@ -48,8 +49,26 @@ export default function Navbar() {
   const { cart, wishlist } = useCart();
   const { user, profile, signOut } = useAuth();
 
+  // Logo / home icon: if the customer is already on the home page (e.g.
+  // scrolled down), a link to '/' does nothing — take them back to the top
+  // instead. Ctrl/cmd-click still opens a new tab as normal.
+  const goHome = (e: React.MouseEvent) => {
+    if (pathname !== '/' || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+
+  // Let the rest of the page know the drawer is covering it, so background
+  // work (e.g. the home page's auto-advancing sliders) can pause.
+  useEffect(() => {
+    const root = document.documentElement;
+    if (mobileOpen) root.dataset.menuOpen = '1';
+    else delete root.dataset.menuOpen;
+    return () => { delete root.dataset.menuOpen; };
+  }, [mobileOpen]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchCatalog, setSearchCatalog] = useState<{ id: string; name: string; slug: string }[]>([]);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
@@ -203,7 +222,10 @@ export default function Navbar() {
     <>
       <header
         ref={headerRef}
-        className="fixed top-0 left-0 w-full max-w-full overflow-x-hidden z-40 transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-stone-200/40 select-none"
+        // Blur is paused while the menu drawer covers the header: a live
+        // backdrop-filter under the drawer made the drawer's animations
+        // (e.g. the A·R·K wordmark) drop to ~30fps on phones.
+        className={`fixed top-0 left-0 w-full max-w-full overflow-x-hidden z-40 transition-all duration-300 bg-white/95 ${mobileOpen ? '' : 'backdrop-blur-md'} border-b border-stone-200/40 select-none`}
       >
         {/* Top Announcement Bar — a continuously-scrolling marquee. The
             message sequence is rendered twice back-to-back; the track is
@@ -252,6 +274,7 @@ export default function Navbar() {
             <div className="flex-shrink-0">
               <Link
                 href="/"
+                onClick={goHome}
                 className="font-syne font-extrabold text-xl sm:text-3xl tracking-[0.12em] sm:tracking-[0.25em] text-stone-900 transition-opacity hover:opacity-85"
               >
                 ARVIIK
@@ -262,6 +285,7 @@ export default function Navbar() {
             <div className="flex items-center space-x-2.5 sm:space-x-5">
               <Link
                 href="/"
+                onClick={goHome}
                 className="text-stone-900 hover:opacity-70 transition-opacity p-1"
                 aria-label="Home"
               >
@@ -483,7 +507,9 @@ export default function Navbar() {
               span the full viewport width). */}
           <div
             onClick={() => setMobileOpen(false)}
-            className="fixed inset-0 bg-stone-950/80 backdrop-blur-md"
+            // Blur only where the backdrop is actually visible (sm+). On phones the
+            // drawer covers the full screen, so blurring behind it was pure cost.
+            className="fixed inset-0 bg-stone-950/80 sm:backdrop-blur-md"
           />
           <div className="relative w-full max-w-md bg-white h-full min-h-screen overflow-y-auto p-6 shadow-2xl flex flex-col justify-between space-y-6 border-r border-stone-200">
             
@@ -696,7 +722,7 @@ export default function Navbar() {
                   </Link>
 
                   <a
-                    href="https://api.whatsapp.com/send?phone=919876543210&text=Hi%20ARVIIK%20Support"
+                    href={`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=Hi%20ARVIIK%20Support`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setMobileOpen(false)}

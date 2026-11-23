@@ -23,6 +23,7 @@ import OrderStatusBadge from '@/components/account/OrderStatusBadge';
 import ConfirmDialog from '@/components/account/ConfirmDialog';
 import Skeleton from '@/components/account/Skeleton';
 import InvoiceViewModal from '@/components/InvoiceViewModal';
+import { WHATSAPP_NUMBER } from '@/lib/contact';
 
 // Adapted from the 7-value DB status enum to a 5-step happy-path timeline.
 // There is no distinct "Out for Delivery" state in the schema today — the
@@ -35,7 +36,6 @@ const TIMELINE_STEPS = [
   { key: 'delivered', label: 'Delivered' },
 ] as const;
 
-const WHATSAPP_NUMBER = '917698892815';
 
 export default function OrderDetailPage() {
   const params = useParams();

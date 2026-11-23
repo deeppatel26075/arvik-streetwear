@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Mail, Phone, MapPin, Clock, HelpCircle, ArrowRight } from 'lucide-react';
+import { WHATSAPP_NUMBER } from '@/lib/contact';
 
 // Lucide has no brand-specific marks — these mirror the same inline SVGs
 // already used for the site's social icons in Footer.tsx, plus WhatsApp.
@@ -40,7 +41,6 @@ function YoutubeIcon({ className }: { className?: string }) {
   );
 }
 
-const WHATSAPP_NUMBER = '919876543210'; // TODO: replace with the real WhatsApp Business number
 
 export default function ContactPage() {
   const [name, setName] = useState('');
