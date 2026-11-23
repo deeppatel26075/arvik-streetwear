@@ -6,7 +6,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   ChevronLeft,
-  Check,
   FileText,
   Eye,
   RotateCcw,
@@ -20,21 +19,11 @@ import { fetchOrderById, Order, orderDisplayId, isCancellable, isReturnable } fr
 import { downloadInvoice } from '@/lib/invoice';
 import { formatPrice } from '@/lib/utils';
 import OrderStatusBadge from '@/components/account/OrderStatusBadge';
+import OrderTimeline from '@/components/account/OrderTimeline';
 import ConfirmDialog from '@/components/account/ConfirmDialog';
 import Skeleton from '@/components/account/Skeleton';
 import InvoiceViewModal from '@/components/InvoiceViewModal';
 import { WHATSAPP_NUMBER } from '@/lib/contact';
-
-// Adapted from the 7-value DB status enum to a 5-step happy-path timeline.
-// There is no distinct "Out for Delivery" state in the schema today — the
-// closest honest equivalent is "packing" (labelled Processing here).
-const TIMELINE_STEPS = [
-  { key: 'pending', label: 'Ordered' },
-  { key: 'accepted', label: 'Confirmed' },
-  { key: 'packing', label: 'Processing' },
-  { key: 'shipped', label: 'Shipped' },
-  { key: 'delivered', label: 'Delivered' },
-] as const;
 
 
 export default function OrderDetailPage() {
@@ -92,8 +81,6 @@ export default function OrderDetailPage() {
     );
   }
 
-  const currentStepIdx = TIMELINE_STEPS.findIndex((s) => s.key === order.status);
-  const isTerminalAlt = order.status === 'cancelled' || order.status === 'returned';
   const paymentStatus = order.payments?.[0]?.status;
   const orderDate = new Date(order.created_at).toLocaleDateString('en-IN', {
     day: 'numeric',
@@ -152,48 +139,7 @@ export default function OrderDetailPage() {
       </div>
 
       {/* Status Timeline */}
-      {isTerminalAlt ? (
-        <div className="p-5 border border-stone-200 rounded-lg bg-stone-50/60">
-          <OrderStatusBadge status={order.status} />
-          <p className="text-xs text-stone-500 font-medium mt-2">
-            {order.status === 'cancelled'
-              ? 'This order was cancelled.'
-              : 'This order was returned.'}
-          </p>
-        </div>
-      ) : (
-        <div className="flex items-start overflow-x-auto py-2">
-          {TIMELINE_STEPS.map((step, i) => {
-            const done = i <= currentStepIdx;
-            const isLast = i === TIMELINE_STEPS.length - 1;
-            return (
-              <div key={step.key} className={`flex items-center ${isLast ? '' : 'flex-1 min-w-[64px]'}`}>
-                <div className="flex flex-col items-center gap-2 w-16 sm:w-20 flex-shrink-0">
-                  <div
-                    className={`h-8 w-8 sm:h-9 sm:w-9 rounded-full flex items-center justify-center border-2 transition-colors ${
-                      done ? 'bg-stone-950 border-stone-950 text-white' : 'bg-white border-stone-200 text-stone-300'
-                    }`}
-                  >
-                    <Check className="h-4 w-4" />
-                  </div>
-                  <span
-                    className={`text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider text-center leading-tight ${
-                      done ? 'text-stone-900' : 'text-stone-300'
-                    }`}
-                  >
-                    {step.label}
-                  </span>
-                </div>
-                {!isLast && (
-                  <div
-                    className={`flex-1 h-0.5 -mt-5 transition-colors ${i < currentStepIdx ? 'bg-stone-950' : 'bg-stone-200'}`}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <OrderTimeline status={order.status} />
 
       {/* Items */}
       <div className="space-y-3">

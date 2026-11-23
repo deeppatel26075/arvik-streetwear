@@ -6,6 +6,16 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { ArrowRight, Lock, Mail, User, Phone } from 'lucide-react';
 
+// Where to send a customer after logging in: ?next=/some/path when a page
+// sent them here (e.g. Track Order), otherwise home. Only same-site paths
+// are accepted so the parameter can't be used to redirect off-site.
+function postLoginPath(): string {
+  if (typeof window === 'undefined') return '/';
+  const next = new URLSearchParams(window.location.search).get('next') || '';
+  // reject protocol-relative ("//evil.com") and backslash ("/\evil.com") forms
+  return /^\/(?![\/\\])/.test(next) ? next : '/';
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const { user, profile, loading, signInMock } = useAuth();
@@ -31,7 +41,7 @@ export default function LoginPage() {
       if (profile?.role === 'admin') {
         router.push('/admin');
       } else {
-        router.push('/');
+        router.push(postLoginPath());
       }
     }
   }, [user, profile, loading, router]);
@@ -131,7 +141,7 @@ export default function LoginPage() {
         if (role === 'admin' || isAdminAccount) {
           router.push('/admin');
         } else {
-          router.push('/');
+          router.push(postLoginPath());
         }
       }
     } catch (err: any) {
