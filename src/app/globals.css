@@ -216,3 +216,27 @@ input:disabled {
 .arviik-sp-frame { opacity: 0; animation: arviik-sp-frame 800ms cubic-bezier(0.22, 1, 0.36, 1) 150ms both; }
 .arviik-sp-wipe { animation: arviik-sp-wipe 700ms cubic-bezier(0.76, 0, 0.24, 1) both; }
 .arviik-sp-content-out { animation: arviik-sp-content-out 450ms cubic-bezier(0.55, 0, 0.45, 1) both; }
+
+/* Mobile menu wordmark — founders' mark (src/components/WaveWordmark.tsx)
+   A·R·K = the founders' initials. One 2.4s timeline: reveal → hold → settle. */
+@keyframes arviik-ark-dim {
+  0%, 100% { opacity: 1; }
+  9%, 80%  { opacity: 0.12; }
+}
+@keyframes arviik-ark-lift {
+  0%       { transform: translateY(0); }
+  9%       { transform: translateY(-4px); }
+  16%, 78% { transform: translateY(-2px); }
+  92%, 100% { transform: translateY(0); }
+}
+@keyframes arviik-ark-underline {
+  0%        { transform: scaleX(0); }
+  14%, 78%  { transform: scaleX(1); }
+  92%, 100% { transform: scaleX(0); }
+}
+.arviik-ark-dim       { animation: arviik-ark-dim 2400ms cubic-bezier(0.65, 0, 0.35, 1) both; }
+.arviik-ark-lift      { animation: arviik-ark-lift 2400ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.arviik-ark-underline { transform: scaleX(0); transform-origin: left; animation: arviik-ark-underline 2400ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .arviik-ark-dim, .arviik-ark-lift, .arviik-ark-underline { animation: none; }
+}

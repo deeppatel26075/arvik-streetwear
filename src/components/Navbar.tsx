@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import WaveWordmark from '@/components/WaveWordmark';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import {
@@ -24,7 +25,6 @@ import {
   PhoneCall,
   RefreshCw,
   Truck,
-  Shirt,
   ArrowUpRight
 } from 'lucide-react';
 
@@ -491,9 +491,8 @@ export default function Navbar() {
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-stone-200 pb-4">
                 <div className="flex items-center space-x-2">
-                  <span className="font-syne font-extrabold text-xl tracking-[0.2em] text-stone-950">
-                    ARVIIK
-                  </span>
+                  {/* Tap for a wave through the letters */}
+                  <WaveWordmark />
                   <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400 bg-stone-100 px-2 py-0.5 rounded-xs">
                     MENU
                   </span>
@@ -603,39 +602,6 @@ export default function Navbar() {
                     <div className="flex items-center space-x-3">
                       <Tag className="w-4 h-4 text-stone-500" />
                       <span className="uppercase tracking-wider">Hidden Patterns</span>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-stone-300" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* SHOP BY SECTION */}
-              <div className="space-y-3 pt-2">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-400 border-b border-stone-100 pb-1.5">
-                  SHOP BY
-                </h3>
-
-                <div className="space-y-1.5 text-xs font-semibold text-stone-800">
-                  <Link
-                    href="/shop?gender=men"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-between py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <User className="w-4 h-4 text-stone-500" />
-                      <span className="uppercase tracking-wider">Men</span>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-stone-300" />
-                  </Link>
-
-                  <Link
-                    href="/shop?gender=unisex"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-between py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Shirt className="w-4 h-4 text-stone-500" />
-                      <span className="uppercase tracking-wider">Unisex</span>
                     </div>
                     <ChevronRight className="w-4 h-4 text-stone-300" />
                   </Link>
