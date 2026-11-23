@@ -17,6 +17,7 @@ interface AuthGateModalProps {
 export default function AuthGateModal({ onCancel, cancelLabel = 'Back to Cart' }: AuthGateModalProps) {
   const { signInMock } = useAuth();
   const [isRegister, setIsRegister] = useState(false);
+  const [isForgot, setIsForgot] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -27,6 +28,7 @@ export default function AuthGateModal({ onCancel, cancelLabel = 'Back to Cart' }
 
   const switchTab = (register: boolean) => {
     setIsRegister(register);
+    setIsForgot(false);
     setErrorMsg(null);
     setSuccessMsg(null);
   };
@@ -41,6 +43,15 @@ export default function AuthGateModal({ onCancel, cancelLabel = 'Back to Cart' }
     const isAdminAccount = cleanEmail === 'rishipatel1610@gmail.com';
 
     try {
+      if (isForgot) {
+        const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        setSuccessMsg(`If ${cleanEmail} has an ARVIIK account, a password reset link is on its way. Check your inbox (and spam).`);
+        return;
+      }
+
       if (isRegister) {
         const { data, error } = await supabase.auth.signUp({
           email: cleanEmail,
@@ -110,6 +121,14 @@ export default function AuthGateModal({ onCancel, cancelLabel = 'Back to Cart' }
         </div>
 
         <div className="p-6 space-y-5">
+          {isForgot ? (
+            <div className="text-center space-y-1">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-stone-900">Reset Your Password</h3>
+              <p className="text-[11px] text-stone-500 leading-relaxed">
+                Enter your account email and we&apos;ll send you a link to set a new password.
+              </p>
+            </div>
+          ) : (
           <div className="flex border-b border-stone-100 text-xs font-bold uppercase tracking-wider">
             <button
               type="button"
@@ -130,6 +149,7 @@ export default function AuthGateModal({ onCancel, cancelLabel = 'Back to Cart' }
               Register
             </button>
           </div>
+          )}
 
           {errorMsg && (
             <p className="bg-red-50 text-red-800 text-[11px] font-semibold uppercase tracking-wider p-3 rounded-xs border border-red-100">
@@ -182,26 +202,58 @@ export default function AuthGateModal({ onCancel, cancelLabel = 'Back to Cart' }
               <Mail className="absolute left-3.5 top-3.5 h-3.5 w-3.5 text-stone-400" />
             </div>
 
-            <div className="relative">
-              <input
-                type="password"
-                required
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-stone-50 border border-stone-200 px-4 py-3 pl-10 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
-              />
-              <Lock className="absolute left-3.5 top-3.5 h-3.5 w-3.5 text-stone-400" />
-            </div>
+            {!isForgot && (
+              <div className="relative">
+                <input
+                  type="password"
+                  required
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-stone-50 border border-stone-200 px-4 py-3 pl-10 text-xs focus:outline-none focus:border-stone-900 rounded-sm"
+                />
+                <Lock className="absolute left-3.5 top-3.5 h-3.5 w-3.5 text-stone-400" />
+              </div>
+            )}
+
+            {!isRegister && !isForgot && (
+              <div className="flex justify-end -mt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsForgot(true);
+                    setErrorMsg(null);
+                    setSuccessMsg(null);
+                  }}
+                  className="text-[11px] font-semibold text-stone-500 hover:text-stone-900 underline underline-offset-4 transition-colors"
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
 
             <button
               type="submit"
               disabled={authLoading}
               className="w-full bg-stone-950 text-white text-xs font-bold uppercase tracking-widest py-3.5 hover:opacity-90 transition-opacity rounded-xs flex items-center justify-center space-x-2 shadow-sm disabled:opacity-60"
             >
-              <span>{authLoading ? 'Verifying...' : isRegister ? 'Create Account' : 'Sign In'}</span>
+              <span>
+                {authLoading
+                  ? isForgot ? 'Sending...' : 'Verifying...'
+                  : isForgot ? 'Send Reset Link' : isRegister ? 'Create Account' : 'Sign In'}
+              </span>
               <ArrowRight className="h-4 w-4" />
             </button>
+
+            {isForgot && (
+              <button
+                type="button"
+                onClick={() => switchTab(false)}
+                className="w-full text-center text-[11px] font-bold uppercase tracking-wider text-stone-500 hover:text-stone-900 transition-colors"
+              >
+                Back to Sign In
+              </button>
+            )}
           </form>
 
           <div className="flex items-center justify-center gap-1.5 text-[10px] text-stone-400 font-semibold uppercase tracking-wider pt-1">
