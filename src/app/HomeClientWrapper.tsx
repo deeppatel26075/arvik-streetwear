@@ -192,6 +192,38 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
 
   const displayProducts = products || [];
 
+  // Featured right under the hero, in this order; New Drops shows the rest.
+  // Matched by name, so it keeps working if the product IDs change.
+  const FEATURED_NAMES = ['farebi', 'obession'];
+  const featuredProducts = FEATURED_NAMES.map((n) =>
+    displayProducts.find((p) => (p.name || '').toLowerCase().trim() === n)
+  ).filter(Boolean);
+  const restProducts = displayProducts.filter((p) => !featuredProducts.includes(p));
+
+  // Shop by Category photos, taken from the products in each category so
+  // they always match the name. A product already shown in Featured is only
+  // used when it's the category's only product, and then from another angle.
+  const categoryImages = React.useMemo(() => {
+    const catOf = (p: any) => ((typeof p.category === 'object' ? p.category?.name : p.category) || '').toLowerCase().trim();
+    const isFeatured = (p: any) => FEATURED_NAMES.includes((p.name || '').toLowerCase().trim());
+    const used = new Set<string>();
+    const photo = (members: any[], fallback: string) => {
+      const withImg = members.filter((p) => p.product_images?.[0]?.image_url);
+      const pick =
+        withImg.find((p) => !isFeatured(p) && !used.has(p.id)) || withImg.find((p) => !used.has(p.id)) || withImg[0];
+      if (!pick) return fallback;
+      used.add(pick.id);
+      const imgs = pick.product_images;
+      return (isFeatured(pick) && imgs[1]?.image_url) || imgs[0].image_url;
+    };
+    const newestFirst = [...displayProducts].sort((a: any, b: any) => (b.created_at || '').localeCompare(a.created_at || ''));
+    const limited = photo(displayProducts.filter((p: any) => catOf(p) === 'limited edition'), '/products/polarize-cream.jpg');
+    const fire = photo(displayProducts.filter((p: any) => catOf(p) === 'on fire'), '/products/5bd3dfaf3ac84a85a18925e9d3989206.jpg');
+    const newest = photo(newestFirst, '/products/polarize-navy.jpg');
+    const mind = photo(displayProducts.filter((p: any) => catOf(p) === 'psychology edition'), '/products/mard-paisa-maroon.jpg');
+    return { limited, fire, newest, mind };
+  }, [displayProducts]);
+
   // Color chips come from the colors actually saved on products (admin
   // panel), so the filter only ever offers colors that exist in the shop.
   const MAX_COLOR_CHIPS = 6;
@@ -209,7 +241,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
           href="/shop"
           className="group block relative overflow-hidden rounded-lg bg-stone-950 border border-stone-800/60 shadow-xl hover:shadow-2xl transition-all duration-300"
         >
-          <div className="flex items-center min-h-[170px] sm:min-h-[185px] lg:min-h-[200px]">
+          <div className="flex items-center min-h-[280px] sm:min-h-[300px] lg:min-h-[360px]">
             {/* Left Content — text swaps in sync with the image on each slide */}
             <div className="flex-1 p-5 sm:p-8 lg:p-10 space-y-3 sm:space-y-4 relative z-10">
               <div key={bannerIndex} className="space-y-2.5 sm:space-y-3 animate-fade-in">
@@ -242,7 +274,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
               onTouchStart={onBannerTouchStart}
               onTouchMove={onBannerTouchMove}
               onTouchEnd={onBannerTouchEnd}
-              className="relative w-[160px] sm:w-[280px] lg:w-[380px] h-[170px] sm:h-[185px] lg:h-[200px] flex-shrink-0 overflow-hidden select-none touch-pan-y"
+              className="relative w-[160px] sm:w-[280px] lg:w-[380px] h-[280px] sm:h-[300px] lg:h-[360px] flex-shrink-0 overflow-hidden select-none touch-pan-y"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-950/60 to-transparent z-10 pointer-events-none" />
               <Image
@@ -304,7 +336,28 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
       </section>
       )}
 
-      {/* 2. CATEGORIES SECTION — compact editorial collection grid */}
+      {/* 2. FEATURED — Farebi and Obession, right under the hero */}
+      {featuredProducts.length > 0 && (
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-2 space-y-6">
+        <div className="flex items-end justify-between gap-3 border-b border-stone-200 pb-4">
+          <div>
+            <span className="text-[10px] text-stone-400 font-extrabold tracking-[0.3em] uppercase block">
+              Most Wanted
+            </span>
+            <h2 className="font-syne font-extrabold text-xl sm:text-2xl uppercase tracking-wider text-stone-900 mt-0.5">
+              Featured
+            </h2>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6">
+          {featuredProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </section>
+      )}
+
+      {/* 3. CATEGORIES SECTION — compact editorial collection grid */}
       <section id="collections" className="scroll-mt-24 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-0">
         {/* Inner wrapper narrower than the hero banner above, so this section
             tapers inward from the banner's edges (a deliberate "pyramid" look)
@@ -335,7 +388,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
           >
             <div className="relative h-[150px] sm:h-[175px] md:h-[200px] xl:h-[215px] bg-stone-100 overflow-hidden">
               <Image
-                src="/products/farebi-olive.jpg"
+                src={categoryImages.limited}
                 alt="Limited Edition"
                 fill
                 sizes="(max-width: 767px) 170px, (max-width: 1279px) 50vw, 25vw"
@@ -357,7 +410,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
           >
             <div className="relative h-[150px] sm:h-[175px] md:h-[200px] xl:h-[215px] bg-stone-100 overflow-hidden">
               <Image
-                src="/products/5bd3dfaf3ac84a85a18925e9d3989206.jpg"
+                src={categoryImages.fire}
                 alt="On Fire"
                 fill
                 sizes="(max-width: 767px) 170px, (max-width: 1279px) 50vw, 25vw"
@@ -379,7 +432,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
           >
             <div className="relative h-[150px] sm:h-[175px] md:h-[200px] xl:h-[215px] bg-stone-100 overflow-hidden">
               <Image
-                src="/products/polarize-navy.jpg"
+                src={categoryImages.newest}
                 alt="New Arrivals"
                 fill
                 sizes="(max-width: 767px) 170px, (max-width: 1279px) 50vw, 25vw"
@@ -401,7 +454,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
           >
             <div className="relative h-[150px] sm:h-[175px] md:h-[200px] xl:h-[215px] bg-stone-100 overflow-hidden">
               <Image
-                src="/products/mard-paisa-maroon.jpg"
+                src={categoryImages.mind}
                 alt="Hidden Patterns"
                 fill
                 sizes="(max-width: 767px) 170px, (max-width: 1279px) 50vw, 25vw"
@@ -420,7 +473,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
         </div>
       </section>
 
-      {/* 3. NEW DROPS SECTION */}
+      {/* 4. NEW DROPS SECTION — everything not featured above */}
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-2 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-stone-200 pb-4">
           <div>
@@ -441,13 +494,13 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6">
-          {displayProducts.map((product) => (
+          {(featuredProducts.length ? restProducts : displayProducts).map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
 
-      {/* 4. FILTER BY COLOR SECTION */}
+      {/* 5. FILTER BY COLOR SECTION */}
       {catalogColors.length > 0 && (
       <section className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-2">
         <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-5 sm:p-6 space-y-4">
