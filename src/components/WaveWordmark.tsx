@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 // ARVIIK wordmark for the mobile menu header — "founders' mark".
 // A, R and K are the founders' initials. Tapping the wordmark fades V-I-I
@@ -14,11 +14,25 @@ const LETTERS = 'ARVIIK'.split('');
 const FOUNDERS: Record<number, { order: number }> = { 0: { order: 0 }, 1: { order: 1 }, 5: { order: 2 } };
 const STEP_MS = 170;
 
-export default function WaveWordmark({ className = '' }: { className?: string }) {
+// After a tap the A·R·K lift plays briefly, then `onNavigate` runs (the menu
+// uses it to close and take the customer home).
+const NAVIGATE_AFTER_MS = 700;
+
+export default function WaveWordmark({ className = '', onNavigate }: { className?: string; onNavigate?: () => void }) {
   const [run, setRun] = useState(0);
+  const navTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (navTimer.current) clearTimeout(navTimer.current);
+  }, []);
 
   const play = () => {
-    if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const reduced = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (onNavigate) {
+      if (navTimer.current) clearTimeout(navTimer.current);
+      navTimer.current = setTimeout(onNavigate, reduced ? 0 : NAVIGATE_AFTER_MS);
+    }
+    if (reduced) return;
     setRun((n) => n + 1);
     try {
       navigator.vibrate?.([8, STEP_MS - 8, 8, STEP_MS - 8, 8]); // one tick per initial
@@ -31,7 +45,7 @@ export default function WaveWordmark({ className = '' }: { className?: string })
     <button
       type="button"
       onClick={play}
-      aria-label="ARVIIK"
+      aria-label={onNavigate ? 'ARVIIK home' : 'ARVIIK'}
       className={`relative inline-flex select-none py-1 text-left [-webkit-tap-highlight-color:transparent] ${className}`}
     >
       <span key={run} className="relative inline-block">

@@ -145,7 +145,10 @@ export default function ArisPanel({ open, onClose }: { open: boolean; onClose: (
         const res = await fetch('/api/aris', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: history.filter((t) => t.content) }),
+          body: JSON.stringify({
+            messages: history.filter((t) => t.content).map((t) => ({ ...t, content: splitChips(t.content).body })),
+            chips: true,
+          }),
           signal: controller.signal,
         });
 
@@ -224,16 +227,16 @@ export default function ArisPanel({ open, onClose }: { open: boolean; onClose: (
       className={`fixed z-[95] inset-0 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[400px] sm:h-[min(640px,calc(100vh-6rem))] flex flex-col bg-[#f6f5f2] sm:rounded-[28px] sm:ring-1 sm:ring-black/10 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.55)] overflow-hidden ${closing ? 'aris-panel-out' : 'aris-panel-in'}`}
     >
       {/* Header — black, lime glow, live status */}
-      <div className="relative bg-stone-950 text-white pt-[max(0.875rem,env(safe-area-inset-top))] pb-4 px-4 overflow-hidden">
+      <div className="relative bg-stone-950 text-white pt-[max(0.625rem,env(safe-area-inset-top))] pb-3 sm:pt-[max(0.875rem,env(safe-area-inset-top))] sm:pb-4 px-4 overflow-hidden">
         <div aria-hidden="true" className="absolute -top-16 -left-10 h-40 w-40 rounded-full bg-lime-400/25 blur-3xl" />
         <div aria-hidden="true" className="absolute -bottom-20 right-0 h-32 w-48 rounded-full bg-lime-300/10 blur-3xl" />
         <div className="aris-rise relative flex items-center gap-3" style={{ animationDelay: '120ms' }}>
           <span className="relative">
             <span aria-hidden="true" className="absolute inset-0 rounded-full bg-lime-400/40 blur-md" />
-            <ArisMark className="relative h-11 w-11 text-base ring-2 ring-lime-300/40" />
+            <ArisMark className="relative h-9 w-9 sm:h-11 sm:w-11 text-sm sm:text-base ring-2 ring-lime-300/40" />
           </span>
           <div className="flex-1 min-w-0">
-            <p className="font-syne font-extrabold text-base tracking-[0.28em] uppercase leading-none">Aris</p>
+            <p className="font-syne font-extrabold text-[15px] sm:text-base tracking-[0.28em] uppercase leading-none">Aris</p>
             <p className="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-stone-400 tracking-wide">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full rounded-full bg-lime-400 opacity-75 animate-ping" />
@@ -267,24 +270,24 @@ export default function ArisPanel({ open, onClose }: { open: boolean; onClose: (
       {/* Conversation */}
       <div
         ref={listRef}
-        className="relative flex-1 overflow-y-auto overscroll-contain px-4 py-5 space-y-4 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.045)_1px,transparent_0)] [background-size:18px_18px]"
+        className="relative flex-1 overflow-y-auto overscroll-contain px-3 sm:px-4 py-4 sm:py-5 space-y-3.5 sm:space-y-4 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.045)_1px,transparent_0)] [background-size:18px_18px]"
         aria-live="polite"
       >
         {turns.length === 0 ? (
-          <div className="space-y-6">
-            <div className="aris-rise pt-2 space-y-2" style={{ animationDelay: '200ms' }}>
+          <div className="space-y-4 sm:space-y-6">
+            <div className="aris-rise pt-1 sm:pt-2 space-y-1.5 sm:space-y-2" style={{ animationDelay: '200ms' }}>
               <span className="text-[10px] font-extrabold uppercase tracking-[0.32em] text-stone-400">ARVIIK Concierge</span>
-              <h2 className="font-syne font-extrabold text-[26px] leading-[1.05] uppercase text-stone-950">
+              <h2 className="font-syne font-extrabold text-[21px] sm:text-[26px] leading-[1.08] uppercase text-stone-950">
                 Hey, I&apos;m Aris.
                 <br />
                 <span className="text-stone-400">What can I help you find?</span>
               </h2>
-              <p className="text-[13px] text-stone-500 leading-relaxed max-w-[300px]">
+              <p className="text-[12.5px] sm:text-[13px] text-stone-500 leading-relaxed max-w-[300px]">
                 Sizing, the latest drop, delivery or exchanges. Ask anything, or start here.
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
               {QUICK_ACTIONS.map((a, i) => {
                 const Icon = a.icon;
                 return (
@@ -293,13 +296,13 @@ export default function ArisPanel({ open, onClose }: { open: boolean; onClose: (
                     type="button"
                     onClick={() => send(a.prompt)}
                     style={{ animationDelay: `${300 + i * 70}ms` }}
-                    className="aris-rise group text-left p-3.5 rounded-2xl bg-white ring-1 ring-black/[0.06] shadow-[0_6px_20px_-12px_rgba(0,0,0,0.35)] hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-14px_rgba(0,0,0,0.45)] hover:ring-black/15 transition-all"
+                    className="aris-rise group text-left p-3 sm:p-3.5 rounded-2xl bg-white ring-1 ring-black/[0.06] shadow-[0_6px_20px_-12px_rgba(0,0,0,0.35)] hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-14px_rgba(0,0,0,0.45)] hover:ring-black/15 transition-all"
                   >
-                    <span className="h-9 w-9 rounded-xl bg-stone-950 flex items-center justify-center mb-3 group-hover:bg-lime-400 transition-colors">
+                    <span className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-stone-950 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-lime-400 transition-colors">
                       <Icon className="h-4 w-4 text-lime-400 group-hover:text-stone-950 transition-colors" />
                     </span>
                     <span className="block text-[12px] font-extrabold uppercase tracking-wider text-stone-950">{a.label}</span>
-                    <span className="block text-[11px] text-stone-500 mt-0.5 leading-snug">{a.hint}</span>
+                    <span className="hidden min-[380px]:block text-[11px] text-stone-500 mt-0.5 leading-snug">{a.hint}</span>
                   </button>
                 );
               })}
@@ -315,14 +318,14 @@ export default function ArisPanel({ open, onClose }: { open: boolean; onClose: (
               <React.Fragment key={i}>
                 <Bubble role={t.role} content={body} showAvatar={firstOfRun} onLinkClick={onLinkClick} />
                 {showChips && (
-                  <div className="flex flex-wrap gap-2 pl-9" aria-label="Suggested questions">
+                  <div className="-mx-3 px-3 pl-12 sm:mx-0 sm:px-0 sm:pl-9 flex gap-2 overflow-x-auto sm:flex-wrap sm:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Suggested questions">
                     {chips.map((c, ci) => (
                       <button
                         key={c}
                         type="button"
                         onClick={() => send(c)}
                         style={{ animationDelay: `${ci * 60}ms` }}
-                        className="aris-msg px-3 py-1.5 rounded-full bg-white text-[12px] font-semibold text-stone-800 ring-1 ring-black/10 shadow-[0_4px_12px_-8px_rgba(0,0,0,0.4)] hover:ring-lime-400 hover:bg-lime-50 active:scale-95 transition-all"
+                        className="aris-msg flex-shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full bg-white text-[12px] font-semibold text-stone-800 ring-1 ring-black/10 shadow-[0_4px_12px_-8px_rgba(0,0,0,0.4)] hover:ring-lime-400 hover:bg-lime-50 active:scale-95 transition-all"
                       >
                         {c}
                       </button>
@@ -370,7 +373,7 @@ export default function ArisPanel({ open, onClose }: { open: boolean; onClose: (
           </button>
         </div>
         <p className="text-[9px] text-stone-400 font-semibold text-center mt-2 tracking-wide">
-          ARVIIK · Answers from our store info · For order help, WhatsApp us
+          Aris answers from ARVIIK store info
         </p>
       </form>
     </div>

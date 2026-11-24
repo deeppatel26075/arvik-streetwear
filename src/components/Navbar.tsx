@@ -517,8 +517,14 @@ export default function Navbar() {
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-stone-200 pb-4">
                 <div className="flex items-center space-x-2">
-                  {/* Tap for a wave through the letters */}
-                  <WaveWordmark />
+                  {/* Tap: the A·R·K founders' animation, then home */}
+                  <WaveWordmark
+                    onNavigate={() => {
+                      setMobileOpen(false);
+                      if (pathname === '/') window.scrollTo({ top: 0, behavior: 'smooth' });
+                      else router.push('/');
+                    }}
+                  />
                   <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400 bg-stone-100 px-2 py-0.5 rounded-xs">
                     MENU
                   </span>

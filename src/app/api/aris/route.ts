@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { ARIS_INSTRUCTIONS, STORE_INFO, getCatalog } from '@/lib/aris/knowledge';
-import { arisAnswer } from '@/lib/aris/brain';
+import { arisAnswer, CHIPS_MARKER } from '@/lib/aris/brain';
 
 // POST /api/aris — returns Aris's reply as plain text.
 // Body: { messages: { role: 'user' | 'assistant', content: string }[] }
@@ -68,8 +68,14 @@ export async function POST(request: Request) {
   }
 
   let messages: ChatTurn[] | null = null;
+  // Only chat windows that render follow-up chips ask for them; an older
+  // copy of the page still open in someone's browser would otherwise show
+  // the raw "::chips::" text.
+  let wantsChips = false;
   try {
-    messages = parseMessages(await request.json());
+    const body = await request.json();
+    wantsChips = (body as { chips?: unknown })?.chips === true;
+    messages = parseMessages(body);
   } catch {
     // fall through to the 400 below
   }
@@ -81,7 +87,8 @@ export async function POST(request: Request) {
 
   // Free built-in mode.
   if (!process.env.ANTHROPIC_API_KEY) {
-    return new Response(arisAnswer(messages, catalog.products), {
+    const answer = arisAnswer(messages, catalog.products);
+    return new Response(wantsChips ? answer : answer.split(CHIPS_MARKER)[0], {
       headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' },
     });
   }
