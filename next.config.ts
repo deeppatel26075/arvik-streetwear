@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   // Headless Chromium used on the server to render invoice PDFs for the
   // order thank-you email; must not be bundled.
   serverExternalPackages: ['@sparticuz/chromium', 'puppeteer-core'],
+  // @sparticuz/chromium unpacks its browser from these files at run time;
+  // they aren't imported, so they must be added to the function by hand.
+  outputFileTracingIncludes: {
+    '/api/orders/place': ['./node_modules/@sparticuz/chromium/bin/**/*'],
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31536000,

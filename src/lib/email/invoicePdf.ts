@@ -49,7 +49,10 @@ export async function renderInvoicePdf(order: Order): Promise<Buffer> {
     margin: { top: '6mm', bottom: '6mm', left: '0', right: '0' },
   };
 
-  if (process.platform === 'linux') {
+  // Decided at run time (the bundler folds `process.platform` at build
+  // time, which dropped this branch). VERCEL is set on every Vercel function.
+  const serverless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+  if (serverless) {
     const chromium = (await import('@sparticuz/chromium')).default;
     const puppeteer = await import('puppeteer-core');
     const browser = await puppeteer.launch({
