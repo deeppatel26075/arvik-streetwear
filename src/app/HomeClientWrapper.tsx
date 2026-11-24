@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
+import CategoryCarousel from '@/components/CategoryCarousel';
 import { getCatalogColors, isLightColor } from '@/lib/colorVariants';
 import { startColorTransition } from '@/components/ColorTransition';
 import { ArrowRight, Star, Flame, Shirt, Truck, Wallet, Tag, Percent, Gift, ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
@@ -349,10 +350,71 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
             </h2>
           </div>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6">
+        {/* Phones and tablets: the usual product cards */}
+        <div className="grid grid-cols-2 lg:hidden gap-3.5 sm:gap-6">
           {featuredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
+        </div>
+
+        {/* Computers: each featured piece as a big photo tile, half the row */}
+        <div className="hidden lg:grid grid-cols-2 gap-6">
+          {featuredProducts.map((product, i) => {
+            const imgs = (product.product_images || []).map((im: { image_url: string }) => im.image_url).filter(Boolean);
+            const front = imgs[0] || '/products/polarize-navy.jpg';
+            const back = imgs[1];
+            const price = product.discount_price || product.price;
+            const cat = typeof product.category === 'object' ? product.category?.name : product.category;
+            return (
+              <Link
+                key={product.id}
+                href={`/shop/${product.slug}`}
+                className="group relative block aspect-[5/4] overflow-hidden rounded-2xl bg-stone-900"
+              >
+                <Image
+                  src={front}
+                  alt={product.name}
+                  fill
+                  priority={i === 0}
+                  sizes="50vw"
+                  className="object-cover object-[50%_25%] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
+                />
+                {back && (
+                  <Image
+                    src={back}
+                    alt=""
+                    fill
+                    sizes="50vw"
+                    loading="lazy"
+                    className="object-cover object-[50%_25%] opacity-0 transition-[opacity,transform] duration-700 ease-out group-hover:opacity-100 group-hover:scale-[1.04]"
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent" />
+
+                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-6 p-8 xl:p-10">
+                  <div className="min-w-0 text-white">
+                    {cat && (
+                      <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/70">
+                        {String(cat).toLowerCase() === 'psychology edition' ? 'Hidden Patterns' : cat}
+                      </span>
+                    )}
+                    <h3 className="mt-2 font-syne font-extrabold uppercase text-4xl xl:text-5xl leading-[0.95] tracking-tight truncate">
+                      {product.name}
+                    </h3>
+                    <p className="mt-3 text-sm font-semibold">
+                      ₹{Number(price).toLocaleString('en-IN')}
+                      {product.discount_price && product.price > product.discount_price && (
+                        <span className="ml-2 text-white/50 line-through font-medium">₹{Number(product.price).toLocaleString('en-IN')}</span>
+                      )}
+                    </p>
+                  </div>
+                  <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white text-stone-950 transition-transform duration-300 group-hover:rotate-[-45deg]">
+                    <ArrowRight className="h-5 w-5" />
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
       )}
@@ -381,95 +443,14 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
           </Link>
         </div>
 
-        <div className="flex md:grid md:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-5 xl:gap-6 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
-          <Link
-            href="/shop?category=Limited+Edition"
-            className="group flex-shrink-0 w-[150px] sm:w-[160px] md:w-auto bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-          >
-            <div className="relative h-[150px] sm:h-[175px] md:h-[200px] xl:h-[215px] bg-stone-100 overflow-hidden">
-              <Image
-                src={categoryImages.limited}
-                alt="Limited Edition"
-                fill
-                sizes="(max-width: 767px) 170px, (max-width: 1279px) 50vw, 25vw"
-                loading="lazy"
-                className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-300"
-              />
-            </div>
-            <div className="p-2.5 sm:p-3 border-t border-stone-100">
-              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-amber-600 block mb-0.5">Exclusive</span>
-              <h3 className="font-syne font-extrabold text-[10px] sm:text-sm uppercase tracking-tight text-stone-950 leading-tight">
-                Limited Edition
-              </h3>
-            </div>
-          </Link>
-
-          <Link
-            href="/shop?category=On+Fire"
-            className="group flex-shrink-0 w-[150px] sm:w-[160px] md:w-auto bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-          >
-            <div className="relative h-[150px] sm:h-[175px] md:h-[200px] xl:h-[215px] bg-stone-100 overflow-hidden">
-              <Image
-                src={categoryImages.fire}
-                alt="On Fire"
-                fill
-                sizes="(max-width: 767px) 170px, (max-width: 1279px) 50vw, 25vw"
-                loading="lazy"
-                className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-300"
-              />
-            </div>
-            <div className="p-2.5 sm:p-3 border-t border-stone-100">
-              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-orange-600 block mb-0.5">Hot Drop</span>
-              <h3 className="font-syne font-extrabold text-[10px] sm:text-sm uppercase tracking-tight text-stone-950 leading-tight">
-                On Fire
-              </h3>
-            </div>
-          </Link>
-
-          <Link
-            href="/shop?filter=new"
-            className="group flex-shrink-0 w-[150px] sm:w-[160px] md:w-auto bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-          >
-            <div className="relative h-[150px] sm:h-[175px] md:h-[200px] xl:h-[215px] bg-stone-100 overflow-hidden">
-              <Image
-                src={categoryImages.newest}
-                alt="New Arrivals"
-                fill
-                sizes="(max-width: 767px) 170px, (max-width: 1279px) 50vw, 25vw"
-                loading="lazy"
-                className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-300"
-              />
-            </div>
-            <div className="p-2.5 sm:p-3 border-t border-stone-100">
-              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-indigo-600 block mb-0.5">Just In</span>
-              <h3 className="font-syne font-extrabold text-[10px] sm:text-sm uppercase tracking-tight text-stone-950 leading-tight">
-                New Arrivals
-              </h3>
-            </div>
-          </Link>
-
-          <Link
-            href="/shop?category=Psychology+Edition"
-            className="group flex-shrink-0 w-[150px] sm:w-[160px] md:w-auto bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-          >
-            <div className="relative h-[150px] sm:h-[175px] md:h-[200px] xl:h-[215px] bg-stone-100 overflow-hidden">
-              <Image
-                src={categoryImages.mind}
-                alt="Hidden Patterns"
-                fill
-                sizes="(max-width: 767px) 170px, (max-width: 1279px) 50vw, 25vw"
-                loading="lazy"
-                className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-300"
-              />
-            </div>
-            <div className="p-2.5 sm:p-3 border-t border-stone-100">
-              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-emerald-600 block mb-0.5">Mindset</span>
-              <h3 className="font-syne font-extrabold text-[10px] sm:text-sm uppercase tracking-tight text-stone-950 leading-tight">
-                Hidden Patterns
-              </h3>
-            </div>
-          </Link>
-        </div>
+        <CategoryCarousel
+          items={[
+            { title: 'Limited Edition', eyebrow: 'Exclusive', eyebrowClass: 'text-amber-600', href: '/shop?category=Limited+Edition', image: categoryImages.limited },
+            { title: 'On Fire', eyebrow: 'Hot Drop', eyebrowClass: 'text-orange-600', href: '/shop?category=On+Fire', image: categoryImages.fire },
+            { title: 'New Arrivals', eyebrow: 'Just In', eyebrowClass: 'text-indigo-600', href: '/shop?filter=new', image: categoryImages.newest },
+            { title: 'Hidden Patterns', eyebrow: 'Mindset', eyebrowClass: 'text-emerald-600', href: '/shop?category=Psychology+Edition', image: categoryImages.mind },
+          ]}
+        />
         </div>
       </section>
 
