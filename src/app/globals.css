@@ -285,3 +285,32 @@ html[data-menu-open] .aris-launcher { display: none; }
 @keyframes aris-dot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.35; } 30% { transform: translateY(-4px); opacity: 1; background-color: #84cc16; } }
 .aris-dot { animation: aris-dot 1.1s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .aris-msg, .aris-dot { animation: none !important; } }
+
+/* Limited Edition holographic foil: the rainbow-pearl shimmer slowly
+   travels across, and the fine foil lines drift with it. */
+@keyframes holoShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.animate-holo-shift { animation: holoShift 18s ease-in-out infinite; }
+@keyframes holoLines { from { background-position: 0 0; } to { background-position: 240px 0; } }
+.animate-holo-lines { animation: holoLines 14s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-holo-shift, .animate-holo-lines { animation: none; }
+}
+
+/* Holographic foil heading on the Limited Edition page: deep foil tones
+   (readable on the pale page) sliding through the letters. */
+.holo-foil-text {
+  background: linear-gradient(100deg, #16181d 0%, #4c2bd8 16%, #1d6fe0 30%, #0e9f9a 44%, #c2387a 58%, #6b3fe6 72%, #16181d 86%, #4c2bd8 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #16181d;
+  animation: holoFoilText 7s ease-in-out infinite;
+}
+@keyframes holoFoilText {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .holo-foil-text { animation: none; }
+}

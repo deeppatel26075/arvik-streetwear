@@ -12,7 +12,7 @@ export interface ThemeColors {
   border: string;
 }
 
-export type ThemePreset = 'minimal' | 'anime' | 'samurai' | 'vintage' | 'chaos' | 'psychology' | 'onfire';
+export type ThemePreset = 'minimal' | 'anime' | 'samurai' | 'vintage' | 'chaos' | 'psychology' | 'onfire' | 'limited';
 
 interface ThemeContextType {
   preset: ThemePreset;
@@ -68,6 +68,16 @@ const themePresets: Record<ThemePreset, ThemeColors> = {
     textPrimary: '#f5ecdd', // Cream, echoing the sclera tone
     textSecondary: '#e8c9b0',
     border: '#2b0505', // Black-crimson border
+  },
+  limited: {
+    // Holographic foil: pearl-silver page, frosted-glass cards, ink text.
+    accent: '#16181d',
+    onAccent: '#ffffff',
+    background: '#eceef3', // Pearl silver
+    secondaryBg: 'rgba(255,255,255,0.6)', // Frosted glass
+    textPrimary: '#16181d',
+    textSecondary: '#666b7a',
+    border: 'rgba(22,24,29,0.10)',
   },
 };
 

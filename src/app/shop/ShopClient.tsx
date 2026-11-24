@@ -7,6 +7,7 @@ import PriceRangeSlider from '@/components/PriceRangeSlider';
 import { useTheme } from '@/context/ThemeContext';
 import PsychologyBackdrop from '@/components/PsychologyBackdrop';
 import OnFireBackdrop from '@/components/OnFireBackdrop';
+import LimitedBackdrop from '@/components/LimitedBackdrop';
 import { categoryDisplayName } from '@/lib/utils';
 import { productMatchesColor, getCatalogColors, isLightColor } from '@/lib/colorVariants';
 import { SlidersHorizontal, ArrowUpDown, ChevronDown, X, Check } from 'lucide-react';
@@ -104,15 +105,17 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
   })();
   const isPsychology = categorySlug === 'psychology-edition';
   const isOnFire = categorySlug === 'on-fire';
+  const isLimited = categorySlug === 'limited-edition';
 
   // Selecting the Psychology Edition or On Fire category repaints the
   // whole tab — background, text, and accent colors — to match its vibe.
   useEffect(() => {
     if (isPsychology) setThemePreset('psychology');
     else if (isOnFire) setThemePreset('onfire');
+    else if (isLimited) setThemePreset('limited');
     else setThemePreset('chaos');
     return () => setThemePreset('chaos');
-  }, [isPsychology, isOnFire, setThemePreset]);
+  }, [isPsychology, isOnFire, isLimited, setThemePreset]);
 
   useEffect(() => {
     // Always filter the fresh server data. Reading back a browser snapshot
@@ -286,6 +289,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
     <>
       <PsychologyBackdrop active={isPsychology} />
       <OnFireBackdrop active={isOnFire} />
+      <LimitedBackdrop active={isLimited} />
       <div className="relative z-10 space-y-3 sm:space-y-12 pb-16 transition-colors duration-500">
       {/* 1. Hero Banner — re-themes automatically per category (On Fire,
           Psychology, default) via the CSS custom properties, and folds the
@@ -301,7 +305,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
               <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-[0.25em] sm:tracking-[0.35em] text-[var(--color-text-secondary)]">
                 {activeFilter ? activeFilter.eyebrow : 'Arviik Catalog'}
               </span>
-              <h1 className="font-syne font-extrabold text-[22px] sm:text-4xl lg:text-5xl uppercase tracking-tight sm:tracking-wide text-[var(--color-text-primary)] leading-[1.02] sm:leading-[0.95] break-words">
+              <h1 className={`font-syne font-extrabold text-[22px] sm:text-4xl lg:text-5xl uppercase tracking-tight sm:tracking-wide leading-[1.02] sm:leading-[0.95] break-words ${isLimited ? 'holo-foil-text' : 'text-[var(--color-text-primary)]'}`}>
                 {selectedCategory ? categoryDisplayName(selectedCategory) : activeFilter ? activeFilter.title : 'Streetwear Drops'}
               </h1>
               <div className="flex flex-wrap items-center gap-3 pt-0.5">
