@@ -126,7 +126,7 @@ export default function CategoryCarousel({ items }: { items: CategoryItem[] }) {
         onPointerLeave={endDrag}
         onClickCapture={onClickCapture}
         onDragStart={(e) => e.preventDefault()}
-        className="flex gap-3 sm:gap-5 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 pb-3 overscroll-x-contain select-none md:cursor-grab"
+        className="flex gap-3 lg:gap-5 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 pb-3 overscroll-x-contain select-none md:cursor-grab"
       >
         {loop.map(({ item, copy }, i) => {
           const clone = copy !== 1;
@@ -137,21 +137,21 @@ export default function CategoryCarousel({ items }: { items: CategoryItem[] }) {
               data-cat-card
               aria-hidden={clone || undefined}
               tabIndex={clone ? -1 : undefined}
-              className="group flex-shrink-0 w-[72vw] sm:w-[44vw] lg:w-[31vw] xl:w-[380px] bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300"
+              className="group flex-shrink-0 w-[150px] sm:w-[160px] lg:w-[31vw] xl:w-[380px] bg-white rounded-2xl lg:rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300"
             >
-              <div className="relative aspect-[4/5] bg-stone-100 overflow-hidden">
+              <div className="relative h-[150px] sm:h-[175px] lg:h-auto lg:aspect-[4/5] bg-stone-100 overflow-hidden">
                 <Image
                   src={item.image}
                   alt={clone ? '' : item.title}
                   fill
-                  sizes="(max-width: 639px) 72vw, (max-width: 1023px) 44vw, 380px"
+                  sizes="(max-width: 1023px) 170px, 380px"
                   loading={i < items.length * 2 ? 'eager' : 'lazy'}
                   className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                 />
               </div>
-              <div className="px-5 py-4 sm:px-6 sm:py-5 border-t border-stone-100">
-                <span className={`text-[11px] sm:text-xs font-bold uppercase tracking-wide block mb-1 ${item.eyebrowClass}`}>{item.eyebrow}</span>
-                <h3 className="font-syne font-extrabold text-base sm:text-xl uppercase tracking-tight text-stone-950 leading-tight">
+              <div className="p-2.5 sm:p-3 lg:px-6 lg:py-5 border-t border-stone-100">
+                <span className={`text-[10px] sm:text-[11px] lg:text-xs font-bold uppercase tracking-wide block mb-0.5 lg:mb-1 ${item.eyebrowClass}`}>{item.eyebrow}</span>
+                <h3 className="font-syne font-extrabold text-[10px] sm:text-sm lg:text-xl uppercase tracking-tight text-stone-950 leading-tight">
                   {item.title}
                 </h3>
               </div>
