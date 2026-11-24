@@ -56,7 +56,17 @@ export default async function ShopPage() {
     (c) => !HIDDEN_CATEGORY_NAMES.includes(c.name.toLowerCase())
   );
 
-  const finalCategories = filteredCategories.length > 0 ? filteredCategories : defaultCategories;
+  // Limited Edition and On Fire lead the list (right after "All"); the rest
+  // keep their order.
+  const PRIORITY = ['limited edition', 'on fire'];
+  const rank = (c: any) => {
+    const i = PRIORITY.indexOf((c.name || '').toLowerCase().trim());
+    return i === -1 ? PRIORITY.length : i;
+  };
+  const finalCategories = (filteredCategories.length > 0 ? filteredCategories : defaultCategories)
+    .map((c, i) => ({ c, i }))
+    .sort((a, b) => rank(a.c) - rank(b.c) || a.i - b.i)
+    .map(({ c }) => c);
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-10 overflow-x-hidden">
