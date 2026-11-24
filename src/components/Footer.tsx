@@ -7,16 +7,44 @@ import { ChevronUp, Shield, Truck, RefreshCw, Award, Check, X } from 'lucide-rea
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [showJoined, setShowJoined] = useState(false);
+  const [subscribing, setSubscribing] = useState(false);
+  const [subscribeError, setSubscribeError] = useState<string | null>(null);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  // Sends the welcome email (src/app/api/club/subscribe/route.ts); the
+  // "Welcome to the Club" popup only shows once it has actually gone out.
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
-      setEmail('');
-      setShowJoined(true);
+    const value = email.trim();
+    if (!value || subscribing) return;
+    setSubscribing(true);
+    setSubscribeError(null);
+    try {
+      const res = await fetch('/api/club/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: value }),
+      });
+      if (res.ok) {
+        setEmail('');
+        setShowJoined(true);
+      } else {
+        const { error } = await res.json().catch(() => ({ error: '' }));
+        setSubscribeError(
+          error === 'invalid_email'
+            ? 'Please enter a valid email address.'
+            : error === 'rate_limited'
+              ? 'Too many tries. Please try again in a little while.'
+              : "We couldn't sign you up right now. Please try again shortly."
+        );
+      }
+    } catch {
+      setSubscribeError('Please check your connection and try again.');
+    } finally {
+      setSubscribing(false);
     }
   };
 
@@ -121,10 +149,16 @@ export default function Footer() {
             />
             <button
               type="submit"
-              className="w-full bg-white text-stone-950 font-extrabold uppercase text-xs tracking-[0.2em] py-3 rounded-sm hover:bg-lime-400 transition-colors"
+              disabled={subscribing}
+              className="w-full bg-white text-stone-950 font-extrabold uppercase text-xs tracking-[0.2em] py-3 rounded-sm hover:bg-lime-400 transition-colors disabled:opacity-60"
             >
-              Subscribe
+              {subscribing ? 'Joining…' : 'Subscribe'}
             </button>
+            {subscribeError && (
+              <p role="alert" className="text-[11px] text-red-400 font-medium">
+                {subscribeError}
+              </p>
+            )}
           </form>
         </div>
 
