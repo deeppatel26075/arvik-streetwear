@@ -242,7 +242,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
           href="/shop"
           className="group block relative overflow-hidden rounded-lg bg-stone-950 border border-stone-800/60 shadow-xl hover:shadow-2xl transition-all duration-300"
         >
-          <div className="flex items-center min-h-[280px] sm:min-h-[300px] lg:min-h-[360px]">
+          <div className="flex items-center min-h-[240px] sm:min-h-[260px] lg:min-h-[300px]">
             {/* Left Content — text swaps in sync with the image on each slide */}
             <div className="flex-1 p-5 sm:p-8 lg:p-10 space-y-3 sm:space-y-4 relative z-10">
               <div key={bannerIndex} className="space-y-2.5 sm:space-y-3 animate-fade-in">
@@ -275,7 +275,7 @@ export default function HomeClientWrapper({ products, heroSlides }: HomeClientWr
               onTouchStart={onBannerTouchStart}
               onTouchMove={onBannerTouchMove}
               onTouchEnd={onBannerTouchEnd}
-              className="relative w-[160px] sm:w-[280px] lg:w-[380px] h-[280px] sm:h-[300px] lg:h-[360px] flex-shrink-0 overflow-hidden select-none touch-pan-y"
+              className="relative w-[160px] sm:w-[280px] lg:w-[380px] h-[240px] sm:h-[260px] lg:h-[300px] flex-shrink-0 overflow-hidden select-none touch-pan-y"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-950/60 to-transparent z-10 pointer-events-none" />
               <Image

@@ -67,7 +67,14 @@ export default function AdminOrders() {
     loadOrders();
   }, []);
 
+  // What happened with the customer email for the last stage change.
+  const [emailNote, setEmailNote] = useState<{ orderId: string; text: string; ok: boolean } | null>(null);
+
   const updateStatus = async (orderId: string, newStatus: string) => {
+    const previous = orders.find((o) => o.id === orderId)?.status;
+    if (newStatus === 'cancelled' && !window.confirm('Cancel this order? The customer will be emailed that it was cancelled.')) return;
+
+    let saved = false;
     try {
       const { error } = await supabase
         .from('orders')
@@ -75,8 +82,33 @@ export default function AdminOrders() {
         .eq('id', orderId);
 
       if (error) throw error;
+      saved = true;
     } catch (e) {
       console.warn('Supabase status update skipped/failed, applying locally:', e);
+    }
+
+    // Email the customer about the new stage, only when it really changed
+    // and was saved (so a double-click doesn't send two emails).
+    if (saved && previous !== newStatus) {
+      setEmailNote({ orderId, text: 'Emailing customer…', ok: true });
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const res = await fetch('/api/orders/status-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, accessToken: sessionData.session?.access_token }),
+        });
+        const out = await res.json().catch(() => ({}));
+        setEmailNote(
+          res.ok && out.to
+            ? { orderId, text: `Customer emailed (${out.to})`, ok: true }
+            : res.ok
+              ? { orderId, text: 'No email needed for this stage', ok: true }
+              : { orderId, text: "Couldn't email the customer. Status was still updated.", ok: false }
+        );
+      } catch {
+        setEmailNote({ orderId, text: "Couldn't email the customer. Status was still updated.", ok: false });
+      }
     }
 
     // Update state
@@ -294,6 +326,9 @@ export default function AdminOrders() {
                     Cancel Order
                   </button>
                 </div>
+                {emailNote && emailNote.orderId === selectedOrder.id && (
+                  <p className={`text-[11px] font-semibold ${emailNote.ok ? 'text-emerald-700' : 'text-red-700'}`}>{emailNote.text}</p>
+                )}
               </div>
 
             </div>

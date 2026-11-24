@@ -1,9 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 import { checkServiceability, estimatePackage, NimbusPostError } from '@/lib/nimbuspost';
 import { FLAT_COD_FEE_RUPEES, getShippingFeeRupees } from '@/lib/shippingConfig';
 import { notifyAdminNewOrder } from '@/lib/orderNotifications';
+import { sendEmail } from '@/lib/email/send';
+import { orderEmailHtml, orderEmailText, orderEmailSubject, type OrderEmailData } from '@/lib/email/orderEmail';
+import { renderInvoicePdf, invoiceFileName } from '@/lib/email/invoicePdf';
+import { ORDER_SELECT, type Order } from '@/lib/orders';
+
+// Gives the thank-you email (sent after the response, with the invoice PDF
+// rendered in a headless browser) time to finish.
+export const maxDuration = 60;
 
 interface PlaceOrderItem {
   productId: string;
@@ -13,6 +21,7 @@ interface PlaceOrderItem {
   slug: string;
   size: string;
   quantity: number;
+  image?: string;
 }
 
 // The one place an order gets created, for both COD and Razorpay. Doing
@@ -168,6 +177,52 @@ export async function POST(request: Request) {
       });
     } catch (notifyErr) {
       console.error('Admin order notification failed:', notifyErr);
+    }
+
+    // Thank-you email to the customer, with the invoice PDF attached. It runs
+    // after the response is sent, so checkout isn't slowed down, and it's
+    // best effort: a failed email or PDF never affects the order itself.
+    if (shipping.email) {
+      const emailData: OrderEmailData = {
+        orderId,
+        customerName: shipping.name,
+        items: items.map((item) => ({
+          name: item.name,
+          size: item.size,
+          quantity: item.quantity,
+          unitPrice: item.discountPrice ?? item.price,
+          image: item.image,
+        })),
+        shippingFee: shippingFeeRupees,
+        total: Number(orderResult.total) || cartValueRupees + shippingFeeRupees,
+        paymentMethod,
+        address: {
+          line: shipping.apartment ? `${shipping.address}, ${shipping.apartment}` : shipping.address,
+          city: shipping.city,
+          state: shipping.state,
+          pincode: shipping.pincode,
+          phone: shipping.phone,
+        },
+      };
+      after(async () => {
+        let attachments: { filename: string; content: Buffer }[] | undefined;
+        try {
+          const { data: fullOrder, error } = await supabase.from('orders').select(ORDER_SELECT).eq('id', orderId).single();
+          if (error || !fullOrder) throw error || new Error('order not found');
+          const order = fullOrder as unknown as Order;
+          attachments = [{ filename: invoiceFileName(order), content: await renderInvoicePdf(order) }];
+        } catch (pdfErr) {
+          console.error('Invoice PDF for the thank-you email failed, sending without it:', pdfErr);
+        }
+        const sent = await sendEmail({
+          to: shipping.email,
+          subject: orderEmailSubject(emailData),
+          html: orderEmailHtml(emailData),
+          text: orderEmailText(emailData),
+          attachments,
+        });
+        if (!sent.ok) console.error('Order thank-you email not sent:', sent.reason, sent.detail || '');
+      });
     }
 
     return NextResponse.json({

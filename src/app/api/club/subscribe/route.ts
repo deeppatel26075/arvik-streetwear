@@ -1,4 +1,5 @@
 import { welcomeEmailHtml, welcomeEmailText, WELCOME_SUBJECT } from '@/lib/email/welcomeEmail';
+import { sendEmail } from '@/lib/email/send';
 
 // Footer "Join the ARVIIK Club" sign-up: sends the welcome email through
 // Resend and, when RESEND_AUDIENCE_ID is set, also saves the address to that
@@ -57,28 +58,9 @@ export async function POST(request: Request) {
     return Response.json({ ok: true, alreadyWelcomed: true });
   }
 
-  const headers = { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
-  const from = process.env.CLUB_FROM_EMAIL || 'ARVIIK <hello@arviik.in>';
-
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      from,
-      to: [email],
-      reply_to: 'info@arviik.in',
-      subject: WELCOME_SUBJECT,
-      html: welcomeEmailHtml(),
-      text: welcomeEmailText(),
-    }),
-  }).catch((err) => {
-    console.error('Club sign-up: could not reach Resend:', err);
-    return null;
-  });
-
-  if (!res || !res.ok) {
-    const detail = res ? await res.text().catch(() => '') : 'network error';
-    console.error('Club sign-up: Resend rejected the welcome email:', res?.status, detail);
+  const sent = await sendEmail({ to: email, subject: WELCOME_SUBJECT, html: welcomeEmailHtml(), text: welcomeEmailText() });
+  if (!sent.ok) {
+    console.error('Club sign-up: welcome email not sent:', sent.reason, sent.detail || '');
     return Response.json({ error: 'send_failed' }, { status: 502 });
   }
   recentlyWelcomed.set(email, Date.now());
@@ -86,6 +68,7 @@ export async function POST(request: Request) {
   // Save to the audience for future newsletters (best effort).
   const audienceId = process.env.RESEND_AUDIENCE_ID;
   if (audienceId) {
+    const headers = { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
     await fetch(`https://api.resend.com/audiences/${encodeURIComponent(audienceId)}/contacts`, {
       method: 'POST',
       headers,

@@ -38,7 +38,7 @@ export interface Order {
   payments: { status: string; provider: string; amount: number }[];
 }
 
-const ORDER_SELECT = `
+export const ORDER_SELECT = `
   id, user_id, status, total_amount, shipping_fee,
   shipping_name, shipping_email, shipping_phone,
   shipping_address, shipping_city, shipping_state, shipping_pincode,
