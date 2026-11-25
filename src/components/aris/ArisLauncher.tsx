@@ -15,7 +15,8 @@ export default function ArisLauncher() {
   const [loaded, setLoaded] = useState(false);
   const [launching, setLaunching] = useState(false);
 
-  if (pathname?.startsWith('/admin')) return null;
+  // Hidden in admin and in the full-screen Customize builder.
+  if (pathname?.startsWith('/admin') || pathname === '/customize') return null;
 
   // Tap: a lime ripple + the A mark spins, then the panel opens with a
   // circular reveal from this corner. The panel's code starts loading on

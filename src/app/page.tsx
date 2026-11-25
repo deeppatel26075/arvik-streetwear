@@ -22,7 +22,7 @@ export default async function HomePage() {
       supabase
         .from('products')
         .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
-        .eq('is_hidden', false)
+        .eq('is_hidden', false).not('slug', 'like', 'custom-tee%')
         .order('created_at', { ascending: false })
     ),
   ]);

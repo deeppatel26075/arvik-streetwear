@@ -15,7 +15,12 @@ export interface CartItem {
   size: 'S' | 'M' | 'L' | 'XL' | 'XXL';
   quantity: number;
   maxStock: number;
+  /** Set for a tee designed in Customize: each design is its own cart line. */
+  customDesignId?: string;
 }
+
+const cartLineId = (productId: string, size: string, customDesignId?: string) =>
+  customDesignId ? `custom-${customDesignId}` : `${productId}-${size}`;
 
 export interface WishlistItem {
   id: string;
@@ -37,8 +42,8 @@ interface CartContextType {
   coupon: Coupon | null;
   couponError: string | null;
   addToCart: (item: Omit<CartItem, 'id'>) => void;
-  removeFromCart: (productId: string, size: string) => void;
-  updateQuantity: (productId: string, size: string, quantity: number) => void;
+  removeFromCart: (productId: string, size: string, lineId?: string) => void;
+  updateQuantity: (productId: string, size: string, quantity: number, lineId?: string) => void;
   clearCart: () => void;
   toggleWishlist: (item: WishlistItem) => void;
   isInWishlist: (productId: string) => boolean;
@@ -109,9 +114,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addToCart = (item: Omit<CartItem, 'id'>) => {
     setCart((prev) => {
-      const existingItemIndex = prev.findIndex(
-        (i) => i.productId === item.productId && i.size === item.size
-      );
+      const lineId = cartLineId(item.productId, item.size, item.customDesignId);
+      const existingItemIndex = prev.findIndex((i) => (i.id || cartLineId(i.productId, i.size)) === lineId);
 
       if (existingItemIndex > -1) {
         const updatedCart = [...prev];
@@ -121,22 +125,27 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return updatedCart;
       }
 
-      return [...prev, { ...item, id: `${item.productId}-${item.size}` }];
+      return [...prev, { ...item, id: lineId }];
     });
   };
 
-  const removeFromCart = (productId: string, size: string) => {
-    setCart((prev) => prev.filter((i) => !(i.productId === productId && i.size === size)));
+  // lineId (the cart item's id) picks one exact line; without it, the
+  // regular product + size match is used.
+  const isLine = (i: CartItem, productId: string, size: string, lineId?: string) =>
+    lineId ? i.id === lineId : i.productId === productId && i.size === size && !i.customDesignId;
+
+  const removeFromCart = (productId: string, size: string, lineId?: string) => {
+    setCart((prev) => prev.filter((i) => !isLine(i, productId, size, lineId)));
   };
 
-  const updateQuantity = (productId: string, size: string, quantity: number) => {
+  const updateQuantity = (productId: string, size: string, quantity: number, lineId?: string) => {
     if (quantity <= 0) {
-      removeFromCart(productId, size);
+      removeFromCart(productId, size, lineId);
       return;
     }
     setCart((prev) =>
       prev.map((i) =>
-        i.productId === productId && i.size === size
+        isLine(i, productId, size, lineId)
           ? { ...i, quantity: Math.min(quantity, i.maxStock) }
           : i
       )

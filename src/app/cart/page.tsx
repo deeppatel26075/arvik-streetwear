@@ -112,14 +112,14 @@ export default function CartPage() {
                 {/* Quantity */}
                 <div className="flex items-center border border-[#ECECEC] rounded-[8px] bg-[#F7F7F7] text-xs">
                   <button
-                    onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1)}
+                    onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1, item.id)}
                     className="px-2.5 py-1.5 text-[#666666] hover:text-[#111111] font-bold"
                   >
                     -
                   </button>
                   <span className="font-bold px-2 text-[#111111]">{item.quantity}</span>
                   <button
-                    onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1)}
+                    onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1, item.id)}
                     className="px-2.5 py-1.5 text-[#666666] hover:text-[#111111] font-bold"
                   >
                     +
@@ -127,7 +127,7 @@ export default function CartPage() {
                 </div>
 
                 <button
-                  onClick={() => removeFromCart(item.productId, item.size)}
+                  onClick={() => removeFromCart(item.productId, item.size, item.id)}
                   className="text-[#666666] hover:text-[#DC2626] p-1.5"
                 >
                   <Trash2 className="h-4.5 w-4.5" />

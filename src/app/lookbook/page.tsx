@@ -36,7 +36,7 @@ export default async function LookbookPage() {
     supabase
       .from('products')
       .select('id, name, slug, description, price, discount_price, product_images(image_url)')
-      .eq('is_hidden', false)
+      .eq('is_hidden', false).not('slug', 'like', 'custom-tee%')
       .order('created_at', { ascending: false }) as unknown as Promise<{ data: LookRow[] | null; error: unknown }>
   );
   if (!res || res.error) throw new Error('Lookbook: failed to load products');

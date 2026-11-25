@@ -22,6 +22,8 @@ interface PlaceOrderItem {
   size: string;
   quantity: number;
   image?: string;
+  /** Set for a tee designed in Customize. */
+  customDesignId?: string;
 }
 
 // The one place an order gets created, for both COD and Razorpay. Doing
@@ -155,6 +157,21 @@ export async function POST(request: Request) {
     }
 
     const orderId: string = orderResult.order_id;
+
+    // Attach any Customize designs to this order, so the admin sees exactly
+    // what to print. The database only lets a customer attach their own,
+    // not-yet-ordered designs to their own order.
+    const designIds = items
+      .map((item) => item.customDesignId)
+      .filter((id): id is string => typeof id === 'string' && /^[0-9a-f-]{36}$/i.test(id));
+    if (designIds.length) {
+      const { error: linkError } = await supabase
+        .from('custom_designs')
+        .update({ order_id: orderId })
+        .in('id', designIds)
+        .is('order_id', null);
+      if (linkError) console.error('Could not link custom designs to order', orderId, linkError);
+    }
 
     // Send instant notification to admin (WhatsApp + Discord)
     try {

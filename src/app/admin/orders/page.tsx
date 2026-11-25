@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { formatPrice } from '@/lib/utils';
 import { RefreshCw, ClipboardList, Info, X } from 'lucide-react';
+import CustomDesignsPanel from '@/components/admin/CustomDesignsPanel';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -290,6 +291,10 @@ export default function AdminOrders() {
                   ))}
                 </div>
               </div>
+
+              {typeof selectedOrder.id === 'string' && selectedOrder.id.length === 36 && (
+                <CustomDesignsPanel key={selectedOrder.id} orderId={selectedOrder.id} />
+              )}
 
               {/* Workflow Status Controls */}
               <div className="space-y-2.5 pt-4 border-t border-stone-100">

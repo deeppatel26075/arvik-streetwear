@@ -26,7 +26,8 @@ import {
   PhoneCall,
   RefreshCw,
   Truck,
-  ArrowUpRight
+  ArrowUpRight,
+  Palette
 } from 'lucide-react';
 
 const TRENDING_SEARCHES = ['Oversized Tees', 'New Arrivals', 'On Fire', 'Limited Edition'];
@@ -119,7 +120,7 @@ export default function Navbar() {
     supabase
       .from('products')
       .select('id, name, slug')
-      .eq('is_hidden', false)
+      .eq('is_hidden', false).not('slug', 'like', 'custom-tee%')
       .then(({ data }: { data: any[] | null }) => {
         if (cancelled || !data) return;
         setSearchCatalog(data.map((p) => ({ id: p.id, name: p.name, slug: p.slug })));
@@ -634,6 +635,27 @@ export default function Navbar() {
                     <div className="flex items-center space-x-3">
                       <Tag className="w-4 h-4 text-stone-500" />
                       <span className="uppercase tracking-wider">Hidden Patterns</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-stone-300" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* CUSTOMIZE SECTION */}
+              <div className="space-y-3 pt-2">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-stone-400 border-b border-stone-100 pb-1.5">
+                  CUSTOMIZE
+                </h3>
+
+                <div className="space-y-1.5 text-xs font-semibold text-stone-800">
+                  <Link
+                    href="/customize"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-between py-2 px-2 hover:bg-stone-50 rounded-xs transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Palette className="w-4 h-4 text-stone-500" />
+                      <span className="uppercase tracking-wider">Design Your Own Tee</span>
                     </div>
                     <ChevronRight className="w-4 h-4 text-stone-300" />
                   </Link>

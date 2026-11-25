@@ -28,7 +28,7 @@ export default async function EditionDetailPage({ params }: EditionPageProps) {
         .from('products')
         .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
         .eq('edition_id', editionData.id)
-        .eq('is_hidden', false);
+        .eq('is_hidden', false).not('slug', 'like', 'custom-tee%');
 
       if (prods) {
         dbProducts = prods.map((p) => ({

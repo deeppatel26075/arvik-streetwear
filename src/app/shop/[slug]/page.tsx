@@ -29,7 +29,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         .from('products')
         .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
         .eq('slug', slug)
-        .eq('is_hidden', false)
+        .eq('is_hidden', false).not('slug', 'like', 'custom-tee%')
         .single()
     ),
     // Fetched separately (not embedded above) so that a missing/pending
@@ -48,7 +48,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       supabase
         .from('products')
         .select('id, name, slug, description, price, discount_price, is_hidden, category_id, category:categories(name), product_images(image_url), inventory(size, quantity)')
-        .eq('is_hidden', false)
+        .eq('is_hidden', false).not('slug', 'like', 'custom-tee%')
     ),
   ]);
 

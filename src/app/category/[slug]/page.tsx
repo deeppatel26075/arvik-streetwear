@@ -33,7 +33,7 @@ export default async function CategoryDetailPage({ params }: CategoryPageProps) 
           .from('products')
           .select('*, category:categories(name), product_images(image_url), inventory(size, quantity)')
           .eq('category_id', categoryData.id)
-          .eq('is_hidden', false)
+          .eq('is_hidden', false).not('slug', 'like', 'custom-tee%')
       );
 
       const prods = prodRes?.data;

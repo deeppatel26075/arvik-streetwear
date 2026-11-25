@@ -152,7 +152,7 @@ export async function getCatalog(): Promise<{ products: ArisProduct[]; text: str
     supabase
       .from('products')
       .select('name, slug, description, price, discount_price, category:categories(name), inventory(size, quantity)')
-      .eq('is_hidden', false)
+      .eq('is_hidden', false).not('slug', 'like', 'custom-tee%')
       .order('created_at', { ascending: false }),
     8000
   );

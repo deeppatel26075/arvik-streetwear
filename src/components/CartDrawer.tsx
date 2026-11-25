@@ -169,7 +169,7 @@ export default function CartDrawer() {
                       <div className="flex-grow space-y-1">
                         <div className="flex justify-between">
                           <Link
-                            href={`/shop/${item.slug}`}
+                            href={item.customDesignId ? "/customize" : `/shop/${item.slug}`}
                             onClick={() => setIsOpen(false)}
                             className="font-bold text-xs tracking-wider uppercase text-[#111111] hover:text-[#666666] line-clamp-1"
                           >
@@ -187,14 +187,14 @@ export default function CartDrawer() {
                         <div className="flex items-center justify-between pt-2">
                           <div className="flex items-center border border-[#ECECEC] rounded-[8px] bg-[#F7F7F7] text-xs">
                             <button
-                              onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1)}
+                              onClick={() => updateQuantity(item.productId, item.size, item.quantity - 1, item.id)}
                               className="px-2.5 py-1 text-[#666666] hover:text-[#111111] font-bold"
                             >
                               <Minus className="h-3 w-3" />
                             </button>
                             <span className="font-bold px-2 text-[#111111]">{item.quantity}</span>
                             <button
-                              onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1)}
+                              onClick={() => updateQuantity(item.productId, item.size, item.quantity + 1, item.id)}
                               className="px-2.5 py-1 text-[#666666] hover:text-[#111111] font-bold"
                             >
                               <Plus className="h-3 w-3" />
@@ -202,7 +202,7 @@ export default function CartDrawer() {
                           </div>
                           
                           <button
-                            onClick={() => removeFromCart(item.productId, item.size)}
+                            onClick={() => removeFromCart(item.productId, item.size, item.id)}
                             className="text-[#666666] hover:text-[#DC2626] transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
